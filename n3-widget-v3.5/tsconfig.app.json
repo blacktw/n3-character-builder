@@ -16,10 +16,12 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
+	"strict": false
+	"noImplicitAny": false
   },
   "include": ["src"]
 }

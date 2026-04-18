@@ -1374,11 +1374,9 @@ export default function NuminaSheet() {
                     const purchased = char.aspectSkillsPurchased;
                     const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
                     const atFull = purchased.length >= aspectSkillMax;
-                    const attrArmorCount = purchased.filter(e => { const sk = ASPECT_SKILLS.find(s => s.name === e.name); return sk && sk.isAttributeOrArmor; }).length;
                     function countOf(name) { return purchased.filter(e => e.name === name).length; }
                     function canAdd(skill) {
                       if (atFull) return false;
-                      if (skill.isAttributeOrArmor && attrArmorCount >= 1) return false;
                       if (!skill.isAttributeOrArmor && numAspects >= 2 && countOf(skill.name) < numAspects) return true;
                       if (countOf(skill.name) >= 1) return false;
                       return true;
@@ -1398,7 +1396,6 @@ export default function NuminaSheet() {
                           <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{totalSpent} CP spent</div>
                         </div>
                         {numAspects >= 2 && <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginBottom:8, fontStyle:"italic" }}>With {numAspects} Aspects, you may buy non-attribute/armor skills up to {numAspects}× (once per Aspect).</div>}
-                        {attrArmorCount > 0 && <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginBottom:8, fontStyle:"italic" }}>⚠ You may only purchase 1 Extra Attribute or Armor-increasing skill total.</div>}
                         <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
                           {ASPECT_SKILLS.map(skill => {
                             const count = countOf(skill.name);

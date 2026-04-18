@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "n3-character-builder",
+  "main": "src/main.tsx", // Your entry point for API/SSR logic
+  "compatibility_date": "2026-04-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application" // Essential for React/Vue/Svelte routers
+  }
+}

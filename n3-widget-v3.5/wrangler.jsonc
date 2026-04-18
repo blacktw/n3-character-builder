@@ -11,5 +11,13 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
-  ]
+  ],
+  "env": {
+    "staging": {
+      "name": "cloudflare-workers-autoconfig-n3-character-builder",
+    },
+    "prod": {
+      // no-op; deploy to default name
+    },
+  }
 }

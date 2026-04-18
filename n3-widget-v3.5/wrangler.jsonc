@@ -8,5 +8,8 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application" // Essential for React/Vue/Svelte routers
-  }
+  },
+  "observability": {
+    "enabled": true
+  },
 }

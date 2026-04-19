@@ -452,6 +452,54 @@ const EXPRESSION_SKILLS = {
   ],
 };
 
+// ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
+
+// Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
+const HIDDEN_EXCELLENCY_COSTS = { "Reservoir": 1, "Deadeye": 1, "Whisper": 1 };
+const HIDDEN_EXPRESSION_COSTS = { "Shadewalker": 1 };
+
+const HIDDEN_EXCELLENCY_SKILLS = {
+  "Reservoir": [
+    { name:"Healing Reservoir", cost:0, verbal:"'Imbue (my name) Reservoir up to 2 people'", description:"Spend 1 Fortitude. Up to 2 imbued people may visit your Reservoir up to 3 times each to 'Heal 2 to Self'. Reservoir cannot be moved once placed. Once per long rest.", attribute:"1 Fortitude" },
+    { name:"Absorb Reservoir", cost:2, verbal:"N/A", description:"1x long rest: pick up your Reservoir and turn off its lights. It no longer functions, but you are Healed 5 Vitality and/or gain 5 Protection based on its type." },
+    { name:"Add to Reservoir", cost:4, verbal:"N/A", description:"Spend a Fortitude or Prowess (as appropriate) to add two additional people to your Reservoir. Cannot be affected by Expanded Reservoir.", attribute:"1 Fortitude or Prowess" },
+    { name:"Deepen Reservoir", cost:3, verbal:"N/A", description:"Your Reservoirs now do +1 Healing or Protection.", attribute:"Thread Skill" },
+    { name:"Expanded Reservoir", cost:3, verbal:"N/A", description:"When you Imbue people to your Reservoir you may add one additional person.", attribute:"Thread Skill" },
+    { name:"Mending Reservoir", cost:2, verbal:"N/A", description:"Once per event: instead of a Healing or Protection Reservoir, create a Cure Maim Reservoir with the same number of effects. May be added to any other reservoir. Must be explained to attached people." },
+    { name:"Move Reservoir", cost:4, verbal:"N/A", description:"Spend one Fortitude to pick up your Reservoir on the field. Must take a short rest before placing it again.", attribute:"1 Fortitude" },
+    { name:"Protective Reservoir", cost:4, verbal:"N/A", description:"Spend 1 Prowess when creating your Protective Reservoir. Choose whether it generates Healing, Protection, or both (pay both attributes for both). Works like Healing Reservoir but grants 2 Protection up to 3 times.", attribute:"1 Prowess" },
+  ],
+  "Deadeye": [
+    { name:"Overwhelm", cost:0, verbal:"'4 Damage'", description:"Make an archery attack for '4 Damage'.", attribute:"1 Prowess" },
+    { name:"Aim", cost:3, verbal:"N/A", description:"Take 10 seconds of RP aiming without moving your feet. Increase an archery damage attack (including Uncalled) by +2.", attribute:"Thread Skill" },
+    { name:"Clear the Field", cost:2, verbal:"N/A", description:"Once per event: use Aim, then make 3 archery attacks of '5 Damage' at different targets. Cannot move between attacks unless using Hold Aim." },
+    { name:"Easy Target", cost:2, verbal:"N/A", description:"If a target is repelled, fire against them as if you have aimed.", attribute:"Thread Skill" },
+    { name:"Find Aim", cost:2, verbal:"N/A", description:"Once per long rest: if you miss an aimed shot, continue applying the Aim thread skill until you hit with a shot." },
+    { name:"Hold Aim", cost:2, verbal:"N/A", description:"Once per short rest: Aim and then move while maintaining your aim. Apply the Aim thread skill on that attack." },
+    { name:"Remove Obstacles", cost:4, verbal:"'Repel by Will'", description:"Spend 1 Insight to call 'Repel by Will'.", attribute:"1 Insight" },
+    { name:"Shift", cost:4, verbal:"'Avoid'", description:"If you are in the process of aiming and are hit by a melee, missile, or spell attack, spend 1 Insight to call 'Avoid'.", attribute:"1 Insight" },
+  ],
+  "Whisper": [
+    { name:"Fade Away", cost:2, verbal:"'Cure Spirit to Self'", description:"Once per long rest: spend 1 Fortitude and take Spirit Form for up to 1 minute (arms crossed over torso). When exiting, say 'Cure Spirit to Self.' Any effect 'to spirit' or similar breaks the form.", attribute:"1 Fortitude" },
+    { name:"Flechette", cost:3, verbal:"N/A", description:"When making a packet attack, expend up to 2 points of armor to deal +1 damage per point of armor spent.", attribute:"Thread Skill" },
+    { name:"Strong Will", cost:3, verbal:"N/A", description:"Your non-physical armor is increased by 1 point.", attribute:"Thread Skill" },
+    { name:"Repair Armor", cost:4, verbal:"'Repair Armor'", description:"Spend 1 Prowess to gain four uses of 'Repair Armor'.", attribute:"1 Prowess" },
+    { name:"Shatter Blade", cost:4, verbal:"'Short Destroy Weapon'", description:"Spend 1 Fortitude to make a packet attack calling 'Short Destroy Weapon'.", attribute:"1 Fortitude" },
+    { name:"Metal Shards", cost:4, verbal:"'3 Damage by Force'", description:"Spend 1 Prowess to make two packet attacks, each calling '3 Damage by Force'.", attribute:"1 Prowess" },
+    { name:"Shrug It Off", cost:4, verbal:"'Avoid'", description:"Once per short rest: spend 1 Fortitude to resist any melee, missile, or packet attack.", attribute:"1 Fortitude" },
+    { name:"Armored Spell", cost:2, verbal:"N/A", description:"Once per event: for your next 10 packet attacks, each time you successfully strike an opponent and they register the hit, you may repair 1 armor." },
+  ],
+};
+
+const HIDDEN_EXPRESSION_SKILLS = {
+  "Shadewalker": [
+    { name:"Attune to the Shade", cost:0, verbal:"N/A", description:"When you pass through a gate to the Shade, your Prowess, Insight, and Fortitude each increase by one (does not count as a Grant). Returns to normal when you leave the Shade.", attribute:"Thread Skill" },
+    { name:"Find the Shade", cost:2, verbal:"N/A", description:"Gain the research topic 'Shade Geography'." },
+    { name:"Shade Strikes", cost:3, verbal:"N/A", description:"Once per short rest, choose melee, missile, or packet. Until your next short rest, all called damage attacks of that type can be 'to Shade' with damage increased by 1. Additionally, all your beneficial effects can be 'By Shade'.", attribute:"Thread Skill" },
+    { name:"Shade Step", cost:3, verbal:"N/A", description:"Once per long rest: spend 1 Insight and roleplay looking at a place for one minute. Turn to Spirit and walk directly there. Any effect 'To Spirit' or 'To Shade' breaks the travel. Immune to all other effects while traveling. Cannot pass through walls, gates, or barriers.", attribute:"1 Insight" },
+  ],
+};
+
 // CP cost rules
 function attrCost(currentPurchased) { return currentPurchased + 3; }
 function totalAttrCost(purchased) {
@@ -702,6 +750,10 @@ function usedCP(char) {
   char.domainSkillsPurchased.forEach(s => { used += s.cost; });
   Object.values(char.excellencySkillsPurchased).forEach(arr => arr.forEach(s => { used += s.cost; }));
   Object.values(char.expressionSkillsPurchased).forEach(arr => arr.forEach(s => { used += s.cost; }));
+  (char.hiddenExcellencies || []).forEach(name => { used += HIDDEN_EXCELLENCY_COSTS[name] || 0; });
+  (char.hiddenExpressions || []).forEach(name => { used += HIDDEN_EXPRESSION_COSTS[name] || 0; });
+  (Object.values(char.hiddenExcellencySkillsPurchased || {}) as {cost:number}[][]).forEach(arr => arr.forEach(s => { used += s.cost; }));
+  (Object.values(char.hiddenExpressionSkillsPurchased || {}) as {cost:number}[][]).forEach(arr => arr.forEach(s => { used += s.cost; }));
   return used;
 }
 
@@ -725,17 +777,20 @@ function Section({ title, children, accent = false }) {
   );
 }
 
-function StatBox({ label, value, onChange, min = 0, max = 10, costNext, readOnly = false }) {
+function StatBox({ label, value, onChange, min = 0, max = 10, costNext = undefined, readOnly = false, accentColor = null }) {
+  const border = accentColor ? `2px solid ${accentColor}` : "2px solid var(--ink)";
+  const labelColor = accentColor || "var(--ink-mid)";
+  const valueColor = accentColor || "var(--ink)";
   return (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-      <div style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--ink-mid)", textAlign:"center", lineHeight:1.2, maxWidth:64 }}>{label}</div>
+      <div style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color:labelColor, textAlign:"center", lineHeight:1.2, maxWidth:64 }}>{label}</div>
       <div style={{ display:"flex", alignItems:"center", gap:3 }}>
         {!readOnly && <button onClick={() => onChange(Math.max(min, value - 1))} style={btnStyle}>−</button>}
-        <div style={{ width:40, height:40, border:"2px solid var(--ink)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font-display)", fontSize:20, fontWeight:"bold", color:"var(--ink)", background:"var(--paper-warm)", boxShadow:"2px 2px 0 var(--ink-faint)" }}>{value}</div>
+        <div style={{ width:40, height:40, border, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font-display)", fontSize:20, fontWeight:"bold", color:valueColor, background:"var(--paper-warm)", boxShadow:"2px 2px 0 var(--ink-faint)" }}>{value}</div>
         {!readOnly && <button onClick={() => onChange(Math.min(max, value + 1))} style={btnStyle}>+</button>}
       </div>
       {costNext !== undefined && !readOnly && (
-        <div style={{ fontSize:9, color:"var(--ink-mid)", fontFamily:"var(--font-body)" }}>next: {costNext} CP</div>
+        <div style={{ fontSize:9, color:labelColor, fontFamily:"var(--font-body)" }}>next: {costNext} CP</div>
       )}
     </div>
   );
@@ -792,6 +847,14 @@ function Tab({ label, active, onClick }) {
   );
 }
 
+function attrChipColor(attribute) {
+  if (!attribute) return null;
+  if (/prowess/i.test(attribute)) return "var(--prowess)";
+  if (/insight/i.test(attribute)) return "var(--insight)";
+  if (/fortitude/i.test(attribute)) return "var(--fortitude)";
+  return null;
+}
+
 function SkillPickerList({ skills, purchased, countOf, canAdd, onAdd, onRemove }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -816,7 +879,15 @@ function SkillPickerList({ skills, purchased, countOf, canAdd, onAdd, onRemove }
                 <span style={{ fontFamily:"var(--font-display)", fontSize:12, color: isPurchased ? "var(--paper-warm)" : "var(--ink)" }}>{skill.name}</span>
                 <span style={{ fontSize:9, padding:"1px 5px", background: isFree ? "transparent" : (isPurchased ? "rgba(255,255,255,0.15)" : "var(--ink)"), color: isFree ? (isPurchased ? "rgba(255,255,255,0.6)" : "var(--ink-mid)") : (isPurchased ? "var(--paper-warm)" : "var(--paper)"), border: isFree ? `1px solid ${isPurchased ? "rgba(255,255,255,0.3)" : "var(--ink-faint)"}` : "none", fontStyle: isFree ? "italic" : "normal" }}>{isFree ? "free" : `${skill.cost} CP`}</span>
                 {skill.verbal && skill.verbal !== "N/A" && <span style={{ fontSize:9, fontStyle:"italic", color: isPurchased ? "var(--ink-faint)" : "var(--ink-mid)" }}>"{skill.verbal}"</span>}
-                {skill.attribute && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)" }}>[{skill.attribute}]</span>}
+                {skill.attribute && (() => {
+                  const ac = attrChipColor(skill.attribute);
+                  return (
+                    <span style={{ fontSize:9, fontWeight: ac ? 600 : "normal",
+                      color: ac ? (isPurchased ? "rgba(255,255,255,0.85)" : ac) : (isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)"),
+                      borderBottom: ac && !isPurchased ? `1.5px solid ${ac}` : "none",
+                    }}>[{skill.attribute}]</span>
+                  );
+                })()}
                 {skill.maxCount > 1 && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)", fontStyle:"italic" }}>[up to {skill.maxCount}×]</span>}
               </div>
               <div style={{ fontSize:10, marginTop:2, lineHeight:1.4, color: isPurchased ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>{skill.description}</div>
@@ -1149,6 +1220,7 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
 
 export default function NuminaSheet() {
   const [tab, setTab] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);
 
   const [char, setChar] = useState({
     name:"", player:"", pronouns:"", characterConcept:"", costumeNotes:"", source:"Arcane",
@@ -1169,6 +1241,10 @@ export default function NuminaSheet() {
     domainSkillsPurchased:[],
     excellencySkillsPurchased:{},
     expressionSkillsPurchased:{},
+    hiddenExcellencies:[],
+    hiddenExcellencySkillsPurchased:{},
+    hiddenExpressions:[],
+    hiddenExpressionSkillsPurchased:{},
     abilitiesNotes:"", notes:"", threadNotes:"",
     bonusCP:0,
   });
@@ -1212,9 +1288,14 @@ export default function NuminaSheet() {
   const hasMultiTalented = (char.expressionSkillsPurchased["Savant"] || []).some(s => s.name === "Multi-talented");
   const foundationSkillMax = 2 + (showSecondFoundation ? 1 : 0) + (hasMultiTalented ? 1 : 0);
 
+  // Total excellency slots used (regular + hidden share the cap of 3)
+  const totalExcellencies = char.excellencies.length + char.hiddenExcellencies.length;
+  // Total expression slots used (regular + hidden share the cap of 2)
+  const totalExpressions = char.expressions.length + char.hiddenExpressions.length;
+
   // Add/remove excellency
   function addExcellency(name) {
-    if (!name || char.excellencies.includes(name) || char.excellencies.length >= 3) return;
+    if (!name || char.excellencies.includes(name) || totalExcellencies >= 3) return;
     const freeSkills = (EXCELLENCY_SKILLS[name] || []).filter(s => s.cost === 0);
     setChar(c => ({ ...c, excellencies: [...c.excellencies, name], excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
   }
@@ -1223,9 +1304,29 @@ export default function NuminaSheet() {
     setChar(c => { const next = { ...c.excellencySkillsPurchased }; delete next[name]; return { ...c, excellencies: c.excellencies.filter((_,i) => i !== idx), excellencySkillsPurchased: next }; });
   }
 
+  // Add/remove hidden excellency
+  function addHiddenExcellency(name) {
+    if (!name || char.hiddenExcellencies.includes(name) || totalExcellencies >= 3) return;
+    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter(s => s.cost === 0);
+    setChar(c => ({ ...c, hiddenExcellencies: [...c.hiddenExcellencies, name], hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+  }
+  function removeHiddenExcellency(name) {
+    setChar(c => { const next = { ...c.hiddenExcellencySkillsPurchased }; delete next[name]; return { ...c, hiddenExcellencies: c.hiddenExcellencies.filter(e => e !== name), hiddenExcellencySkillsPurchased: next }; });
+  }
+
+  // Add/remove hidden expression
+  function addHiddenExpression(name) {
+    if (!name || char.hiddenExpressions.includes(name) || totalExpressions >= 2) return;
+    const freeSkills = (HIDDEN_EXPRESSION_SKILLS[name] || []).filter(s => s.cost === 0);
+    setChar(c => ({ ...c, hiddenExpressions: [...c.hiddenExpressions, name], hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+  }
+  function removeHiddenExpression(name) {
+    setChar(c => { const next = { ...c.hiddenExpressionSkillsPurchased }; delete next[name]; return { ...c, hiddenExpressions: c.hiddenExpressions.filter(e => e !== name), hiddenExpressionSkillsPurchased: next }; });
+  }
+
   // Add/remove expression
   function addExpression(name) {
-    if (!name || char.expressions.includes(name) || char.expressions.length >= 2) return;
+    if (!name || char.expressions.includes(name) || totalExpressions >= 2) return;
     const freeSkills = (EXPRESSION_SKILLS[name] || []).filter(s => s.cost === 0);
     setChar(c => ({ ...c, expressions: [...c.expressions, name], expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
   }
@@ -1252,20 +1353,32 @@ export default function NuminaSheet() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
-        :root {
-          --font-display: 'IM Fell English', serif; --font-body: 'Crimson Pro', Georgia, serif;
-          --paper: #f5f0e8; --paper-warm: #ede8dc; --ink: #1a1410; --ink-mid: #5a4e3a;
-          --ink-light: #9a8c6e; --ink-faint: #c8bca0; --red: #7a1e1e; --accent: #4a3010;
-        }
+        :root { --font-display: 'IM Fell English', serif; --font-body: 'Crimson Pro', Georgia, serif; }
         * { box-sizing:border-box; margin:0; padding:0; }
-        body { background:#2a2018; min-height:100vh; display:flex; justify-content:center; padding:20px; }
+        body { background:${darkMode ? "#0e0c0a" : "#2a2018"}; min-height:100vh; display:flex; justify-content:center; padding:20px; }
         input, select, textarea { font-family:var(--font-body); }
         ::-webkit-scrollbar { width:6px; }
         ::-webkit-scrollbar-track { background:var(--paper); }
         ::-webkit-scrollbar-thumb { background:var(--ink-light); }
       `}</style>
 
-      <div style={{ width:"100%", maxWidth:860, background:"var(--paper)", boxShadow:"0 0 60px rgba(0,0,0,0.7), inset 0 0 100px rgba(0,0,0,0.05)", position:"relative", overflow:"hidden" }}>
+      <div style={{
+        width:"100%", maxWidth:860, background:"var(--paper)",
+        boxShadow:"0 0 60px rgba(0,0,0,0.7), inset 0 0 100px rgba(0,0,0,0.05)",
+        position:"relative", overflow:"hidden",
+        // Theme tokens — cascade to all children
+        ...( darkMode ? {
+          "--paper":"#1e1a14", "--paper-warm":"#26201a", "--ink":"#ddd0b8",
+          "--ink-mid":"#a89070", "--ink-light":"#6a5a42", "--ink-faint":"#3c3028",
+          "--red":"#cc5555", "--accent":"#c8a06a",
+          "--prowess":"#e07070", "--insight":"#6090d8", "--fortitude":"#52b86a",
+        } : {
+          "--paper":"#f5f0e8", "--paper-warm":"#ede8dc", "--ink":"#1a1410",
+          "--ink-mid":"#5a4e3a", "--ink-light":"#9a8c6e", "--ink-faint":"#c8bca0",
+          "--red":"#7a1e1e", "--accent":"#4a3010",
+          "--prowess":"#8b1c1c", "--insight":"#1a3d6b", "--fortitude":"#1a5c2a",
+        }) as React.CSSProperties,
+      }}>
 
         {/* Corner marks */}
         {["top:8px;left:8px","top:8px;right:8px","bottom:8px;left:8px","bottom:8px;right:8px"].map((pos,i) => (
@@ -1273,7 +1386,10 @@ export default function NuminaSheet() {
         ))}
 
         {/* Header */}
-        <div style={{ background:"var(--ink)", padding:"20px 28px 16px", textAlign:"center" }}>
+        <div style={{ background:"var(--ink)", padding:"20px 28px 16px", textAlign:"center", position:"relative" }}>
+          <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Switch to light mode" : "Switch to dark mode"} style={{ position:"absolute", top:12, right:14, background:"transparent", border:"1px solid var(--ink-light)", color:"var(--paper-warm)", cursor:"pointer", fontFamily:"var(--font-body)", fontSize:16, width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", opacity:0.8 }}>
+            {darkMode ? "☀" : "☾"}
+          </button>
           <div style={{ fontFamily:"var(--font-display)", fontSize:11, letterSpacing:"0.3em", color:"var(--ink-faint)", textTransform:"uppercase", marginBottom:4 }}>Numina LARP · 2026</div>
           <div style={{ fontFamily:"var(--font-display)", fontSize:32, color:"var(--paper-warm)", letterSpacing:"0.05em", lineHeight:1 }}>Character Sheet</div>
           {char.name && <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:16, color:"var(--ink-faint)", marginTop:4 }}>{char.name}</div>}
@@ -1599,9 +1715,9 @@ export default function NuminaSheet() {
               <Section title="Core Attributes" accent>
                 <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:16, lineHeight:1.5 }}>Prowess, Insight, and Fortitude start at 2 each and are <em>spent</em> to use skills.</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:20, justifyContent:"center", marginBottom:20 }}>
-                  <StatBox label="Prowess" value={prowessVal} min={2} max={10} onChange={v => update("prowessPurchased",v-2)} costNext={attrCost(char.prowessPurchased)} />
-                  <StatBox label="Insight" value={insightVal} min={2} max={10} onChange={v => update("insightPurchased",v-2)} costNext={attrCost(char.insightPurchased)} />
-                  <StatBox label="Fortitude" value={fortitudeVal} min={2} max={10} onChange={v => update("fortitudePurchased",v-2)} costNext={attrCost(char.fortitudePurchased)} />
+                  <StatBox label="Prowess" value={prowessVal} min={2} max={10} onChange={v => update("prowessPurchased",v-2)} costNext={attrCost(char.prowessPurchased)} accentColor="var(--prowess)" />
+                  <StatBox label="Insight" value={insightVal} min={2} max={10} onChange={v => update("insightPurchased",v-2)} costNext={attrCost(char.insightPurchased)} accentColor="var(--insight)" />
+                  <StatBox label="Fortitude" value={fortitudeVal} min={2} max={10} onChange={v => update("fortitudePurchased",v-2)} costNext={attrCost(char.fortitudePurchased)} accentColor="var(--fortitude)" />
                 </div>
                 <div style={{ fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--ink-mid)", marginBottom:8 }}>Attribute CP Cost Table</div>
                 <div style={{ display:"flex", gap:0, marginBottom:16, fontFamily:"var(--font-body)", fontSize:11 }}>
@@ -1634,10 +1750,10 @@ export default function NuminaSheet() {
 
               <Section title="Attribute Summary">
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:6, fontFamily:"var(--font-body)", fontSize:12 }}>
-                  {[["Prowess",prowessVal,totalAttrCost(char.prowessPurchased)],["Insight",insightVal,totalAttrCost(char.insightPurchased)],["Fortitude",fortitudeVal,totalAttrCost(char.fortitudePurchased)],["Void",2,0],["Purpose",purposeVal,char.purposePurchased*4],["Vitality",vitalityVal,totalAttrCost(char.vitalityPurchased)]].map(([name,val,cost]) => (
-                    <div key={name} style={{ padding:"8px 10px", border:"1px solid var(--ink-faint)", background:"var(--paper-warm)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                      <span style={{color:"var(--ink-mid)"}}>{name}</span>
-                      <span style={{fontFamily:"var(--font-display)",fontSize:18,color:"var(--ink)"}}>{val}</span>
+                  {([["Prowess",prowessVal,totalAttrCost(char.prowessPurchased),"var(--prowess)"],["Insight",insightVal,totalAttrCost(char.insightPurchased),"var(--insight)"],["Fortitude",fortitudeVal,totalAttrCost(char.fortitudePurchased),"var(--fortitude)"],["Void",2,0,null],["Purpose",purposeVal,char.purposePurchased*4,null],["Vitality",vitalityVal,totalAttrCost(char.vitalityPurchased),null]] as [string,number,number,string|null][]).map(([name,val,cost,ac]) => (
+                    <div key={name} style={{ padding:"8px 10px", border:`1px solid ${ac || "var(--ink-faint)"}`, background:"var(--paper-warm)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <span style={{color: ac || "var(--ink-mid)", fontWeight: ac ? 600 : "normal"}}>{name}</span>
+                      <span style={{fontFamily:"var(--font-display)",fontSize:18,color: ac || "var(--ink)"}}>{val}</span>
                       <span style={{fontSize:10,color:"var(--ink-faint)"}}>{cost>0?`${cost} CP`:"free"}</span>
                     </div>
                   ))}
@@ -1658,7 +1774,7 @@ export default function NuminaSheet() {
                       <button onClick={() => removeExcellency(i)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--paper-warm)"}}>✕</button>
                     </div>
                   ))}
-                  {char.excellencies.length < 3 && (
+                  {totalExcellencies < 3 && (
                     <select defaultValue="" onChange={e => { addExcellency(e.target.value); e.target.value=""; }} style={{...inputStyle, flex:"none"}}>
                       <option value="">+ Add Excellency ({excellencyCost(char.excellencies.length)} CP)</option>
                       {ALL_EXCELLENCIES.filter(e => !char.excellencies.includes(e)).map(e => <option key={e} value={e}>{e}</option>)}
@@ -1698,6 +1814,56 @@ export default function NuminaSheet() {
                 })}
                 {char.excellencies.length === 0 && <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",fontStyle:"italic",padding:"8px 0"}}>Add an Excellency above to see its skills.</div>}
               </Section>
+
+              <Section title="Hidden Excellencies" accent={false}>
+                <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",marginBottom:10,padding:"6px 10px",background:"var(--paper-warm)",border:"1px dashed var(--ink-light)",lineHeight:1.5}}>
+                  ⚠ These Excellencies are only available to characters who have unlocked them in-game. Anyone may view and plan with them here.
+                </div>
+                <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
+                  {char.hiddenExcellencies.map(e => (
+                    <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink)",background:"var(--ink)",color:"var(--paper)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
+                      <span>{e}</span>
+                      <span style={{fontSize:10,color:"var(--ink-faint)"}}>(1 CP)</span>
+                      <button onClick={() => removeHiddenExcellency(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--paper-warm)"}}>✕</button>
+                    </div>
+                  ))}
+                  {totalExcellencies < 3 && (
+                    <select defaultValue="" onChange={e => { addHiddenExcellency(e.target.value); e.target.value=""; }} style={{...inputStyle,flex:"none"}}>
+                      <option value="">+ Add Hidden Excellency (1 CP)</option>
+                      {Object.keys(HIDDEN_EXCELLENCY_SKILLS).filter(e => !char.hiddenExcellencies.includes(e)).map(e => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                {char.hiddenExcellencies.map(exclName => {
+                  const skills = HIDDEN_EXCELLENCY_SKILLS[exclName] || [];
+                  const purchased = char.hiddenExcellencySkillsPurchased[exclName] || [];
+                  const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
+                  function countOf(name) { return purchased.filter(e => e.name === name).length; }
+                  function canAdd(skill) { return countOf(skill.name) === 0; }
+                  function addSkill(skill) {
+                    if (!canAdd(skill)) return;
+                    setChar(c => ({ ...c, hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [exclName]: [...(c.hiddenExcellencySkillsPurchased[exclName]||[]), {name:skill.name,cost:skill.cost}] } }));
+                  }
+                  function removeSkill(name) {
+                    setChar(c => {
+                      const arr = c.hiddenExcellencySkillsPurchased[exclName] || [];
+                      const idx = [...arr].reverse().findIndex(e => e.name === name);
+                      if (idx === -1) return c;
+                      return { ...c, hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [exclName]: arr.filter((_,i) => i !== arr.length-1-idx) } };
+                    });
+                  }
+                  return (
+                    <Section key={exclName} title={`${exclName} Skills`}>
+                      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
+                        <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
+                      </div>
+                      <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                    </Section>
+                  );
+                })}
+              </Section>
             </>
           )}
 
@@ -1713,13 +1879,63 @@ export default function NuminaSheet() {
                       <button onClick={() => removeExpression(i)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--ink-mid)"}}>✕</button>
                     </div>
                   ))}
-                  {char.expressions.length < 2 && (
+                  {totalExpressions < 2 && (
                     <select defaultValue="" onChange={e => { addExpression(e.target.value); e.target.value=""; }} style={{...inputStyle,flex:"none"}}>
                       <option value="">+ Add Expression ({expressionCost(char.expressions.length)} CP)</option>
                       {EXPRESSIONS.filter(e => !char.expressions.includes(e)).map(e => <option key={e} value={e}>{e}</option>)}
                     </select>
                   )}
                 </div>
+              </Section>
+
+              <Section title="Hidden Expressions" accent={false}>
+                <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",marginBottom:10,padding:"6px 10px",background:"var(--paper-warm)",border:"1px dashed var(--ink-light)",lineHeight:1.5}}>
+                  ⚠ These Expressions are only available to characters who have unlocked them in-game. Anyone may view and plan with them here.
+                </div>
+                <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
+                  {char.hiddenExpressions.map(e => (
+                    <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink-mid)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
+                      <span>{e}</span>
+                      <span style={{fontSize:10,color:"var(--ink-mid)"}}>(1 CP)</span>
+                      <button onClick={() => removeHiddenExpression(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--ink-mid)"}}>✕</button>
+                    </div>
+                  ))}
+                  {totalExpressions < 2 && (
+                    <select defaultValue="" onChange={e => { addHiddenExpression(e.target.value); e.target.value=""; }} style={{...inputStyle,flex:"none"}}>
+                      <option value="">+ Add Hidden Expression (1 CP)</option>
+                      {Object.keys(HIDDEN_EXPRESSION_SKILLS).filter(e => !char.hiddenExpressions.includes(e)).map(e => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                {char.hiddenExpressions.map(exprName => {
+                  const skills = HIDDEN_EXPRESSION_SKILLS[exprName] || [];
+                  const purchased = char.hiddenExpressionSkillsPurchased[exprName] || [];
+                  const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
+                  function countOf(name) { return purchased.filter(e => e.name === name).length; }
+                  function canAdd(skill) { return countOf(skill.name) === 0; }
+                  function addSkill(skill) {
+                    if (!canAdd(skill)) return;
+                    setChar(c => ({ ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: [...(c.hiddenExpressionSkillsPurchased[exprName]||[]), {name:skill.name,cost:skill.cost}] } }));
+                  }
+                  function removeSkill(name) {
+                    setChar(c => {
+                      const arr = c.hiddenExpressionSkillsPurchased[exprName] || [];
+                      const idx = [...arr].reverse().findIndex(e => e.name === name);
+                      if (idx === -1) return c;
+                      return { ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: arr.filter((_,i) => i !== arr.length-1-idx) } };
+                    });
+                  }
+                  return (
+                    <Section key={exprName} title={`${exprName} Skills`}>
+                      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
+                        <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
+                      </div>
+                      <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                    </Section>
+                  );
+                })}
               </Section>
 
               {char.expressions.map(exprName => {
@@ -1827,6 +2043,8 @@ export default function NuminaSheet() {
                   const allSourceSkills = [
                     ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
                     ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),
+                    ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
+                    ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
                     ...char.domainSkillsPurchased.map(s => ({...s, source:`${char.domain} Domain`, skillDefs:DOMAIN_SKILLS[char.domain]||[]})),
                     ...char.aspectSkillsPurchased.map(s => ({...s, source:"Aspect", skillDefs:ASPECT_SKILLS})),
                     ...char.foundationSkillsPurchased.map(s => { const defs = getFoundationSkills(); return {...s, source:`${char.foundation} Foundation`, skillDefs:defs}; }),

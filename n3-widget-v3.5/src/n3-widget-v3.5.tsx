@@ -1,5 +1,57 @@
 import { useState, useCallback } from "react";
 
+// ─── TYPES ───────────────────────────────────────────────────────────────────
+
+interface SkillDef {
+  name: string;
+  cost: number;
+  verbal: string;
+  description: string;
+  attribute?: string;
+  isAttributeOrArmor?: boolean;
+  maxCount?: number;
+}
+
+interface PurchasedSkill {
+  name: string;
+  cost: number;
+}
+
+interface CharState {
+  name: string; player: string; pronouns: string;
+  characterConcept: string; costumeNotes: string; source: string;
+  aspect1: string; aspect2: string; aspect3: string;
+  chosenTrait: string;
+  foundation: string; foundation2: string;
+  culture: string; culture2: string; culture3: string;
+  domain: string;
+  aspectSkillsPurchased: PurchasedSkill[];
+  foundationSkillsPurchased: PurchasedSkill[];
+  cultureSkillsPurchased: PurchasedSkill[];
+  domainSkillsPurchased: PurchasedSkill[];
+  excellencies: string[];
+  expressions: string[];
+  prowessPurchased: number; insightPurchased: number; fortitudePurchased: number;
+  voidVal: number; purposePurchased: number; vitalityPurchased: number;
+  armorType: string;
+  openSkillsPurchased: PurchasedSkill[];
+  excellencySkillsPurchased: Record<string, PurchasedSkill[]>;
+  expressionSkillsPurchased: Record<string, PurchasedSkill[]>;
+  hiddenExcellencies: string[];
+  hiddenExcellencySkillsPurchased: Record<string, PurchasedSkill[]>;
+  hiddenExpressions: string[];
+  hiddenExpressionSkillsPurchased: Record<string, PurchasedSkill[]>;
+  abilitiesNotes: string; notes: string; threadNotes: string;
+  bonusCP: number;
+  craftingNotes?: string;
+  history?: string;
+  contactsNotes?: string;
+  infoSkillsNotes?: string;
+  drakar?: string; ketch?: string; reel?: string;
+  holding?: string;
+  cpLog?: string;
+}
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const ASPECTS = [
@@ -51,7 +103,7 @@ const ALL_EXCELLENCIES = [
   "Stalker","Tempest","Tinkerer","Tornado","Volcano","Wellspring",
 ];
 
-const EXCELLENCY_SKILLS = {
+const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   "Ballista": [
     { name:"Trio of Arrows", cost:0, verbal:"'3 Damage'", description:"Free. Spend 1 Attribute to make two archery attacks of 3 damage.", attribute:"1 Insight" },
     { name:"Refresh Quiver", cost:4, verbal:"'Refresh Quiver to self'", description:"Spend 1 Attribute to instantly refresh your quiver. Effects triggered by quiver refresh are activated.", attribute:"1 Prowess" },
@@ -359,7 +411,7 @@ const EXPRESSIONS = [
   "Prodigy","Remembrancer","Savant","Songsmith","Strategist","Virtuoso",
 ];
 
-const EXPRESSION_SKILLS = {
+const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
   "Aspected": [
     { name:"Third Aspect", cost:0, verbal:"See Description", description:"Free. Choose a 3rd Aspect. Gain one ability usable via any of your three Aspect Traits: Bane (5 Damage Packet/Melee/Missile, 1 Fortitude) or Balm (Heal 5 touch packet, 1 Fortitude). Grants a Third Aspect selector on the Background tab.", attribute:"1 Fortitude" },
     { name:"Gather Aspect", cost:4, verbal:"'Heal All by <trait>'", description:"Once per Long Rest, when presented with a source of any of your aspects, spend 10 seconds of rest at the source and restore all your Vitality." },
@@ -455,10 +507,10 @@ const EXPRESSION_SKILLS = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS = { "Reservoir": 1, "Deadeye": 1, "Whisper": 1 };
-const HIDDEN_EXPRESSION_COSTS = { "Shadewalker": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisper": 1 };
+const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
-const HIDDEN_EXCELLENCY_SKILLS = {
+const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   "Reservoir": [
     { name:"Healing Reservoir", cost:0, verbal:"'Imbue (my name) Reservoir up to 2 people'", description:"Spend 1 Fortitude. Up to 2 imbued people may visit your Reservoir up to 3 times each to 'Heal 2 to Self'. Reservoir cannot be moved once placed. Once per long rest.", attribute:"1 Fortitude" },
     { name:"Absorb Reservoir", cost:2, verbal:"N/A", description:"1x long rest: pick up your Reservoir and turn off its lights. It no longer functions, but you are Healed 5 Vitality and/or gain 5 Protection based on its type." },
@@ -491,7 +543,7 @@ const HIDDEN_EXCELLENCY_SKILLS = {
   ],
 };
 
-const HIDDEN_EXPRESSION_SKILLS = {
+const HIDDEN_EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
   "Shadewalker": [
     { name:"Attune to the Shade", cost:0, verbal:"N/A", description:"When you pass through a gate to the Shade, your Prowess, Insight, and Fortitude each increase by one (does not count as a Grant). Returns to normal when you leave the Shade.", attribute:"Thread Skill" },
     { name:"Find the Shade", cost:2, verbal:"N/A", description:"Gain the research topic 'Shade Geography'." },
@@ -501,14 +553,14 @@ const HIDDEN_EXPRESSION_SKILLS = {
 };
 
 // CP cost rules
-function attrCost(currentPurchased) { return currentPurchased + 3; }
-function totalAttrCost(purchased) {
+function attrCost(currentPurchased: number): number { return currentPurchased + 3; }
+function totalAttrCost(purchased: number): number {
   let total = 0;
   for (let i = 0; i < purchased; i++) total += attrCost(i);
   return total;
 }
-function excellencyCost(index) { return 5 + index; }
-function expressionCost(index) { return 4 + index; }
+function excellencyCost(index: number): number { return 5 + index; }
+function expressionCost(index: number): number { return 4 + index; }
 
 const ADVENTURER_SKILLS = [
   { name:"Base Weapon Skills", description:"Skilled with Basic One-Handed & Two-Handed weapons." },
@@ -530,7 +582,7 @@ const ARMOR_TYPES = [
   { name:"Heavy Armor", points:4 },
 ];
 
-const ASPECT_SKILLS = [
+const ASPECT_SKILLS: SkillDef[] = [
   { name:"Extra Attribute", cost:3, verbal:"N/A", description:"You have an additional Attribute (choose one of Prowess, Insight, or Fortitude).", isAttributeOrArmor:true },
   { name:"Aspect Armaments", cost:4, verbal:"N/A", description:"You gain a special weapon tied to your Aspect. See Aspect Armament Skills section for details.", isAttributeOrArmor:false },
   { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
@@ -544,7 +596,7 @@ const ASPECT_SKILLS = [
   { name:"Absorb Elements", cost:3, verbal:"N/A", description:"Once per Long Rest, when you are affected by your Chosen Trait, you can instead say 'Absorb to Heal 2'.", isAttributeOrArmor:false },
 ];
 
-const FOUNDATION_TYPES = {
+const FOUNDATION_TYPES: Record<string, string> = {
   Agriculture:"Resource", Alchemical:"Resource", Arcane:"Specialty",
   Artifice:"Resource", Ecclesiastic:"Specialty", Entertainer:"Interaction",
   Artistic:"Resource", Heroic:"Place", Leisure:"Resource", Mariner:"Place",
@@ -553,7 +605,7 @@ const FOUNDATION_TYPES = {
   Stargazer:"Specialty", Traveler:"Place", University:"Specialty", Wilderness:"Place",
 };
 
-const PLACE_SKILLS = [
+const PLACE_SKILLS: SkillDef[] = [
   { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this." },
   { name:"Defense", cost:2, verbal:"'Reduce to 2 damage'", description:"Once per event, reduce any damage melee, missile, or packet attack to 1 damage." },
   { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place." },
@@ -562,7 +614,7 @@ const PLACE_SKILLS = [
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
 ];
 
-const SPECIALTY_SKILLS = [
+const SPECIALTY_SKILLS: SkillDef[] = [
   { name:"Enhance", cost:2, verbal:"N/A", description:"Once per event, when using a healing or damage effect powered by your Foundation Type, Increase the effect by 4. Extra Thread Skill." },
   { name:"Expose", cost:2, verbal:"'By my gesture, expose <specialty>'", description:"Once per event, expose your Specialty. Examples: Astrology→Shade, Magic→Arcane, Theology→Divine, Spirits→Dead or Spirit, Nature→Beast or Plant." },
   { name:"Convert", cost:2, verbal:"'… by specialty'", description:"Once per event, make a damage, Agony, or Maim attack with the Trait of your specialty (e.g. 'Arcane', 'Shade')." },
@@ -571,7 +623,7 @@ const SPECIALTY_SKILLS = [
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
 ];
 
-const RESOURCE_SKILLS = [
+const RESOURCE_SKILLS: SkillDef[] = [
   { name:"Enhance", cost:2, verbal:"N/A", description:"Once per event, when using a healing or damage effect powered by your Specialty, Increase the effect by 4. Extra Thread Skill." },
   { name:"Find Resources", cost:2, verbal:"N/A", description:"You have a way of finding Resources. At check-in you gain an extra 2 Drakar coin." },
   { name:"Convert", cost:2, verbal:"'… by Providence'", description:"Once per event, make a damage, Agony, or Maim attack with the Trait 'By Providence'." },
@@ -580,7 +632,7 @@ const RESOURCE_SKILLS = [
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
 ];
 
-const INTERACTION_SKILLS = [
+const INTERACTION_SKILLS: SkillDef[] = [
   { name:"Not my Fight", cost:2, verbal:"N/A", description:"Once per event, if roleplaying in an encounter that turns into a fight, turn to Spirit for 10 seconds and move away from combat." },
   { name:"Observer", cost:2, verbal:"N/A", description:"Once per event, when too many people are on a module, offer to go as a Spirit instead — stay to the side, avoid combat, speak only in whispers." },
   { name:"Extrovert", cost:3, verbal:"'Refresh two attributes to self'", description:"Once per event, when you engage in your signature RP (your Interaction type), refresh two points of Insight, Fortitude, or Prowess to yourself." },
@@ -589,7 +641,7 @@ const INTERACTION_SKILLS = [
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
 ];
 
-const OPEN_SKILLS = [
+const OPEN_SKILLS: SkillDef[] = [
   { name:"Acrobat", cost:4, verbal:"N/A", description:"Gain the benefit of Light Armor without wearing armor. Skills/items that affect armor apply to your costuming instead." },
   { name:"Archery", cost:3, verbal:"N/A", description:"Use a bow or crossbow in combat. You get 5 shots; Short Rest to prepare 5 more. You may block with your bow but not wield a weapon in your other hand." },
   { name:"Buckler", cost:3, verbal:"N/A", description:"Use a buckler in combat alongside any one-handed weapon you are skilled with." },
@@ -617,7 +669,7 @@ const OPEN_SKILLS = [
   { name:"Summon Music", cost:1, verbal:"N/A", description:"Set up background music in your cabin or a non-public area, or during a special tavern event." },
 ];
 
-const CULTURE_SKILLS = [
+const CULTURE_SKILLS: SkillDef[] = [
   { name:"Appreciation", cost:2, verbal:"'Grant Defense Guard'", description:"When you share something of value from your culture (meal, drinks, art, music) with a player of a different culture, you both gain a Guard against the next called attack." },
   { name:"Camaraderie", cost:2, verbal:"'Heal 4 and Repair 4 Armor to <Culture>'", description:"Once per event, when you see someone of your culture in trouble, remind them of a homeland value and use a touch packet to heal them and restore their armor." },
   { name:"Garb", cost:2, verbal:"'Imbue to self +1 Armor'", description:"Once per event, when dressed in the style of your culture, your clothing gains additional protection — allowing you to exceed your normal armor maximum. Ends at next Long Rest or outfit change." },
@@ -625,7 +677,7 @@ const CULTURE_SKILLS = [
   { name:"Practice", cost:2, verbal:"'Grant <attack> 4 damage by <Trait>'", description:"Once per event, when you act in a manner that exemplifies your culture, gain a grant attack (melee, missile, or spell) for yourself or another." },
 ];
 
-const DOMAIN_SKILLS = {
+const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   Air: [
     { name:"Air's Determination", cost:0, verbal:"'2 Damage'", description:"Free. When you take a Short Rest you gain three Archery attacks of 2 damage." },
     { name:"Air's Touch", cost:4, verbal:"'2 Damage'", description:"When you take a Short Rest and use Void to refresh attributes, your next Missile attack that costs an attribute is free." },
@@ -696,7 +748,7 @@ const DOMAIN_SKILLS = {
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
-function getFoundationSkillList(foundation) {
+function getFoundationSkillList(foundation: string): SkillDef[] {
   const fType = FOUNDATION_TYPES[foundation] || "Place";
   return fType === "Place" ? PLACE_SKILLS
        : fType === "Specialty" ? SPECIALTY_SKILLS
@@ -705,7 +757,7 @@ function getFoundationSkillList(foundation) {
 }
 
 // Merge two skill lists, deduplicating by name (first occurrence wins for display, but both costs count)
-function mergeSkillLists(list1, list2) {
+function mergeSkillLists(list1: SkillDef[], list2: SkillDef[]): SkillDef[] {
   const seen = new Set();
   const merged = [];
   for (const s of [...list1, ...list2]) {
@@ -714,52 +766,52 @@ function mergeSkillLists(list1, list2) {
   return merged;
 }
 
-function hasThirdAspect(char) {
+function hasThirdAspect(char: CharState): boolean {
   const aspectedSkills = char.expressionSkillsPurchased["Aspected"] || [];
-  return aspectedSkills.some(s => s.name === "Third Aspect");
+  return aspectedSkills.some((s: PurchasedSkill) => s.name === "Third Aspect");
 }
 
-function hasSkilledLearner(char) {
+function hasSkilledLearner(char: CharState): boolean {
   const savantSkills = char.expressionSkillsPurchased["Savant"] || [];
-  return savantSkills.some(s => s.name === "Skilled Learner");
+  return savantSkills.some((s: PurchasedSkill) => s.name === "Skilled Learner");
 }
 
-function hasDualCitizenship(char) {
+function hasDualCitizenship(char: CharState): boolean {
   const ft = char.expressionSkillsPurchased["Far Traveler"] || [];
-  return ft.some(s => s.name === "Dual Citizenship");
+  return ft.some((s: PurchasedSkill) => s.name === "Dual Citizenship");
 }
 
-function hasMultinational(char) {
+function hasMultinational(char: CharState): boolean {
   const ft = char.expressionSkillsPurchased["Far Traveler"] || [];
-  return ft.some(s => s.name === "Multinational");
+  return ft.some((s: PurchasedSkill) => s.name === "Multinational");
 }
 
-function usedCP(char) {
+function usedCP(char: CharState): number {
   let used = 0;
-  char.excellencies.forEach((_, i) => { used += excellencyCost(i); });
-  char.expressions.forEach((_, i) => { used += expressionCost(i); });
-  char.aspectSkillsPurchased.forEach(e => { used += e.cost || 0; });
-  char.foundationSkillsPurchased.forEach(e => { used += e.cost; });
-  char.cultureSkillsPurchased.forEach(e => { used += e.cost; });
+  char.excellencies.forEach((_: string, i: number) => { used += excellencyCost(i); });
+  char.expressions.forEach((_: string, i: number) => { used += expressionCost(i); });
+  char.aspectSkillsPurchased.forEach((e: PurchasedSkill) => { used += e.cost || 0; });
+  char.foundationSkillsPurchased.forEach((e: PurchasedSkill) => { used += e.cost; });
+  char.cultureSkillsPurchased.forEach((e: PurchasedSkill) => { used += e.cost; });
   used += totalAttrCost(char.prowessPurchased);
   used += totalAttrCost(char.insightPurchased);
   used += totalAttrCost(char.fortitudePurchased);
   used += char.purposePurchased * 4;
   used += totalAttrCost(char.vitalityPurchased);
-  char.openSkillsPurchased.forEach(e => { used += e.cost; });
-  char.domainSkillsPurchased.forEach(s => { used += s.cost; });
-  Object.values(char.excellencySkillsPurchased).forEach(arr => arr.forEach(s => { used += s.cost; }));
-  Object.values(char.expressionSkillsPurchased).forEach(arr => arr.forEach(s => { used += s.cost; }));
-  (char.hiddenExcellencies || []).forEach(name => { used += HIDDEN_EXCELLENCY_COSTS[name] || 0; });
-  (char.hiddenExpressions || []).forEach(name => { used += HIDDEN_EXPRESSION_COSTS[name] || 0; });
-  (Object.values(char.hiddenExcellencySkillsPurchased || {}) as {cost:number}[][]).forEach(arr => arr.forEach(s => { used += s.cost; }));
-  (Object.values(char.hiddenExpressionSkillsPurchased || {}) as {cost:number}[][]).forEach(arr => arr.forEach(s => { used += s.cost; }));
+  char.openSkillsPurchased.forEach((e: PurchasedSkill) => { used += e.cost; });
+  char.domainSkillsPurchased.forEach((s: PurchasedSkill) => { used += s.cost; });
+  Object.values(char.excellencySkillsPurchased).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
+  Object.values(char.expressionSkillsPurchased).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
+  (char.hiddenExcellencies || []).forEach((name: string) => { used += HIDDEN_EXCELLENCY_COSTS[name] || 0; });
+  (char.hiddenExpressions || []).forEach((name: string) => { used += HIDDEN_EXPRESSION_COSTS[name] || 0; });
+  Object.values(char.hiddenExcellencySkillsPurchased || {}).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
+  Object.values(char.hiddenExpressionSkillsPurchased || {}).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
   return used;
 }
 
 // ─── SUB-COMPONENTS ──────────────────────────────────────────────────────────
 
-function Section({ title, children, accent = false }) {
+function Section({ title, children, accent = false }: { title: string; children: React.ReactNode; accent?: boolean }) {
   return (
     <div style={{
       border: `2px solid ${accent ? "var(--ink)" : "var(--ink-light)"}`,
@@ -777,7 +829,10 @@ function Section({ title, children, accent = false }) {
   );
 }
 
-function StatBox({ label, value, onChange, min = 0, max = 10, costNext = undefined, readOnly = false, accentColor = null }) {
+function StatBox({ label, value, onChange, min = 0, max = 10, costNext = undefined, readOnly = false, accentColor = null }: {
+  label: string; value: number; onChange: (v: number) => void;
+  min?: number; max?: number; costNext?: number; readOnly?: boolean; accentColor?: string | null;
+}) {
   const border = accentColor ? `2px solid ${accentColor}` : "2px solid var(--ink)";
   const labelColor = accentColor || "var(--ink-mid)";
   const valueColor = accentColor || "var(--ink)";
@@ -802,7 +857,10 @@ const btnStyle = {
   display:"flex", alignItems:"center", justifyContent:"center", padding:0, lineHeight:1,
 };
 
-function TextInput({ label, value, onChange, placeholder, wide = false }) {
+function TextInput({ label, value, onChange, placeholder, wide = false }: {
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; wide?: boolean;
+}) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:3, flex: wide ? "1 1 100%" : "1 1 140px" }}>
       <label style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--ink-mid)" }}>{label}</label>
@@ -811,7 +869,10 @@ function TextInput({ label, value, onChange, placeholder, wide = false }) {
   );
 }
 
-function SelectInput({ label, value, onChange, options, wide = false }) {
+function SelectInput({ label, value, onChange, options, wide = false }: {
+  label: string; value: string; onChange: (v: string) => void;
+  options: (string | { value: string; label: string })[]; wide?: boolean;
+}) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:3, flex: wide ? "1 1 100%" : "1 1 140px" }}>
       <label style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--ink-mid)" }}>{label}</label>
@@ -823,7 +884,7 @@ function SelectInput({ label, value, onChange, options, wide = false }) {
   );
 }
 
-function CPBadge({ used, total }) {
+function CPBadge({ used, total }: { used: number; total: number }) {
   const remaining = total - used;
   const pct = Math.min(100, (used / total) * 100);
   const over = remaining < 0;
@@ -841,13 +902,13 @@ function CPBadge({ used, total }) {
 
 const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Spells & Abilities","Notes","Export / Print"];
 
-function Tab({ label, active, onClick }) {
+function Tab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} style={{ fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.1em", textTransform:"uppercase", padding:"8px 12px", border:"none", borderBottom: active ? "3px solid var(--ink)" : "3px solid transparent", background:"transparent", color: active ? "var(--ink)" : "var(--ink-mid)", cursor:"pointer", whiteSpace:"nowrap" }}>{label}</button>
   );
 }
 
-function attrChipColor(attribute) {
+function attrChipColor(attribute: string): string | null {
   if (!attribute) return null;
   if (/prowess/i.test(attribute)) return "var(--prowess)";
   if (/insight/i.test(attribute)) return "var(--insight)";
@@ -855,7 +916,13 @@ function attrChipColor(attribute) {
   return null;
 }
 
-function SkillPickerList({ skills, purchased, countOf, canAdd, onAdd, onRemove }) {
+function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove }: {
+  skills: SkillDef[];
+  countOf: (name: string) => number;
+  canAdd: (skill: SkillDef) => boolean;
+  onAdd: (skill: SkillDef) => void;
+  onRemove: (name: string) => void;
+}) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
       {skills.map(skill => {
@@ -888,7 +955,7 @@ function SkillPickerList({ skills, purchased, countOf, canAdd, onAdd, onRemove }
                     }}>[{skill.attribute}]</span>
                   );
                 })()}
-                {skill.maxCount > 1 && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)", fontStyle:"italic" }}>[up to {skill.maxCount}×]</span>}
+                {(skill.maxCount ?? 0) > 1 && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)", fontStyle:"italic" }}>[up to {skill.maxCount}×]</span>}
               </div>
               <div style={{ fontSize:10, marginTop:2, lineHeight:1.4, color: isPurchased ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>{skill.description}</div>
             </div>
@@ -901,7 +968,10 @@ function SkillPickerList({ skills, purchased, countOf, canAdd, onAdd, onRemove }
 
 // ─── EXPORT PANEL ────────────────────────────────────────────────────────────
 
-function ExportPanel({ char, setChar }) {
+function ExportPanel({ char, setChar }: {
+  char: CharState;
+  setChar: React.Dispatch<React.SetStateAction<CharState>>;
+}) {
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState(false);
@@ -912,7 +982,7 @@ function ExportPanel({ char, setChar }) {
   const jsonExport = JSON.stringify(char, null, 2);
 
   function handleCopyJSON() {
-    const ta = document.getElementById("json-export-ta");
+    const ta = document.getElementById("json-export-ta") as HTMLTextAreaElement | null;
     if (!ta) return;
     ta.select();
     try {
@@ -951,46 +1021,48 @@ function ExportPanel({ char, setChar }) {
     const total = 50 + (char.bonusCP || 0);
     const activeAspects = [char.aspect1, char.aspect2, char.aspect3].filter(a => a && a !== "(none)");
 
-    function getFL(f) {
+    type PrintSkill = PurchasedSkill & Partial<SkillDef> & { source?: string };
+
+    function getFL(f: string): SkillDef[] {
       const t = FOUNDATION_TYPES[f] || "Place";
       return t==="Place"?PLACE_SKILLS:t==="Specialty"?SPECIALTY_SKILLS:t==="Resource"?RESOURCE_SKILLS:INTERACTION_SKILLS;
     }
 
-    const allExcSkills = char.excellencies.flatMap(n =>
-      (char.excellencySkillsPurchased[n]||[]).map(s => {
-        const def = (EXCELLENCY_SKILLS[n]||[]).find(d=>d.name===s.name)||{};
+    const allExcSkills: PrintSkill[] = char.excellencies.flatMap((n: string) =>
+      (char.excellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+        const def = (EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
         return {...s,...def,source:n};
       })
     );
-    const allExprSkills = char.expressions.flatMap(n =>
-      (char.expressionSkillsPurchased[n]||[]).map(s => {
-        const def = (EXPRESSION_SKILLS[n]||[]).find(d=>d.name===s.name)||{};
+    const allExprSkills: PrintSkill[] = char.expressions.flatMap((n: string) =>
+      (char.expressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+        const def = (EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
         return {...s,...def,source:n};
       })
     );
-    const domainDefs = char.domainSkillsPurchased.map(s => {
-      const def = (DOMAIN_SKILLS[char.domain]||[]).find(d=>d.name===s.name)||{};
+    const domainDefs: PrintSkill[] = char.domainSkillsPurchased.map((s: PurchasedSkill) => {
+      const def = (DOMAIN_SKILLS[char.domain]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-    const aspectDefs = char.aspectSkillsPurchased.map(s => {
-      const def = ASPECT_SKILLS.find(d=>d.name===s.name)||{};
+    const aspectDefs: PrintSkill[] = char.aspectSkillsPurchased.map((s: PurchasedSkill) => {
+      const def = ASPECT_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-    const foundDefs = char.foundationSkillsPurchased.map(s => {
+    const foundDefs: PrintSkill[] = char.foundationSkillsPurchased.map((s: PurchasedSkill) => {
       const defs = [...getFL(char.foundation), ...(char.foundation2?getFL(char.foundation2):[])];
-      const def = defs.find(d=>d.name===s.name)||{};
+      const def = defs.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-    const cultDefs = char.cultureSkillsPurchased.map(s => {
-      const def = CULTURE_SKILLS.find(d=>d.name===s.name)||{};
+    const cultDefs: PrintSkill[] = char.cultureSkillsPurchased.map((s: PurchasedSkill) => {
+      const def = CULTURE_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-    const openDefs = char.openSkillsPurchased.map(s => {
-      const def = OPEN_SKILLS.find(d=>d.name===s.name)||{};
+    const openDefs: PrintSkill[] = char.openSkillsPurchased.map((s: PurchasedSkill) => {
+      const def = OPEN_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
 
-    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter(s => {
+    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
       return /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
     });
 
@@ -998,8 +1070,8 @@ function ExportPanel({ char, setChar }) {
     const sc2 = char.culture2 ? CULTURES.find(c=>c.name===char.culture2) : null;
     const sc3 = char.culture3 ? CULTURES.find(c=>c.name===char.culture3) : null;
 
-    function skillRows(skills) {
-      return skills.map(s => {
+    function skillRows(skills: PrintSkill[]): string {
+      return skills.map((s: PrintSkill) => {
         const isExtra = /extra thread/i.test((s.description||"")+(s.attribute||""));
         const isThread = /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
         const badge = s.cost===0 ? '<span style="font-size:7pt;border:0.5pt solid #9a8c6e;padding:1pt 3pt;color:#5a4e3a;">free</span>'
@@ -1015,7 +1087,7 @@ function ExportPanel({ char, setChar }) {
       }).join("");
     }
 
-    function infoRow(label, value) {
+    function infoRow(label: string, value: string): string {
       if (!value) return "";
       return `<div style="display:flex;justify-content:space-between;border-bottom:0.5pt dotted #c8bca0;padding:1.5pt 0;font-size:9.5pt;gap:8pt;">
         <span style="color:#5a4e3a;">${label}</span><span style="font-weight:600;">${value}</span>
@@ -1171,7 +1243,7 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
             readOnly
             value={jsonExport}
             style={{ fontFamily:"monospace", fontSize:10, width:"100%", height:220, resize:"vertical", border:"1px solid var(--ink-light)", background:"var(--paper-warm)", color:"var(--ink)", padding:"8px 10px", lineHeight:1.5, outline:"none" }}
-            onClick={e => e.target.select()}
+            onClick={e => (e.target as HTMLTextAreaElement).select()}
           />
         )}
         <div style={ss.note}>
@@ -1222,7 +1294,7 @@ export default function NuminaSheet() {
   const [tab, setTab] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
 
-  const [char, setChar] = useState({
+  const [char, setChar] = useState<CharState>({
     name:"", player:"", pronouns:"", characterConcept:"", costumeNotes:"", source:"Arcane",
     aspect1:"", aspect2:"", aspect3:"",
     chosenTrait:"",
@@ -1249,7 +1321,7 @@ export default function NuminaSheet() {
     bonusCP:0,
   });
 
-  const update = useCallback((key, val) => setChar(c => ({ ...c, [key]: val })), []);
+  const update = useCallback(<K extends keyof CharState>(key: K, val: CharState[K]) => setChar(c => ({ ...c, [key]: val })), []);
 
   const prowessVal = 2 + char.prowessPurchased;
   const insightVal = 2 + char.insightPurchased;
@@ -1294,48 +1366,51 @@ export default function NuminaSheet() {
   const totalExpressions = char.expressions.length + char.hiddenExpressions.length;
 
   // Add/remove excellency
-  function addExcellency(name) {
+  function addExcellency(name: string): void {
     if (!name || char.excellencies.includes(name) || totalExcellencies >= 3) return;
-    const freeSkills = (EXCELLENCY_SKILLS[name] || []).filter(s => s.cost === 0);
-    setChar(c => ({ ...c, excellencies: [...c.excellencies, name], excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+    const freeSkills = (EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    setChar(c => ({ ...c, excellencies: [...c.excellencies, name], excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
   }
-  function removeExcellency(idx) {
+  function removeExcellency(idx: number): void {
     const name = char.excellencies[idx];
-    setChar(c => { const next = { ...c.excellencySkillsPurchased }; delete next[name]; return { ...c, excellencies: c.excellencies.filter((_,i) => i !== idx), excellencySkillsPurchased: next }; });
+    setChar(c => { const next = { ...c.excellencySkillsPurchased }; delete next[name]; return { ...c, excellencies: c.excellencies.filter((_: string, i: number) => i !== idx), excellencySkillsPurchased: next }; });
   }
 
   // Add/remove hidden excellency
-  function addHiddenExcellency(name) {
+  function addHiddenExcellency(name: string): void {
     if (!name || char.hiddenExcellencies.includes(name) || totalExcellencies >= 3) return;
-    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter(s => s.cost === 0);
-    setChar(c => ({ ...c, hiddenExcellencies: [...c.hiddenExcellencies, name], hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    setChar(c => ({ ...c, hiddenExcellencies: [...c.hiddenExcellencies, name], hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
   }
-  function removeHiddenExcellency(name) {
-    setChar(c => { const next = { ...c.hiddenExcellencySkillsPurchased }; delete next[name]; return { ...c, hiddenExcellencies: c.hiddenExcellencies.filter(e => e !== name), hiddenExcellencySkillsPurchased: next }; });
+  function removeHiddenExcellency(name: string): void {
+    setChar(c => { const next = { ...c.hiddenExcellencySkillsPurchased }; delete next[name]; return { ...c, hiddenExcellencies: c.hiddenExcellencies.filter((e: string) => e !== name), hiddenExcellencySkillsPurchased: next }; });
   }
 
   // Add/remove hidden expression
-  function addHiddenExpression(name) {
+  function addHiddenExpression(name: string): void {
     if (!name || char.hiddenExpressions.includes(name) || totalExpressions >= 2) return;
-    const freeSkills = (HIDDEN_EXPRESSION_SKILLS[name] || []).filter(s => s.cost === 0);
-    setChar(c => ({ ...c, hiddenExpressions: [...c.hiddenExpressions, name], hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+    const freeSkills = (HIDDEN_EXPRESSION_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    setChar(c => ({ ...c, hiddenExpressions: [...c.hiddenExpressions, name], hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
   }
-  function removeHiddenExpression(name) {
-    setChar(c => { const next = { ...c.hiddenExpressionSkillsPurchased }; delete next[name]; return { ...c, hiddenExpressions: c.hiddenExpressions.filter(e => e !== name), hiddenExpressionSkillsPurchased: next }; });
+  function removeHiddenExpression(name: string): void {
+    setChar(c => { const next = { ...c.hiddenExpressionSkillsPurchased }; delete next[name]; return { ...c, hiddenExpressions: c.hiddenExpressions.filter((e: string) => e !== name), hiddenExpressionSkillsPurchased: next }; });
   }
 
   // Add/remove expression
-  function addExpression(name) {
+  function addExpression(name: string): void {
     if (!name || char.expressions.includes(name) || totalExpressions >= 2) return;
-    const freeSkills = (EXPRESSION_SKILLS[name] || []).filter(s => s.cost === 0);
-    setChar(c => ({ ...c, expressions: [...c.expressions, name], expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [name]: freeSkills.map(s => ({ name:s.name, cost:0 })) } }));
+    const freeSkills = (EXPRESSION_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    setChar(c => ({ ...c, expressions: [...c.expressions, name], expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
   }
-  function removeExpression(idx) {
+  function removeExpression(idx: number): void {
     const name = char.expressions[idx];
     setChar(c => {
       const next = { ...c.expressionSkillsPurchased }; delete next[name];
       // If removing Aspected, clear aspect3; if removing Savant, clear foundation2
-      const upd = { expressions: c.expressions.filter((_,i) => i !== idx), expressionSkillsPurchased: next };
+      const upd: Partial<CharState> & { expressions: string[]; expressionSkillsPurchased: Record<string, PurchasedSkill[]> } = {
+        expressions: c.expressions.filter((_: string, i: number) => i !== idx),
+        expressionSkillsPurchased: next,
+      };
       if (name === "Aspected") upd.aspect3 = "";
       if (name === "Savant") { upd.foundation2 = ""; upd.foundationSkillsPurchased = []; }
       if (name === "Far Traveler") { upd.culture2 = ""; upd.culture3 = ""; }
@@ -1490,19 +1565,19 @@ export default function NuminaSheet() {
                     const purchased = char.aspectSkillsPurchased;
                     const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
                     const atFull = purchased.length >= aspectSkillMax;
-                    function countOf(name) { return purchased.filter(e => e.name === name).length; }
-                    function canAdd(skill) {
+                    const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                    const canAdd = (skill: SkillDef) => {
                       if (atFull) return false;
                       if (!skill.isAttributeOrArmor && numAspects >= 2 && countOf(skill.name) < numAspects) return true;
                       if (countOf(skill.name) >= 1) return false;
                       return true;
-                    }
-                    function addSkill(skill) { if (!canAdd(skill)) return; update("aspectSkillsPurchased", [...purchased, { name:skill.name, cost:skill.cost }]); }
-                    function removeOne(name) {
-                      const idx = [...purchased].reverse().findIndex(e => e.name === name);
+                    };
+                    const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("aspectSkillsPurchased", [...purchased, { name:skill.name, cost:skill.cost }]); };
+                    const removeOne = (name: string) => {
+                      const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                       if (idx === -1) return;
-                      update("aspectSkillsPurchased", purchased.filter((_,i) => i !== purchased.length - 1 - idx));
-                    }
+                      update("aspectSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length - 1 - idx));
+                    };
                     return (
                       <>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:8 }}>
@@ -1580,14 +1655,14 @@ export default function NuminaSheet() {
                   const purchased = char.foundationSkillsPurchased;
                   const totalSpent = purchased.reduce((s,e) => s+e.cost, 0);
                   const atFull = purchased.length >= foundationSkillMax;
-                  function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                  function canAdd(skill) { return !atFull && countOf(skill.name) === 0; }
-                  function addSkill(skill) { if (!canAdd(skill)) return; update("foundationSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); }
-                  function removeSkill(name) {
-                    const idx = [...purchased].reverse().findIndex(e=>e.name===name);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => !atFull && countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("foundationSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); };
+                  const removeSkill = (name: string) => {
+                    const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                     if (idx===-1) return;
-                    update("foundationSkillsPurchased", purchased.filter((_,i) => i !== purchased.length-1-idx));
-                  }
+                    update("foundationSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length-1-idx));
+                  };
                   return (
                     <div style={{ marginTop:14, borderTop:"1px dashed var(--ink-faint)", paddingTop:12 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
@@ -1596,7 +1671,7 @@ export default function NuminaSheet() {
                         </div>
                         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skillList} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skillList} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                     </div>
                   );
                 })()}
@@ -1651,21 +1726,21 @@ export default function NuminaSheet() {
                   const purchased = char.cultureSkillsPurchased;
                   const totalSpent = purchased.reduce((s,e)=>s+e.cost,0);
                   const atFull = purchased.length >= 2;
-                  function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                  function canAdd(skill) { return !atFull && countOf(skill.name) === 0; }
-                  function addSkill(skill) { if (!canAdd(skill)) return; update("cultureSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); }
-                  function removeSkill(name) {
-                    const idx = [...purchased].reverse().findIndex(e=>e.name===name);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => !atFull && countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("cultureSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); };
+                  const removeSkill = (name: string) => {
+                    const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                     if (idx===-1) return;
-                    update("cultureSkillsPurchased", purchased.filter((_,i) => i !== purchased.length-1-idx));
-                  }
+                    update("cultureSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length-1-idx));
+                  };
                   return (
                     <div style={{ marginTop:14, borderTop:"1px dashed var(--ink-faint)", paddingTop:12 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
                         <div style={{ fontFamily:"var(--font-display)", fontSize:11 }}>Culture Skills &nbsp;<strong style={{color:atFull?"var(--red)":"var(--ink)"}}>{purchased.length}</strong><span style={{color:"var(--ink-mid)"}}> / 2</span></div>
                         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={CULTURE_SKILLS} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={CULTURE_SKILLS} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                     </div>
                   );
                 })()}
@@ -1684,20 +1759,20 @@ export default function NuminaSheet() {
                 {char.domain && (() => {
                   const skills = DOMAIN_SKILLS[char.domain] || [];
                   const purchased = char.domainSkillsPurchased;
-                  function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                  function canAdd(skill) { return countOf(skill.name) === 0; }
-                  function addSkill(skill) { if (!canAdd(skill)) return; update("domainSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); }
-                  function removeSkill(name) {
-                    const idx = [...purchased].reverse().findIndex(e=>e.name===name);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("domainSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); };
+                  const removeSkill = (name: string) => {
+                    const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                     if (idx===-1) return;
-                    update("domainSkillsPurchased", purchased.filter((_,i) => i !== purchased.length-1-idx));
-                  }
+                    update("domainSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length-1-idx));
+                  };
                   return (
                     <div style={{ marginTop:14, borderTop:"1px dashed var(--ink-faint)", paddingTop:12 }}>
                       <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:8 }}>
                         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{purchased.reduce((s,e)=>s+e.cost,0)} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                     </div>
                   );
                 })()}
@@ -1787,27 +1862,27 @@ export default function NuminaSheet() {
                 {char.excellencies.map(exclName => {
                   const skills = EXCELLENCY_SKILLS[exclName] || [];
                   const purchased = char.excellencySkillsPurchased[exclName] || [];
-                  const totalSpent = purchased.reduce((s,e)=>s+e.cost,0);
-                  function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                  function canAdd(skill) { return countOf(skill.name) === 0; }
-                  function addSkill(skill) {
+                  const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s+e.cost, 0);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => {
                     if (!canAdd(skill)) return;
                     setChar(c => ({ ...c, excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [exclName]: [...(c.excellencySkillsPurchased[exclName]||[]), {name:skill.name,cost:skill.cost}] } }));
-                  }
-                  function removeSkill(name) {
+                  };
+                  const removeSkill = (name: string) => {
                     setChar(c => {
                       const arr = c.excellencySkillsPurchased[exclName]||[];
-                      const idx = [...arr].reverse().findIndex(e=>e.name===name);
+                      const idx = [...arr].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                       if (idx===-1) return c;
-                      return { ...c, excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [exclName]: arr.filter((_,i)=>i!==arr.length-1-idx) } };
+                      return { ...c, excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [exclName]: arr.filter((_: PurchasedSkill, i: number) => i!==arr.length-1-idx) } };
                     });
-                  }
+                  };
                   return (
                     <Section key={exclName} title={`${exclName} Skills`}>
                       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
                         <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
                       </div>
-                      {skills.length > 0 ? <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      {skills.length > 0 ? <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                         : <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",fontStyle:"italic"}}>Skills unlocked in-game or via staff.</div>}
                     </Section>
                   );
@@ -1839,27 +1914,27 @@ export default function NuminaSheet() {
                 {char.hiddenExcellencies.map(exclName => {
                   const skills = HIDDEN_EXCELLENCY_SKILLS[exclName] || [];
                   const purchased = char.hiddenExcellencySkillsPurchased[exclName] || [];
-                  const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
-                  function countOf(name) { return purchased.filter(e => e.name === name).length; }
-                  function canAdd(skill) { return countOf(skill.name) === 0; }
-                  function addSkill(skill) {
+                  const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s + e.cost, 0);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => {
                     if (!canAdd(skill)) return;
                     setChar(c => ({ ...c, hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [exclName]: [...(c.hiddenExcellencySkillsPurchased[exclName]||[]), {name:skill.name,cost:skill.cost}] } }));
-                  }
-                  function removeSkill(name) {
+                  };
+                  const removeSkill = (name: string) => {
                     setChar(c => {
                       const arr = c.hiddenExcellencySkillsPurchased[exclName] || [];
-                      const idx = [...arr].reverse().findIndex(e => e.name === name);
+                      const idx = [...arr].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                       if (idx === -1) return c;
-                      return { ...c, hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [exclName]: arr.filter((_,i) => i !== arr.length-1-idx) } };
+                      return { ...c, hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [exclName]: arr.filter((_: PurchasedSkill, i: number) => i !== arr.length-1-idx) } };
                     });
-                  }
+                  };
                   return (
                     <Section key={exclName} title={`${exclName} Skills`}>
                       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
                         <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                     </Section>
                   );
                 })}
@@ -1912,27 +1987,27 @@ export default function NuminaSheet() {
                 {char.hiddenExpressions.map(exprName => {
                   const skills = HIDDEN_EXPRESSION_SKILLS[exprName] || [];
                   const purchased = char.hiddenExpressionSkillsPurchased[exprName] || [];
-                  const totalSpent = purchased.reduce((s,e) => s + e.cost, 0);
-                  function countOf(name) { return purchased.filter(e => e.name === name).length; }
-                  function canAdd(skill) { return countOf(skill.name) === 0; }
-                  function addSkill(skill) {
+                  const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s + e.cost, 0);
+                  const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const addSkill = (skill: SkillDef) => {
                     if (!canAdd(skill)) return;
                     setChar(c => ({ ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: [...(c.hiddenExpressionSkillsPurchased[exprName]||[]), {name:skill.name,cost:skill.cost}] } }));
-                  }
-                  function removeSkill(name) {
+                  };
+                  const removeSkill = (name: string) => {
                     setChar(c => {
                       const arr = c.hiddenExpressionSkillsPurchased[exprName] || [];
-                      const idx = [...arr].reverse().findIndex(e => e.name === name);
+                      const idx = [...arr].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                       if (idx === -1) return c;
-                      return { ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: arr.filter((_,i) => i !== arr.length-1-idx) } };
+                      return { ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: arr.filter((_: PurchasedSkill, i: number) => i !== arr.length-1-idx) } };
                     });
-                  }
+                  };
                   return (
                     <Section key={exprName} title={`${exprName} Skills`}>
                       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
                         <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                     </Section>
                   );
                 })}
@@ -1941,27 +2016,29 @@ export default function NuminaSheet() {
               {char.expressions.map(exprName => {
                 const skills = EXPRESSION_SKILLS[exprName] || [];
                 const purchased = char.expressionSkillsPurchased[exprName] || [];
-                const totalSpent = purchased.reduce((s,e)=>s+e.cost,0);
-                function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                function canAdd(skill) { return countOf(skill.name) === 0; }
-                function addSkill(skill) {
+                const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s+e.cost, 0);
+                const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                const addSkill = (skill: SkillDef) => {
                   if (!canAdd(skill)) return;
                   setChar(c => ({ ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: [...(c.expressionSkillsPurchased[exprName]||[]), {name:skill.name,cost:skill.cost}] } }));
-                }
-                function removeSkill(name) {
+                };
+                const removeSkill = (name: string) => {
                   setChar(c => {
                     const arr = c.expressionSkillsPurchased[exprName]||[];
-                    const idx = [...arr].reverse().findIndex(e=>e.name===name);
+                    const idx = [...arr].reverse().findIndex((e: PurchasedSkill) => e.name===name);
                     if (idx===-1) return c;
                     // If removing Third Aspect, clear aspect3
-                    const upd = { expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.filter((_,i)=>i!==arr.length-1-idx) } };
+                    const upd: Partial<CharState> & { expressionSkillsPurchased: Record<string, PurchasedSkill[]> } = {
+                      expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.filter((_: PurchasedSkill, i: number) => i!==arr.length-1-idx) },
+                    };
                     if (exprName==="Aspected" && name==="Third Aspect") upd.aspect3="";
                     if (exprName==="Savant" && name==="Skilled Learner") { upd.foundation2=""; upd.foundationSkillsPurchased=[]; }
                     if (exprName==="Far Traveler" && name==="Dual Citizenship") { upd.culture2=""; upd.culture3=""; }
                     if (exprName==="Far Traveler" && name==="Multinational") upd.culture3="";
                     return { ...c, ...upd };
                   });
-                }
+                };
                 return (
                   <Section key={exprName} title={`${exprName} Skills`}>
                     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
@@ -1989,7 +2066,7 @@ export default function NuminaSheet() {
                         {showThirdCulture && (char.culture3 ? ` Multinational active: Culture 3 = ${char.culture3}.` : " Multinational active — select Culture 3 on the Background tab.")}
                       </div>
                     )}
-                    <SkillPickerList skills={skills} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
                   </Section>
                 );
               })}
@@ -2002,21 +2079,21 @@ export default function NuminaSheet() {
               <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12 }}>Available to all players. Click to purchase; click again to remove.</div>
               {(() => {
                 const purchased = char.openSkillsPurchased;
-                const totalSpent = purchased.reduce((s,e)=>s+e.cost,0);
-                function countOf(name) { return purchased.filter(e=>e.name===name).length; }
-                function canAdd(skill) { return countOf(skill.name) < (skill.maxCount||1); }
-                function addSkill(skill) { if (!canAdd(skill)) return; update("openSkillsPurchased",[...purchased,{name:skill.name,cost:skill.cost}]); }
-                function removeOne(name) {
-                  const idx = [...purchased].reverse().findIndex(e=>e.name===name);
+                const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s+e.cost, 0);
+                const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
+                const canAdd = (skill: SkillDef) => countOf(skill.name) < (skill.maxCount||1);
+                const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("openSkillsPurchased",[...purchased,{name:skill.name,cost:skill.cost}]); };
+                const removeOne = (name: string) => {
+                  const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
                   if (idx===-1) return;
-                  update("openSkillsPurchased",purchased.filter((_,i)=>i!==purchased.length-1-idx));
-                }
+                  update("openSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i!==purchased.length-1-idx));
+                };
                 return (
                   <>
                     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
                       <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{purchased.length} skill{purchased.length!==1?"s":""} · {totalSpent} CP spent</div>
                     </div>
-                    <SkillPickerList skills={OPEN_SKILLS} purchased={purchased} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeOne} />
+                    <SkillPickerList skills={OPEN_SKILLS} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeOne} />
                   </>
                 );
               })()}
@@ -2039,7 +2116,7 @@ export default function NuminaSheet() {
                   Thread Skills enhance other skills. You may apply up to 3 Thread Skills to a single effect (plus 1 Extra Thread Skill). Thread Skills cannot be applied to uncalled damage, grants, or item effects.
                 </div>
                 {(() => {
-                  const threadSkills = [];
+                  const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean }[] = [];
                   const allSourceSkills = [
                     ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
                     ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),

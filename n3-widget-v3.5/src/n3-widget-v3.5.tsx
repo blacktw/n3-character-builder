@@ -619,6 +619,8 @@ const OPEN_SKILLS: SkillDef[] = [
   { name:"Summon Music", cost:1, verbal:"N/A", description:"Set up background music in your cabin or a non-public area, or during a special tavern event." },
 ];
 
+const SAVANT_FREE_SKILL_OPTIONS = ["Buckler", "Disarm Traps", "Pick Locks", "Cornucopia", "Merchant", "Platform", "Resourceful", "Two Weapon Fighting"];
+
 const CULTURE_SKILLS: SkillDef[] = [
   { name:"Appreciation", cost:2, verbal:"'Grant Defense Guard'", description:"When you share something of value from your culture (meal, drinks, art, music) with a player of a different culture, you both gain a Guard against the next called attack." },
   { name:"Camaraderie", cost:2, verbal:"'Heal 4 and Repair 4 Armor to <Culture>'", description:"Once per event, when you see someone of your culture in trouble, remind them of a homeland value and use a touch packet to heal them and restore their armor." },
@@ -1337,7 +1339,7 @@ export default function NuminaSheet() {
         expressionSkillsPurchased: next,
       };
       if (name === "Aspected") upd.aspect3 = "";
-      if (name === "Savant") { upd.foundation2 = ""; upd.foundationSkillsPurchased = []; }
+      if (name === "Savant") { upd.foundation2 = ""; upd.foundationSkillsPurchased = []; upd.savantFreeSkill1 = ""; upd.savantFreeSkill2 = ""; }
       if (name === "Far Traveler") { upd.culture2 = ""; upd.culture3 = ""; }
       return { ...c, ...upd };
     });
@@ -1958,7 +1960,8 @@ export default function NuminaSheet() {
                       expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.filter((_: PurchasedSkill, i: number) => i!==arr.length-1-idx) },
                     };
                     if (exprName==="Aspected" && name==="Third Aspect") upd.aspect3="";
-                    if (exprName==="Savant" && name==="Skilled Learner") { upd.foundation2=""; upd.foundationSkillsPurchased=[]; }
+                    if (exprName==="Savant" && name==="Skilled Learner") { upd.foundation2=""; upd.foundationSkillsPurchased=[]; upd.savantFreeSkill1=""; }
+                    if (exprName==="Savant" && name==="Multi-talented") { upd.savantFreeSkill2=""; }
                     if (exprName==="Far Traveler" && name==="Dual Citizenship") { upd.culture2=""; upd.culture3=""; }
                     if (exprName==="Far Traveler" && name==="Multinational") upd.culture3="";
                     return { ...c, ...upd };
@@ -1984,6 +1987,58 @@ export default function NuminaSheet() {
                           : char.foundation && char.foundation2 ? " Same category — no additional skill list unlocked." : ""}
                       </div>
                     )}
+                    {exprName==="Savant" && showSecondFoundation && (
+                      <div style={{fontFamily:"var(--font-body)",fontSize:11,marginBottom:8,padding:"8px 10px",background:"var(--paper-warm)",border:"1px dashed var(--ink-light)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                        <span style={{color:"var(--ink-mid)"}}>Free Open Skill (Skilled Learner):</span>
+                        <select
+                          style={{fontFamily:"var(--font-body)",fontSize:11,border:"1px solid var(--ink-light)",background:"var(--paper)",color:"var(--ink)",padding:"3px 6px",cursor:"pointer",borderRadius:0}}
+                          value={char.savantFreeSkill1||""}
+                          onChange={e => {
+                            const newSkill = e.target.value;
+                            setChar(c => {
+                              let openSkills = c.openSkillsPurchased;
+                              if (newSkill) {
+                                const firstIdx = openSkills.findIndex(s => s.name === newSkill);
+                                if (firstIdx !== -1) openSkills = openSkills.filter((_, i) => i !== firstIdx);
+                              }
+                              return { ...c, savantFreeSkill1: newSkill, openSkillsPurchased: openSkills };
+                            });
+                          }}
+                        >
+                          <option value="">— choose free skill —</option>
+                          {SAVANT_FREE_SKILL_OPTIONS.map(n => (
+                            <option key={n} value={n} disabled={n === (char.savantFreeSkill2||"")}>{n}</option>
+                          ))}
+                        </select>
+                        {char.savantFreeSkill1 && <span style={{color:"var(--fortitude)",fontSize:10}}>✓ {char.savantFreeSkill1} granted free</span>}
+                      </div>
+                    )}
+                    {exprName==="Savant" && hasMultiTalented && (
+                      <div style={{fontFamily:"var(--font-body)",fontSize:11,marginBottom:8,padding:"8px 10px",background:"var(--paper-warm)",border:"1px dashed var(--ink-light)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                        <span style={{color:"var(--ink-mid)"}}>Free Open Skill (Multi-talented):</span>
+                        <select
+                          style={{fontFamily:"var(--font-body)",fontSize:11,border:"1px solid var(--ink-light)",background:"var(--paper)",color:"var(--ink)",padding:"3px 6px",cursor:"pointer",borderRadius:0}}
+                          value={char.savantFreeSkill2||""}
+                          onChange={e => {
+                            const newSkill = e.target.value;
+                            setChar(c => {
+                              let openSkills = c.openSkillsPurchased;
+                              if (newSkill) {
+                                const firstIdx = openSkills.findIndex(s => s.name === newSkill);
+                                if (firstIdx !== -1) openSkills = openSkills.filter((_, i) => i !== firstIdx);
+                              }
+                              return { ...c, savantFreeSkill2: newSkill, openSkillsPurchased: openSkills };
+                            });
+                          }}
+                        >
+                          <option value="">— choose free skill —</option>
+                          {SAVANT_FREE_SKILL_OPTIONS.map(n => (
+                            <option key={n} value={n} disabled={n === (char.savantFreeSkill1||"")}>{n}</option>
+                          ))}
+                        </select>
+                        {char.savantFreeSkill2 && <span style={{color:"var(--fortitude)",fontSize:10}}>✓ {char.savantFreeSkill2} granted free</span>}
+                      </div>
+                    )}
                     {exprName==="Far Traveler" && showSecondCulture && (
                       <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)",marginBottom:8,padding:"6px 10px",background:"var(--paper-warm)",border:"1px dashed var(--ink-light)"}}>
                         ✓ Dual Citizenship active — select Culture 2 on the Background tab.
@@ -2005,8 +2060,13 @@ export default function NuminaSheet() {
               {(() => {
                 const purchased = char.openSkillsPurchased;
                 const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s+e.cost, 0);
+                const savantFreeSkills = [char.savantFreeSkill1||"", char.savantFreeSkill2||""].filter(Boolean);
+                const freeItems = [
+                  { slot: "Skilled Learner", name: char.savantFreeSkill1||"" },
+                  { slot: "Multi-talented", name: char.savantFreeSkill2||"" },
+                ].filter(item => item.name);
                 const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
-                const canAdd = (skill: SkillDef) => countOf(skill.name) < (skill.maxCount||1);
+                const canAdd = (skill: SkillDef) => !savantFreeSkills.includes(skill.name) && countOf(skill.name) < (skill.maxCount||1);
                 const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("openSkillsPurchased",[...purchased,{name:skill.name,cost:skill.cost}]); };
                 const removeOne = (name: string) => {
                   const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);
@@ -2016,8 +2076,33 @@ export default function NuminaSheet() {
                 return (
                   <>
                     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}>
-                      <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{purchased.length} skill{purchased.length!==1?"s":""} · {totalSpent} CP spent</div>
+                      <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{purchased.length + freeItems.length} skill{purchased.length+freeItems.length!==1?"s":""} · {totalSpent} CP spent</div>
                     </div>
+                    {freeItems.length > 0 && (
+                      <div style={{marginBottom:8,display:"flex",flexDirection:"column",gap:4}}>
+                        {freeItems.map(item => {
+                          const def = OPEN_SKILLS.find(s => s.name === item.name);
+                          if (!def) return null;
+                          return (
+                            <div key={item.slot} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"7px 10px",background:"var(--ink)",border:"1px solid var(--ink)"}}>
+                              <div style={{minWidth:24,display:"flex",alignItems:"center",justifyContent:"center",paddingTop:2,flexShrink:0}}>
+                                <div style={{width:14,height:14,border:"2px solid var(--paper-warm)",background:"var(--paper-warm)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                                  <span style={{color:"var(--ink)",fontSize:9,lineHeight:1}}>✓</span>
+                                </div>
+                              </div>
+                              <div style={{flex:1}}>
+                                <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
+                                  <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--paper-warm)"}}>{def.name}</span>
+                                  <span style={{fontSize:9,padding:"1px 5px",fontStyle:"italic",background:"rgba(255,255,255,0.15)",color:"var(--paper-warm)"}}>free · {item.slot}</span>
+                                  {def.verbal && def.verbal !== "N/A" && <span style={{fontSize:9,fontStyle:"italic",color:"rgba(255,255,255,0.5)"}}>"{def.verbal}"</span>}
+                                </div>
+                                <div style={{fontSize:10,marginTop:2,lineHeight:1.4,color:"rgba(255,255,255,0.7)"}}>{def.description}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                     <SkillPickerList skills={OPEN_SKILLS} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeOne} />
                   </>
                 );

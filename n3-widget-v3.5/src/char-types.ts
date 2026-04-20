@@ -33,6 +33,8 @@ export interface CharState {
   voidVal: number; purposePurchased: number; vitalityPurchased: number;
   armorType: string;
   openSkillsPurchased: PurchasedSkill[];
+  savantFreeSkill1: string;
+  savantFreeSkill2: string;
   excellencySkillsPurchased: Record<string, PurchasedSkill[]>;
   expressionSkillsPurchased: Record<string, PurchasedSkill[]>;
   hiddenExcellencies: string[];
@@ -67,6 +69,8 @@ export const DEFAULT_CHAR: CharState = {
   voidVal: 2, purposePurchased: 0, vitalityPurchased: 0,
   armorType: "Unarmored",
   openSkillsPurchased: [],
+  savantFreeSkill1: "",
+  savantFreeSkill2: "",
   excellencySkillsPurchased: {},
   expressionSkillsPurchased: {},
   hiddenExcellencies: [],

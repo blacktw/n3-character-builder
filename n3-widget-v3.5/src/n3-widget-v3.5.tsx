@@ -761,6 +761,173 @@ function usedCP(char: CharState): number {
   return used;
 }
 
+// ─── SUMMARY TAB HELPERS ─────────────────────────────────────────────────────
+
+type FrequencyType = 'passive' | 'attribute' | 'short-rest' | 'long-rest' | 'event';
+
+interface SummarySkill {
+  name: string;
+  source: string;
+  def: SkillDef;
+}
+
+const WORD_TO_NUM: Record<string, number> = {
+  one:1, two:2, three:3, four:4, five:5,
+  six:6, seven:7, eight:8, nine:9, ten:10,
+};
+
+function parseSkillFrequency(def: SkillDef): { type: FrequencyType; count: number } {
+  const desc = def.description || '';
+  const attr = def.attribute || '';
+
+  if (/^\d+\s+(Prowess|Insight|Fortitude)/i.test(attr)) return { type: 'attribute', count: 1 };
+
+  // "Short Rest you gain N" pattern (domain Determination skills)
+  const srGain = desc.match(/short rest[^.]*?(?:you gain|gain)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i);
+  if (srGain) {
+    const w = srGain[1].toLowerCase();
+    return { type: 'short-rest', count: WORD_TO_NUM[w] ?? parseInt(w) ?? 1 };
+  }
+
+  if (/twice per short rest/i.test(desc)) return { type: 'short-rest', count: 2 };
+  const srX = desc.match(/(\d+)x?\s*per\s*short\s*rest/i);
+  if (srX) return { type: 'short-rest', count: parseInt(srX[1]) };
+  if (/once per short rest/i.test(desc)) return { type: 'short-rest', count: 1 };
+
+  if (/twice per long rest/i.test(desc)) return { type: 'long-rest', count: 2 };
+  const lrX = desc.match(/(\d+)x?\s*per\s*long\s*rest/i);
+  if (lrX) return { type: 'long-rest', count: parseInt(lrX[1]) };
+  if (/once per long rest|1x\/long rest/i.test(desc)) return { type: 'long-rest', count: 1 };
+
+  if (/twice per event/i.test(desc)) return { type: 'event', count: 2 };
+  const evX = desc.match(/(\d+)x?\s*per\s*event/i);
+  if (evX) return { type: 'event', count: parseInt(evX[1]) };
+  if (/once per event|1x\/event/i.test(desc)) return { type: 'event', count: 1 };
+
+  return { type: 'passive', count: -1 };
+}
+
+function isSkillThread(def: SkillDef): boolean {
+  const combined = (def.description || '') + ' ' + (def.attribute || '') + ' ' + (def.verbal || '');
+  return /thread skill|extra thread/i.test(combined);
+}
+
+function isExtraThread(def: SkillDef): boolean {
+  const combined = (def.description || '') + ' ' + (def.attribute || '') + ' ' + (def.verbal || '');
+  return /extra thread/i.test(combined);
+}
+
+function skillHasMultipleEffects(def: SkillDef): boolean {
+  const desc = def.description || '';
+  const verbal = def.verbal || '';
+  if (/counts as multiple attacks for thread skills/i.test(desc)) return true;
+  if (/\btriple\b/i.test(verbal)) return true;
+  const m = desc.match(/(?:gain|grant(?:ing)?|get)\s+(two|three|four|five|six|seven|eight|nine|ten|\d+)\s+(?:additional\s+)?(?:missile|melee|archery|packet|healing)?\s*(?:attacks?|effects?|uses?)/i);
+  if (m) {
+    const w = m[1].toLowerCase();
+    const n = WORD_TO_NUM[w] ?? parseInt(w) ?? 0;
+    if (n > 1) return true;
+  }
+  return false;
+}
+
+function threadAppliesTo(thread: SkillDef, target: SkillDef): boolean {
+  if (isSkillThread(target)) return false;
+
+  const tDesc = thread.description || '';
+  const tDescL = tDesc.toLowerCase();
+  const targetVerbal = (target.verbal || '').toLowerCase();
+  const targetDescL = (target.description || '').toLowerCase();
+  const targetAll = targetVerbal + ' ' + targetDescL;
+  const targetName = (target.name || '').toLowerCase();
+
+  // Named-skill-specific: check for skill names in single quotes in thread description
+  const nameRefs = tDesc.match(/'([^']+)'/g);
+  if (nameRefs && nameRefs.length > 0) {
+    const names = nameRefs.map(n => n.replace(/'/g, '').trim().toLowerCase());
+    return names.some(n => targetName === n || n.includes(targetName) || targetName.includes(n));
+  }
+
+  // Rule: thread targets multi-effect skills → target must have multiple effects
+  if (/granting multiple|with multiple uses/i.test(tDesc)) {
+    if (!skillHasMultipleEffects(target)) return false;
+  }
+
+  // Rule: thread requires damage in target → target verbal must contain "Damage"
+  if (/called damage|damage\s+(?:archery|missile|melee|packet)\s+(?:attack|effect)|(?:melee|packet|missile|archery)\s+(?:attack|effect)\s+of\s+\d+\s+damage/i.test(tDesc)) {
+    if (!/\bdamage\b/i.test(target.verbal || '')) return false;
+  }
+
+  // Attack type matching: if thread specifies a type, require target to match
+  const tMelee = /\bmelee\b/i.test(tDescL);
+  const tPacket = /\bpacket\b/i.test(tDescL);
+  const tMissile = /\bmissile\b|\barchery\b|\barrow\b/i.test(tDescL);
+  const tHeal = /\bheal\b/i.test(tDescL);
+  const tProt = /\bprotection\b/i.test(tDescL);
+  const tRepair = /\brepair armor\b/i.test(tDescL);
+
+  const targetMelee = /\bmelee\b/i.test(targetAll);
+  const targetPacket = /\bpacket\b/i.test(targetAll);
+  const targetMissile = /\bmissile\b|\barchery\b|\barrow\b|\bbow\b|\bcrossbow\b/i.test(targetAll);
+  const targetHeal = /\bheal\b/i.test(targetAll);
+  const targetProt = /\bprotection\b/i.test(targetAll);
+  const targetRepair = /\brepair armor\b/i.test(targetAll);
+
+  if (tMelee && !tPacket && !tMissile && !targetMelee) return false;
+  if (tPacket && !tMelee && !tMissile && !targetPacket) return false;
+  if (tMissile && !tMelee && !tPacket && !targetMissile) return false;
+  if (tHeal && !tMelee && !tPacket && !tMissile && !tProt && !tRepair && !targetHeal) return false;
+  if (tProt && !tMelee && !tPacket && !tHeal && !targetProt) return false;
+  if (tRepair && !tMelee && !tPacket && !targetRepair) return false;
+
+  return true;
+}
+
+function getAllSkillsForSummary(char: CharState): SummarySkill[] {
+  const skills: SummarySkill[] = [];
+
+  ADVENTURER_SKILLS.forEach(s => {
+    skills.push({ name: s.name, source: 'Adventurer', def: { name: s.name, cost: 0, verbal: 'N/A', description: s.description } });
+  });
+
+  (DOMAIN_SKILLS[char.domain] || []).filter(d => d.cost === 0).forEach(d => {
+    skills.push({ name: d.name, source: `${char.domain} Domain (free)`, def: d });
+  });
+
+  const savantFree = [char.savantFreeSkill1 || '', char.savantFreeSkill2 || ''].filter(Boolean);
+  savantFree.forEach(sName => {
+    const def = OPEN_SKILLS.find(d => d.name === sName);
+    if (def) skills.push({ name: sName, source: 'Savant (free)', def });
+  });
+
+  const sources: Array<{ name: string; source: string; skillDefs: SkillDef[] }> = [
+    ...Object.entries(char.excellencySkillsPurchased).flatMap(([n, arr]) =>
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXCELLENCY_SKILLS[n] || [] }))
+    ),
+    ...Object.entries(char.expressionSkillsPurchased).flatMap(([n, arr]) =>
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXPRESSION_SKILLS[n] || [] }))
+    ),
+    ...Object.entries(char.hiddenExcellencySkillsPurchased || {}).flatMap(([n, arr]) =>
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXCELLENCY_SKILLS[n] || [] }))
+    ),
+    ...Object.entries(char.hiddenExpressionSkillsPurchased || {}).flatMap(([n, arr]) =>
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [] }))
+    ),
+    ...char.domainSkillsPurchased.map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [] })),
+    ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS })),
+    ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation) })),
+    ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS })),
+    ...char.openSkillsPurchased.map(s => ({ name: s.name, source: 'Open Skills', skillDefs: OPEN_SKILLS })),
+  ];
+
+  sources.forEach(({ name, source, skillDefs }) => {
+    const def = skillDefs.find(d => d.name === name);
+    if (def) skills.push({ name, source, def });
+  });
+
+  return skills;
+}
+
 // ─── SUB-COMPONENTS ──────────────────────────────────────────────────────────
 
 function Section({ title, children, accent = false }: { title: string; children: React.ReactNode; accent?: boolean }) {
@@ -852,7 +1019,7 @@ function CPBadge({ used, total }: { used: number; total: number }) {
   );
 }
 
-const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Spells & Abilities","Notes","Export / Print"];
+const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Summary","Spells & Abilities","Notes","Export / Print"];
 
 function Tab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
@@ -2116,8 +2283,148 @@ export default function NuminaSheet() {
             </Section>
           )}
 
-          {/* ── TAB 6: SPELLS & ABILITIES ── */}
-          {tab === 6 && (
+          {/* ── TAB 6: SUMMARY ── */}
+          {tab === 6 && (() => {
+            const allSkills = getAllSkillsForSummary(char);
+            const threadSkills = allSkills.filter(s => isSkillThread(s.def));
+            const nonThreadSkills = allSkills.filter(s => !isSkillThread(s.def));
+
+            type FreqGroup = SummarySkill & { freq: { type: FrequencyType; count: number } };
+            const byFreq: Record<FrequencyType, FreqGroup[]> = {
+              passive: [], attribute: [], 'short-rest': [], 'long-rest': [], event: [],
+            };
+            nonThreadSkills.forEach(s => {
+              const freq = parseSkillFrequency(s.def);
+              byFreq[freq.type].push({ ...s, freq });
+            });
+
+            const freqLabel: Record<FrequencyType, string> = {
+              passive: 'Passive / Always Available',
+              attribute: 'Attribute Pool (Restores on Short Rest)',
+              'short-rest': 'Short Rest',
+              'long-rest': 'Long Rest',
+              event: 'Per Event',
+            };
+            const freqColor: Record<FrequencyType, string> = {
+              passive: 'var(--ink-mid)',
+              attribute: 'var(--prowess)',
+              'short-rest': '#2e7d32',
+              'long-rest': '#1565c0',
+              event: 'var(--red)',
+            };
+            const ORDER: FrequencyType[] = ['short-rest', 'long-rest', 'event', 'attribute', 'passive'];
+
+            const prowess = char.prowessPurchased + 2;
+            const insight = char.insightPurchased + 2;
+            const fortitude = char.fortitudePurchased + 2;
+
+            return (
+              <>
+                <Section title="Skill Activations Summary" accent>
+                  <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12, lineHeight:1.5 }}>
+                    All skills available to this character, grouped by when they refresh.
+                    Attribute pools restore on Short Rest — <strong style={{color:"var(--prowess)"}}>Prowess {prowess}</strong> · <strong style={{color:"var(--insight)"}}>Insight {insight}</strong> · <strong style={{color:"var(--fortitude)"}}>Fortitude {fortitude}</strong>.
+                  </div>
+                  {ORDER.map(freqType => {
+                    const group = byFreq[freqType];
+                    if (group.length === 0) return null;
+                    return (
+                      <div key={freqType} style={{ marginBottom:16 }}>
+                        <div style={{ fontFamily:"var(--font-display)", fontSize:11, letterSpacing:"0.1em", textTransform:"uppercase", color:freqColor[freqType], borderBottom:"1px solid currentColor", paddingBottom:4, marginBottom:8 }}>
+                          {freqLabel[freqType]}
+                        </div>
+                        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                          {group.map((s, i) => {
+                            const attr = s.def.attribute || '';
+                            const attrColor = /prowess/i.test(attr) ? 'var(--prowess)' : /insight/i.test(attr) ? 'var(--insight)' : /fortitude/i.test(attr) ? 'var(--fortitude)' : null;
+                            const countBadge = s.freq.count > 0 ? `${s.freq.count}×` : null;
+                            return (
+                              <div key={i} style={{ padding:"6px 10px", background:"var(--paper-warm)", border:"1px solid var(--ink-faint)", display:"flex", gap:8, alignItems:"flex-start" }}>
+                                <div style={{ flex:1 }}>
+                                  <div style={{ display:"flex", gap:6, alignItems:"baseline", flexWrap:"wrap" }}>
+                                    <span style={{ fontFamily:"var(--font-display)", fontSize:12, color:"var(--ink)" }}>{s.name}</span>
+                                    {countBadge && (
+                                      <span style={{ fontSize:9, padding:"1px 5px", background:freqColor[freqType], color:"white", fontFamily:"var(--font-display)" }}>{countBadge}</span>
+                                    )}
+                                    {attrColor && attr && (
+                                      <span style={{ fontSize:9, padding:"1px 5px", background:attrColor, color:"white" }}>{attr}</span>
+                                    )}
+                                    <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>{s.source}</span>
+                                    {s.def.verbal && s.def.verbal !== 'N/A' && (
+                                      <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>"{s.def.verbal}"</span>
+                                    )}
+                                  </div>
+                                  {s.def.description && (
+                                    <div style={{ fontSize:10, color:"var(--ink-mid)", marginTop:2, lineHeight:1.4 }}>{s.def.description}</div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </Section>
+
+                <Section title="Thread Skill Applicability">
+                  {threadSkills.length === 0 ? (
+                    <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", fontStyle:"italic" }}>
+                      No Thread Skills purchased. Purchase skills marked "Thread Skill" to see applicability analysis here.
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12, lineHeight:1.5 }}>
+                        Skills that have applicable Thread Skills from your purchases are shown below. Up to 3 Thread Skills (+ 1 Extra Thread) may be applied per skill use. Skills marked <strong>Multi</strong> grant multiple effects and are eligible for "add one extra" threads.
+                      </div>
+                      {nonThreadSkills
+                        .filter(target => threadSkills.some(ts => threadAppliesTo(ts.def, target.def)))
+                        .map((target, i) => {
+                          const applicable = threadSkills.filter(ts => threadAppliesTo(ts.def, target.def));
+                          const isMulti = skillHasMultipleEffects(target.def);
+                          return (
+                            <div key={i} style={{ marginBottom:8, padding:"10px 12px", background:"var(--paper-warm)", border:"1px solid var(--ink-faint)" }}>
+                              <div style={{ display:"flex", gap:8, alignItems:"baseline", flexWrap:"wrap", marginBottom:6 }}>
+                                <span style={{ fontFamily:"var(--font-display)", fontSize:13, color:"var(--ink)" }}>{target.name}</span>
+                                <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>{target.source}</span>
+                                {target.def.verbal && target.def.verbal !== 'N/A' && (
+                                  <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>"{target.def.verbal}"</span>
+                                )}
+                                {isMulti && (
+                                  <span style={{ fontSize:9, padding:"1px 5px", background:"var(--ink)", color:"var(--paper)", fontFamily:"var(--font-display)" }}>Multi</span>
+                                )}
+                              </div>
+                              <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
+                                {applicable.map((ts, j) => {
+                                  const extra = isExtraThread(ts.def);
+                                  return (
+                                    <div key={j} style={{ padding:"3px 8px", background: extra ? "var(--red)" : "var(--ink)", color:"var(--paper)", fontSize:10, fontFamily:"var(--font-display)" }}>
+                                      {extra ? '★ ' : ''}{ts.name}
+                                      <span style={{ fontWeight:"normal", fontSize:9, color:"rgba(255,255,255,0.6)", marginLeft:4 }}>({ts.source})</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      {(() => {
+                        const noThreadCount = nonThreadSkills.filter(t => !threadSkills.some(ts => threadAppliesTo(ts.def, t.def))).length;
+                        return noThreadCount > 0 ? (
+                          <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:8, fontStyle:"italic" }}>
+                            {noThreadCount} skill{noThreadCount !== 1 ? 's' : ''} have no applicable Thread Skills from your current purchases.
+                          </div>
+                        ) : null;
+                      })()}
+                    </>
+                  )}
+                </Section>
+              </>
+            );
+          })()}
+
+          {/* ── TAB 7: SPELLS & ABILITIES ── */}
+          {tab === 7 && (
             <>
               <Section title="Spellcasting & Abilities Summary" accent>
                 <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", lineHeight:1.7 }}>
@@ -2191,13 +2498,13 @@ export default function NuminaSheet() {
             </>
           )}
 
-          {/* ── TAB 8: EXPORT / PRINT ── */}
-          {tab === 8 && (
+          {/* ── TAB 9: EXPORT / PRINT ── */}
+          {tab === 9 && (
             <ExportPanel char={char} setChar={setChar} />
           )}
 
-          {/* ── TAB 7: NOTES ── */}
-          {tab === 7 && (
+          {/* ── TAB 8: NOTES ── */}
+          {tab === 8 && (
             <>
               <Section title="Character History & Background" accent>
                 <textarea value={char.history||""} onChange={e => update("history",e.target.value)} placeholder="Write your character's history here. Submitting a character history is worth 2 bonus CP!" style={{...inputStyle,width:"100%",minHeight:160,resize:"vertical",lineHeight:1.7}} />

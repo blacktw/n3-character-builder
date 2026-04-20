@@ -11,7 +11,8 @@
       "Bash(python -c \"import PyPDF2; print\\('ok'\\)\")",
       "Bash(python -c \"import pdfminer; print\\('ok'\\)\")",
       "Bash(pip install *)",
-      "Bash(python -)"
+      "Bash(python -)",
+      "Bash(npx tsc *)"
     ]
   }
 }

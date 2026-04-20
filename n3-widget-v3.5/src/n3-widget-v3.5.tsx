@@ -1141,7 +1141,7 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
 </div>`:""}
 
 <div style="margin-top:18pt;font-size:8pt;color:#9a8c6e;text-align:center;border-top:0.5pt solid #c8bca0;padding-top:5pt;font-style:italic;">
-  All contents were created by Zyz Inc for use with the Numina LARP.
+  All contents were created by Zyz Inc for use with the Numina LARP. Rules version v3.5.1
   <span style="display:block;margin-top:2pt;color:#c8bca0;font-style:normal;">Generated ${new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}</span>
 </div>
 </div></body></html>`;
@@ -1412,7 +1412,7 @@ export default function NuminaSheet() {
               <input type="number" value={char.bonusCP} onChange={e => update("bonusCP", parseInt(e.target.value)||0)} style={{ ...inputStyle, width:46, marginLeft:4 }} min={0} />
             </div>
             <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:4, lineHeight:1.4 }}>Earn bonus CP by attending events (1), submitting PELs (0.5), NPCing (up to 2), setup/cleanup tasks (0.5 each).</div>
-            <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:11, color:"var(--ink-light)", marginTop:6, letterSpacing:"0.02em" }}>All contents were created by Zyz Inc for use with the Numina LARP.</div>
+            <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:11, color:"var(--ink-light)", marginTop:6, letterSpacing:"0.02em" }}>All contents were created by Zyz Inc for use with the Numina LARP. Rules version v3.5.1</div>
           </div>
         </div>
 
@@ -1879,7 +1879,7 @@ export default function NuminaSheet() {
           {tab === 4 && (
             <>
               <Section title="Expressions (up to 2 at creation)" accent>
-                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:10, lineHeight:1.5 }}>1st Expression: 4 CP · 2nd: 5 CP.</div>
+                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:10, lineHeight:1.5 }}>1st Expression: 5 CP · 2nd: 6 CP.</div>
                 <div style={{ display:"flex", gap:8, marginBottom:10, flexWrap:"wrap" }}>
                   {char.expressions.map((e,i) => (
                     <div key={e} style={{ padding:"4px 10px", border:"2px solid var(--ink-mid)", fontFamily:"var(--font-display)", fontSize:12, display:"flex", alignItems:"center", gap:8 }}>

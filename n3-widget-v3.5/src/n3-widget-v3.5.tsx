@@ -160,7 +160,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Quick Strike", cost:4, verbal:"'4 Damage'", description:"Melee attack for 4 Damage.", attribute:"1 Prowess" },
     { name:"A Little Bit More", cost:4, verbal:"'5 Damage'", description:"When your death effect is negated by a called defense, gain a melee attack of 5 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"The Little Death", cost:2, verbal:"'Short Weakness'", description:"Melee attack for Short Weakness.", attribute:"1 Insight" },
-    { name:"Touch Death", cost:4, verbal:"N/A", description:"If you die (including a life effect), refresh a use of Deadly Strike.", attribute:"At will" },
+    { name:"Touch Death", cost:4, verbal:"N/A", description:"If you die and have the 'Dead' condition, and you receive a Cure Death effect, you refresh a use of the skill Deadly Strike.", attribute:"At will" },
     { name:"Seeing Another's Time", cost:3, verbal:"N/A", description:"During a Short Rest, study a single opponent; your damage melee attacks against them from any source are +2 damage. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Awakener": [
@@ -247,7 +247,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   "Devastator": [
     { name:"Caster's Companion", cost:0, verbal:"N/A", description:"Free. Wield a single basic one-handed weapon while making packet attacks from your other hand." },
     { name:"Channel Sparks", cost:4, verbal:"'2 Damage by Fire'", description:"Gain two attacks of '2 Damage by Fire' as packet or melee.", attribute:"1 Fortitude" },
-    { name:"Hand of Magics", cost:3, verbal:"N/A", description:"If you've had only a single one-handed weapon or packets since your last Short Rest, Spell attacks of 2 or greater are +1 damage. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Hand of Magics", cost:3, verbal:"N/A", description:"If you've had only a single one-handed weapon or packets since your last Short Rest, Packet attacks of 2 or greater are +1 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Hand of Steel", cost:3, verbal:"N/A", description:"If you've had only a single one-handed weapon or packets since your last Short Rest, Melee attacks of 2 or greater are +1 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Summon to Your Blade", cost:3, verbal:"N/A", description:"Once per Long Rest, if you throw a packet and miss, convert that spell to a melee attack at no additional cost. Lost if you make another called attack first or take a Long Rest." },
     { name:"Channel Will", cost:4, verbal:"'Agony by Will'", description:"Make an 'Agony by Will' attack by packet or melee.", attribute:"1 Prowess" },
@@ -363,7 +363,7 @@ const EXPRESSIONS = [
 
 const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
   "Aspected": [
-    { name:"Third Aspect", cost:0, verbal:"See Description", description:"Free. Choose a 3rd Aspect. Gain one ability usable via any of your three Aspect Traits: Bane (5 Damage Packet/Melee/Missile, 1 Fortitude) or Balm (Heal 5 touch packet, 1 Fortitude). Grants a Third Aspect selector on the Background tab.", attribute:"1 Fortitude" },
+    { name:"Third Aspect", cost:0, verbal:"See Description", description:"Free. Choose a 3rd Aspect. Gain one ability usable via any of your three Aspect Traits: Bane (5 Damage Packet/Melee/Missile, 1 Fortitude), Balm (Heal 5 touch packet, 1 Fortitude), or Repulse (Repel Packet/Melee/Missile attack, 1 attribute). Grants a Third Aspect selector on the Background tab.", attribute:"1 Fortitude" },
     { name:"Gather Aspect", cost:4, verbal:"'Heal All by <trait>'", description:"Once per Long Rest, when presented with a source of any of your aspects, spend 10 seconds of rest at the source and restore all your Vitality." },
     { name:"Commune with Aspects", cost:2, verbal:"N/A", description:"Once per event, after taking a Long Rest you can refresh a single 1x/event skill you used." },
     { name:"Aspect Versatility", cost:0, verbal:"N/A", description:"Free. Purchase up to 3 additional abilities from your available Aspect skill list." },
@@ -420,13 +420,13 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
     { name:"Complete Focus", cost:0, verbal:"'Purge Mental'", description:"Free. Carry an item representative of your Foundation. Roleplay 3 seconds touching the item, spend 1 attribute, and Purge any mental effect. Can be used even while Paralyzed if the item is on your person.", attribute:"1 Fortitude" },
     { name:"Complimentary Exchange", cost:4, verbal:"'Grant 4 protection by Inspiration'", description:"Show appreciation to someone for their skill in their Foundation (roleplaying choice). After showing appreciation, use a Touch Packet on them for the effect.", attribute:"1 Insight" },
     { name:"Well Founded", cost:4, verbal:"N/A", description:"Gain one additional use per event of each of your per-event Foundation Skills." },
-    { name:"Tricks of the Trade", cost:4, verbal:"See description", description:"Twice per Long Rest, take 10 seconds of rest while holding an item of your Foundation. By doing so, refresh your Domain 'Touch' skill." },
+    { name:"Tricks of the Trade", cost:4, verbal:"See description", description:"Once per Long Rest, if you hold an item of your Foundation while taking a Short Rest, you can use the skill 'Fire's Touch, Air's Touch, Water's Touch, Ice's Touch, or Lightning's Touch' without having to spend Void." },
   ],
   "Remembrancer": [
     { name:"Tongue of the Moth", cost:0, verbal:"'Speak to Dead'", description:"Free. Gain the ability to 'Speak to Dead' and 'Speak to Spirit of the Dead', allowing you to speak to someone lying dead in front of you or who has turned to spirit after dying." },
     { name:"Carry Token", cost:3, verbal:"Unique — based on chosen Memento Mori", description:"Carry one of three tokens (switch after Long Rest in Place of Peace): (1) Token of Joy: 1x/Long Rest, stabilize at 59 seconds if unstable. (2) Token of Sorrow: 1x/Long Rest, increase a melee/missile/packet attack to include 'and Agony by Fear' (Thread Skill). (3) Token of Wonder: 1x/Long Rest, spend 2 Prowess and grant 'Melee attack Five Damage and Grant Extra Melee attack Five Damage'." },
     { name:"Friend of Death", cost:4, verbal:"N/A", description:"When you die, you are known to Death as a Remembrancer and may gain additional concessions from Death while in Death's realm. Invoke upon meeting Death as a spirit by saying 'I carry the memories of the dead'." },
-    { name:"Sooth Memory", cost:4, verbal:"'Cure Mental by Memory'", description:"Soothe those whose minds are disrupted. Spend 1 Intent to 'Cure Mental by Memory'.", attribute:"1 Intent" },
+    { name:"Sooth Memory", cost:4, verbal:"'Cure Mental by Memory'", description:"Soothe those whose minds are disrupted. Spend one point of Insight to 'Cure Mental by Memory'.", attribute:"1 Insight" },
   ],
   "Savant": [
     { name:"Skilled Learner", cost:0, verbal:"N/A", description:"Free. Select a second Foundation — gain its trait and may purchase its skills (max Foundation skills increases by 1). If the second Foundation is a different category from your first, you may buy skills from both category lists. Choose one free Open Skill: Buckler, Disarm Trap, Pick Locks, Cornucopia, Merchant, Platform, Resourceful, or Two Weapons." },
@@ -510,7 +510,7 @@ function totalAttrCost(purchased: number): number {
   return total;
 }
 function excellencyCost(index: number): number { return 5 + index; }
-function expressionCost(index: number): number { return 4 + index; }
+function expressionCost(index: number): number { return 5 + index; }
 
 const ADVENTURER_SKILLS = [
   { name:"Base Weapon Skills", description:"Skilled with Basic One-Handed & Two-Handed weapons." },
@@ -575,7 +575,7 @@ const SPECIALTY_SKILLS: SkillDef[] = [
 
 const RESOURCE_SKILLS: SkillDef[] = [
   { name:"Enhance", cost:2, verbal:"N/A", description:"Once per event, when using a healing or damage effect powered by your Specialty, Increase the effect by 4. Extra Thread Skill." },
-  { name:"Find Resources", cost:2, verbal:"N/A", description:"You have a way of finding Resources. At check-in you gain an extra 2 Drakar coin." },
+  { name:"Discover", cost:2, verbal:"N/A", description:"You have a way of finding Resources. At check-in you gain an extra 2 Drakar coin." },
   { name:"Convert", cost:2, verbal:"'… by Providence'", description:"Once per event, make a damage, Agony, or Maim attack with the Trait 'By Providence'." },
   { name:"What's in Back", cost:2, verbal:"N/A", description:"Once per event, access an additional list of items for sale from the Guild and purchase one." },
   { name:"Shopping Spree", cost:2, verbal:"N/A", description:"Once per event, when you use a Resource (coin, components, magic items, etc.), gain a point of Prowess until your next Long Rest." },
@@ -592,7 +592,7 @@ const INTERACTION_SKILLS: SkillDef[] = [
 ];
 
 const OPEN_SKILLS: SkillDef[] = [
-  { name:"Acrobat", cost:4, verbal:"N/A", description:"Gain the benefit of Light Armor without wearing armor. Skills/items that affect armor apply to your costuming instead." },
+  { name:"Agility", cost:4, verbal:"N/A", description:"Gain the benefit of Light Armor without wearing armor. Skills/items that affect armor apply to your costuming instead. Agility only replaces the need for a Light Armor phys rep. If you want the benefits of Medium or Heavy armor, you must wear the appropriate phys rep for that armor type." },
   { name:"Archery", cost:3, verbal:"N/A", description:"Use a bow or crossbow in combat. You get 5 shots; Short Rest to prepare 5 more. You may block with your bow but not wield a weapon in your other hand." },
   { name:"Buckler", cost:3, verbal:"N/A", description:"Use a buckler in combat alongside any one-handed weapon you are skilled with." },
   { name:"Shield", cost:3, verbal:"N/A", description:"Use a shield in combat alongside any basic one-handed weapon you are skilled with." },
@@ -608,7 +608,7 @@ const OPEN_SKILLS: SkillDef[] = [
   { name:"Courier", cost:4, verbal:"N/A", description:"Send a physical message via the Lattice to any character you have been formally or informally introduced to." },
   { name:"Disarm Traps", cost:1, verbal:"N/A", description:"Use tools or your hands to disable in-game traps. Cannot damage props without NPC permission." },
   { name:"Pick Locks", cost:1, verbal:"N/A", description:"Engage with lock-based challenges (including picking actual locks) marked as such in-game." },
-  { name:"Merchant", cost:2, verbal:"N/A", description:"Gain X coins at check-in. May also sell out-of-game items for in-game coin." },
+  { name:"Merchant", cost:2, verbal:"N/A", description:"Gain 3 coins at check-in. May also sell out-of-game items for in-game coin." },
   { name:"Resourceful", cost:2, verbal:"N/A", description:"At check-in, gain 2 random components." },
   { name:"True Sight", cost:2, verbal:"N/A", description:"Between events, send up to 2 yes/no questions about cosmological facts learned in-game. Receive a 100% certain answer." },
   { name:"Cornucopia", cost:2, verbal:"'Heal All'", description:"When you sell an OOG item for in-game coin in a Place of Peace, use a touch packet to Heal All the purchaser." },
@@ -632,7 +632,7 @@ const CULTURE_SKILLS: SkillDef[] = [
 const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   Air: [
     { name:"Air's Determination", cost:0, verbal:"'2 Damage'", description:"Free. When you take a Short Rest you gain three Archery attacks of 2 damage." },
-    { name:"Air's Touch", cost:4, verbal:"'2 Damage'", description:"When you take a Short Rest and use Void to refresh attributes, your next Missile attack that costs an attribute is free." },
+    { name:"Air's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next Missile attack that costs an attribute is free." },
     { name:"Air's Grace", cost:4, verbal:"N/A", description:"You can refresh your quiver in 30 seconds instead of a minute." },
     { name:"Air's Skill", cost:2, verbal:"N/A", description:"Your quiver holds 10 arrows instead of 5. Once per Short Rest, refresh your quiver with a 10-second Rest." },
     { name:"Air's Last Stand", cost:2, verbal:"'6 Damage'", description:"Once per event, shoot an Archery attack of 6 damage." },
@@ -654,7 +654,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   ],
   Fire: [
     { name:"Fire's Determination", cost:0, verbal:"'2 Damage by Fire'", description:"Free. When you take a Short Rest you gain three packet attacks of 2 Damage by Fire." },
-    { name:"Fire's Touch", cost:4, verbal:"'3 Damage by Fire'", description:"When you take a Short Rest and use Void to refresh attributes, your next Non-Beneficial Packet attack that costs an attribute is free." },
+    { name:"Fire's Touch", cost:4, verbal:"N/A", description:"When you take a short rest, your next Non-Beneficial Packet attack that costs an attribute is free." },
     { name:"Fire's Grace", cost:3, verbal:"N/A", description:"Once each Short Rest, you can call 'Surge' and refresh your packet Flurry." },
     { name:"Fire's Skill", cost:4, verbal:"N/A", description:"You can use packet attacks while holding a staff or Basic single-handed weapon in one hand." },
     { name:"Fire's Last Stand", cost:2, verbal:"'6 damage by Fire'", description:"Once per event, cast '6 damage by Fire.' Twice per event call 'Surge' to refresh your packet Flurry." },
@@ -665,7 +665,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   ],
   Ice: [
     { name:"Ice's Determination", cost:0, verbal:"'Repair 1 Armor to self'", description:"Free. When you take a Short Rest, gain three uses of 'Repair 1 Armor to self'." },
-    { name:"Ice's Touch", cost:4, verbal:"'Repair 2 Armor to self'", description:"When you take a Short Rest and spend Void to refresh attributes, gain three more uses of 'Repair 1 Armor'. Stacks with Ice's Determination." },
+    { name:"Ice's Touch", cost:4, verbal:"'Repair 1 Armor'", description:"When you take a Short Rest, gain three uses of 'Repair 1 Armor'. Stacks with Ice's Determination." },
     { name:"Ice's Grace", cost:4, verbal:"'Resist'", description:"Once per Short Rest, Resist an effect that would destroy your shield or armor." },
     { name:"Ice's Skill", cost:4, verbal:"N/A", description:"You gain the ability to use Heavy Armor. Prerequisite: medium armor." },
     { name:"Ice's Last Stand", cost:2, verbal:"'Heal 5 and Repair 5 armor to self'", description:"Once per event, heal 5 and repair 5 armor to self." },
@@ -676,7 +676,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   ],
   Lightning: [
     { name:"Lightning's Determination", cost:0, verbal:"'2 Damage'", description:"Free. When you take a Short Rest you gain three Melee attacks of 2 Damage." },
-    { name:"Lightning's Touch", cost:4, verbal:"'3 Damage'", description:"When you take a Short Rest and use Void to refresh attributes, your next Melee attack that costs an attribute is free." },
+    { name:"Lightning's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next Melee attack that costs an attribute is free." },
     { name:"Lightning's Grace", cost:4, verbal:"'Resist'", description:"Once per Short Rest, Resist a 'Destroy weapon' effect." },
     { name:"Lightning's Skill", cost:4, verbal:"N/A", description:"Use called melee attacks 'by Force' instead of the Weapon trait. Gain weapon styles: two one-handed weapons, spear + one-handed, spear + buckler." },
     { name:"Lightning's Last Stand", cost:2, verbal:"N/A", description:"Once per event, make a melee attack of 6 damage." },
@@ -687,7 +687,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   ],
   Water: [
     { name:"Water's Determination", cost:0, verbal:"'Heal 1'", description:"Free. When you take a Short Rest you gain five 'Heal 1 by <Trait>' beneficial effects." },
-    { name:"Water's Touch", cost:4, verbal:"'Heal by <Your Trait>'", description:"When you take a Short Rest and spend a point of Void, your next beneficial effect Skill that costs an attribute is free." },
+    { name:"Water's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next beneficial effect Skill that costs an attribute is free." },
     { name:"Water's Grace", cost:4, verbal:"'… and heal 2…'", description:"Once per Short Rest, when you use a Skill (other than First Aid) with a Cure effect, improve it to 'Cure X and Heal 2'." },
     { name:"Water's Skill", cost:4, verbal:"N/A", description:"Use packets (beneficial or non-beneficial) while holding a staff or single-handed weapon in your off hand." },
     { name:"Water's Last Stand", cost:2, verbal:"'Heal All by [Your Trait]'", description:"Once per event, use a touch packet to Heal All to someone else. Twice per event call 'Surge' to refresh your packet Flurry." },
@@ -954,6 +954,12 @@ function ExportPanel({ char, setChar }: {
     try {
       const parsed = JSON.parse(importText.trim());
       if (typeof parsed !== "object" || !parsed) throw new Error("Invalid format");
+      // v3.51 migration: "Acrobat" renamed to "Agility"
+      if (Array.isArray(parsed.openSkillsPurchased)) {
+        parsed.openSkillsPurchased = parsed.openSkillsPurchased.map((s: PurchasedSkill) =>
+          s.name === "Acrobat" ? { ...s, name: "Agility" } : s
+        );
+      }
       setChar(c => ({ ...c, ...parsed }));
       setImportSuccess(true);
       setImportText("");
@@ -1135,7 +1141,7 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
 </div>`:""}
 
 <div style="margin-top:18pt;font-size:8pt;color:#9a8c6e;text-align:center;border-top:0.5pt solid #c8bca0;padding-top:5pt;font-style:italic;">
-  All contents were created by Zyz Inc for use with the Numina LARP.
+  All contents were created by Zyz Inc for use with the Numina LARP. Rules version v3.5.1
   <span style="display:block;margin-top:2pt;color:#c8bca0;font-style:normal;">Generated ${new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})}</span>
 </div>
 </div></body></html>`;
@@ -1406,7 +1412,7 @@ export default function NuminaSheet() {
               <input type="number" value={char.bonusCP} onChange={e => update("bonusCP", parseInt(e.target.value)||0)} style={{ ...inputStyle, width:46, marginLeft:4 }} min={0} />
             </div>
             <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:4, lineHeight:1.4 }}>Earn bonus CP by attending events (1), submitting PELs (0.5), NPCing (up to 2), setup/cleanup tasks (0.5 each).</div>
-            <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:11, color:"var(--ink-light)", marginTop:6, letterSpacing:"0.02em" }}>All contents were created by Zyz Inc for use with the Numina LARP.</div>
+            <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:11, color:"var(--ink-light)", marginTop:6, letterSpacing:"0.02em" }}>All contents were created by Zyz Inc for use with the Numina LARP. Rules version v3.5.1</div>
           </div>
         </div>
 
@@ -1873,7 +1879,7 @@ export default function NuminaSheet() {
           {tab === 4 && (
             <>
               <Section title="Expressions (up to 2 at creation)" accent>
-                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:10, lineHeight:1.5 }}>1st Expression: 4 CP · 2nd: 5 CP.</div>
+                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:10, lineHeight:1.5 }}>1st Expression: 5 CP · 2nd: 6 CP.</div>
                 <div style={{ display:"flex", gap:8, marginBottom:10, flexWrap:"wrap" }}>
                   {char.expressions.map((e,i) => (
                     <div key={e} style={{ padding:"4px 10px", border:"2px solid var(--ink-mid)", fontFamily:"var(--font-display)", fontSize:12, display:"flex", alignItems:"center", gap:8 }}>

@@ -6,7 +6,12 @@
       "Bash(node_modules/.bin/tsc -p tsconfig.app.json --strict --noImplicitAny)",
       "Bash(node_modules/.bin/tsc -p tsconfig.app.json)",
       "Bash(npm install *)",
-      "Bash(npm test *)"
+      "Bash(npm test *)",
+      "Bash(python -c \"import pypdf; print\\('ok'\\)\")",
+      "Bash(python -c \"import PyPDF2; print\\('ok'\\)\")",
+      "Bash(python -c \"import pdfminer; print\\('ok'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python -)"
     ]
   }
 }

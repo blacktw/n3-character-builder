@@ -1,0 +1,16 @@
+{
+  "name": "Corvin Dusk",
+  "player": "Alex P.",
+  "aspect1": "Shade",
+  "domain": "Lightning",
+  "excellencies": ["Dervish"],
+  "excellencySkillsPurchased": {
+    "Dervish": [
+      { "name": "Flurry of Blows", "cost": 0 },
+      { "name": "Painful Strike", "cost": 4 }
+    ]
+  },
+  "prowessPurchased": 3,
+  "armorType": "Medium Armor",
+  "bonusCP": 2
+}

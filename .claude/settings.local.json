@@ -4,7 +4,9 @@
       "WebFetch(domain:docs.google.com)",
       "Bash(npm run *)",
       "Bash(node_modules/.bin/tsc -p tsconfig.app.json --strict --noImplicitAny)",
-      "Bash(node_modules/.bin/tsc -p tsconfig.app.json)"
+      "Bash(node_modules/.bin/tsc -p tsconfig.app.json)",
+      "Bash(npm install *)",
+      "Bash(npm test *)"
     ]
   }
 }

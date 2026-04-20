@@ -1,0 +1,105 @@
+{
+  "name": "Seraphina Coldwell",
+  "player": "Morgan R.",
+  "pronouns": "she/her",
+  "characterConcept": "Former military archer turned wandering healer, carrying the weight of past orders.",
+  "costumeNotes": "Worn half-plate, pale blue sash, silver arrow pendant.",
+  "source": "Divine",
+  "aspect1": "Life",
+  "aspect2": "Fire",
+  "aspect3": "Shade",
+  "chosenTrait": "Sacred Flame",
+  "foundation": "Military",
+  "foundation2": "Ecclesiastic",
+  "culture": "Eltiel",
+  "culture2": "Rues",
+  "culture3": "",
+  "domain": "Air",
+  "aspectSkillsPurchased": [
+    { "name": "Extra Attribute", "cost": 3 },
+    { "name": "Blast Aspect", "cost": 2 },
+    { "name": "Channel Aspect", "cost": 2 }
+  ],
+  "foundationSkillsPurchased": [
+    { "name": "Attack", "cost": 2 },
+    { "name": "Defense", "cost": 2 },
+    { "name": "Enhance", "cost": 2 }
+  ],
+  "cultureSkillsPurchased": [
+    { "name": "Camaraderie", "cost": 2 },
+    { "name": "Practice", "cost": 2 }
+  ],
+  "domainSkillsPurchased": [
+    { "name": "Air's Determination", "cost": 0 },
+    { "name": "Air's Skill", "cost": 2 },
+    { "name": "Empower Air", "cost": 3 }
+  ],
+  "excellencies": ["Ballista", "Stalker", "Locus"],
+  "expressions": ["Aspected", "Far Traveler"],
+  "prowessPurchased": 1,
+  "insightPurchased": 2,
+  "fortitudePurchased": 1,
+  "voidVal": 2,
+  "purposePurchased": 2,
+  "vitalityPurchased": 1,
+  "armorType": "Heavy Armor",
+  "openSkillsPurchased": [
+    { "name": "Archery", "cost": 3 },
+    { "name": "Medium Armor", "cost": 3 },
+    { "name": "Research", "cost": 4 },
+    { "name": "True Sight", "cost": 2 }
+  ],
+  "excellencySkillsPurchased": {
+    "Ballista": [
+      { "name": "Trio of Arrows", "cost": 0 },
+      { "name": "Extended Quiver", "cost": 2 },
+      { "name": "Prepare Arrow", "cost": 3 }
+    ],
+    "Stalker": [
+      { "name": "Sharpened Arrow", "cost": 0 },
+      { "name": "First Blood", "cost": 3 },
+      { "name": "Target of Ire", "cost": 3 }
+    ],
+    "Locus": [
+      { "name": "Channel Healing", "cost": 0 },
+      { "name": "Restore Limb", "cost": 4 },
+      { "name": "Medic Station", "cost": 3 }
+    ]
+  },
+  "expressionSkillsPurchased": {
+    "Aspected": [
+      { "name": "Third Aspect", "cost": 0 },
+      { "name": "Aspect Versatility", "cost": 0 },
+      { "name": "Gather Aspect", "cost": 4 }
+    ],
+    "Far Traveler": [
+      { "name": "Dual Citizenship", "cost": 0 },
+      { "name": "Hardy Traveler", "cost": 3 }
+    ]
+  },
+  "hiddenExcellencies": ["Reservoir"],
+  "hiddenExcellencySkillsPurchased": {
+    "Reservoir": [
+      { "name": "Healing Reservoir", "cost": 0 },
+      { "name": "Absorb Reservoir", "cost": 2 },
+      { "name": "Expanded Reservoir", "cost": 3 }
+    ]
+  },
+  "hiddenExpressions": ["Shadewalker"],
+  "hiddenExpressionSkillsPurchased": {
+    "Shadewalker": [
+      { "name": "Attune to the Shade", "cost": 0 },
+      { "name": "Find the Shade", "cost": 2 }
+    ]
+  },
+  "abilitiesNotes": "Prefer to open with Trio of Arrows into Medic Station once safe.",
+  "notes": "Seraphina left the Eltiel military after the Siege of Greyvast. She now travels with the Order of Rues, offering healing to those who cannot pay.",
+  "threadNotes": "Empower Air + Prepare Arrow + Rain of Arrows for max missile output.",
+  "bonusCP": 8,
+  "craftingNotes": "Can craft basic healing elixirs if near an alchemy lab.",
+  "history": "Decorated archer, disgraced officer, wandering pilgrim.",
+  "cpLog": "Event 1: +1 (attend) +0.5 (PEL). Event 2: +1 (attend) +2 (NPC day).",
+  "drakar": "14",
+  "ketch": "3",
+  "reel": "0"
+}

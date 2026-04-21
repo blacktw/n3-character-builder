@@ -1208,18 +1208,34 @@ function ExportPanel({ char, setChar }: {
       return t==="Place"?PLACE_SKILLS:t==="Specialty"?SPECIALTY_SKILLS:t==="Resource"?RESOURCE_SKILLS:INTERACTION_SKILLS;
     }
 
-    const allExcSkills: PrintSkill[] = char.excellencies.flatMap((n: string) =>
-      (char.excellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:n};
-      })
-    );
-    const allExprSkills: PrintSkill[] = char.expressions.flatMap((n: string) =>
-      (char.expressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:n};
-      })
-    );
+    const allExcSkills: PrintSkill[] = [
+      ...char.excellencies.flatMap((n: string) =>
+        (char.excellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:n};
+        })
+      ),
+      ...(char.hiddenExcellencies||[]).flatMap((n: string) =>
+        (char.hiddenExcellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (HIDDEN_EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:`${n} (Hidden)`};
+        })
+      ),
+    ];
+    const allExprSkills: PrintSkill[] = [
+      ...char.expressions.flatMap((n: string) =>
+        (char.expressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:n};
+        })
+      ),
+      ...(char.hiddenExpressions||[]).flatMap((n: string) =>
+        (char.hiddenExpressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (HIDDEN_EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:`${n} (Hidden)`};
+        })
+      ),
+    ];
     const domainDefs: PrintSkill[] = char.domainSkillsPurchased.map((s: PurchasedSkill) => {
       const def = (DOMAIN_SKILLS[char.domain]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
@@ -1241,20 +1257,7 @@ function ExportPanel({ char, setChar }: {
       const def = OPEN_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-    const allHiddenExcSkills: PrintSkill[] = (char.hiddenExcellencies||[]).flatMap((n: string) =>
-      (char.hiddenExcellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (HIDDEN_EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:`${n} (Hidden)`};
-      })
-    );
-    const allHiddenExprSkills: PrintSkill[] = (char.hiddenExpressions||[]).flatMap((n: string) =>
-      (char.hiddenExpressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (HIDDEN_EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:`${n} (Hidden)`};
-      })
-    );
-
-    const threadSkills = [...allExcSkills,...allExprSkills,...allHiddenExcSkills,...allHiddenExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
+    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
       return /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
     });
 
@@ -1271,8 +1274,9 @@ function ExportPanel({ char, setChar }: {
         const threadBadge = isExtra ? '<span style="font-size:7pt;background:#7a1e1e;color:white;padding:1pt 3pt;margin-left:3pt;">Extra Thread</span>'
           : isThread ? '<span style="font-size:7pt;background:#555;color:white;padding:1pt 3pt;margin-left:3pt;">Thread</span>' : "";
         const srcBadge = s.source ? `<span style="font-size:7.5pt;color:#5a4e3a;font-style:italic;margin-left:4pt;">· ${s.source}</span>` : "";
+        const attrBadge = s.attribute ? `<span style="font-size:7.5pt;font-weight:600;color:#7a4e1e;border-bottom:1.5px solid #7a4e1e;margin-left:4pt;">[${s.attribute}]</span>` : "";
         return `<div style="margin-bottom:5pt;padding-bottom:5pt;border-bottom:0.5pt dashed #c8bca0;">
-          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${srcBadge}</div>
+          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${attrBadge}${srcBadge}</div>
           ${s.verbal&&s.verbal!=="N/A"?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
           ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${s.description}</div>`:""}
         </div>`;
@@ -1359,8 +1363,6 @@ ${threadSkills.length?`<hr><div class="sec"><div class="sec-t">Thread Skills</di
 <div>
   ${allExcSkills.length?`<div class="sec"><div class="sec-t">Excellency Skills</div>${skillRows(allExcSkills)}</div>`:""}
   ${allExprSkills.length?`<div class="sec"><div class="sec-t">Expression Skills</div>${skillRows(allExprSkills)}</div>`:""}
-  ${allHiddenExcSkills.length?`<div class="sec"><div class="sec-t">Hidden Excellency Skills</div>${skillRows(allHiddenExcSkills)}</div>`:""}
-  ${allHiddenExprSkills.length?`<div class="sec"><div class="sec-t">Hidden Expression Skills</div>${skillRows(allHiddenExprSkills)}</div>`:""}
 </div>
 <div>
   ${domainDefs.length?`<div class="sec"><div class="sec-t">${char.domain} Domain Skills</div>${skillRows(domainDefs)}</div>`:""}

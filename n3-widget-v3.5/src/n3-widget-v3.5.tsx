@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { SkillDef, PurchasedSkill, CharState } from "./char-types";
 import { DEFAULT_CHAR } from "./char-types";
 
@@ -1019,7 +1019,7 @@ function CPBadge({ used, total }: { used: number; total: number }) {
   );
 }
 
-const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Summary","Spells & Abilities","Notes","Export / Print"];
+const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Summary","Export / Print","Notes"];
 
 function Tab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
@@ -1087,6 +1087,61 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove }: {
 
 // ─── EXPORT PANEL ────────────────────────────────────────────────────────────
 
+function PrintModal({ html, onClose }: { html: string; onClose: () => void }) {
+  function doPrint() {
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, "_blank", "width=900,height=700");
+    if (w) w.addEventListener("load", () => { w.print(); URL.revokeObjectURL(url); });
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+        e.preventDefault();
+        doPrint();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const toolbarBtn = (primary: boolean): React.CSSProperties => ({
+    fontFamily: "var(--font-display)", fontSize: 11, letterSpacing: "0.08em",
+    textTransform: "uppercase", cursor: "pointer", padding: "6px 14px",
+    border: primary ? "2px solid #c8bca0" : "2px solid #9a8c6e",
+    background: primary ? "#1a1410" : "transparent",
+    color: primary ? "#c8bca0" : "#9a8c6e",
+  });
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.85)",
+      display: "flex", flexDirection: "column",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 16px", background: "#1a1410", flexShrink: 0,
+      }}>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c8bca0" }}>
+          Print Preview — Ctrl/Cmd+P to print or save as PDF
+        </span>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={doPrint} style={toolbarBtn(true)}>⎙ Print / Save PDF</button>
+          <button onClick={onClose} style={toolbarBtn(false)}>✕ Close</button>
+        </div>
+      </div>
+      <iframe
+        srcDoc={html}
+        style={{ flex: 1, border: "none", background: "white" }}
+        title="Print Preview"
+      />
+    </div>
+  );
+}
+
 function ExportPanel({ char, setChar }: {
   char: CharState;
   setChar: React.Dispatch<React.SetStateAction<CharState>>;
@@ -1153,18 +1208,34 @@ function ExportPanel({ char, setChar }: {
       return t==="Place"?PLACE_SKILLS:t==="Specialty"?SPECIALTY_SKILLS:t==="Resource"?RESOURCE_SKILLS:INTERACTION_SKILLS;
     }
 
-    const allExcSkills: PrintSkill[] = char.excellencies.flatMap((n: string) =>
-      (char.excellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:n};
-      })
-    );
-    const allExprSkills: PrintSkill[] = char.expressions.flatMap((n: string) =>
-      (char.expressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
-        const def = (EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
-        return {...s,...def,source:n};
-      })
-    );
+    const allExcSkills: PrintSkill[] = [
+      ...char.excellencies.flatMap((n: string) =>
+        (char.excellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:n};
+        })
+      ),
+      ...(char.hiddenExcellencies||[]).flatMap((n: string) =>
+        (char.hiddenExcellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (HIDDEN_EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:`${n} (Hidden)`};
+        })
+      ),
+    ];
+    const allExprSkills: PrintSkill[] = [
+      ...char.expressions.flatMap((n: string) =>
+        (char.expressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:n};
+        })
+      ),
+      ...(char.hiddenExpressions||[]).flatMap((n: string) =>
+        (char.hiddenExpressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+          const def = (HIDDEN_EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+          return {...s,...def,source:`${n} (Hidden)`};
+        })
+      ),
+    ];
     const domainDefs: PrintSkill[] = char.domainSkillsPurchased.map((s: PurchasedSkill) => {
       const def = (DOMAIN_SKILLS[char.domain]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
@@ -1186,10 +1257,10 @@ function ExportPanel({ char, setChar }: {
       const def = OPEN_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
-
-    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
+    function isThread(s: PrintSkill): boolean {
       return /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
-    });
+    }
+    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter(isThread);
 
     const sc = char.culture ? CULTURES.find(c=>c.name===char.culture) : null;
     const sc2 = char.culture2 ? CULTURES.find(c=>c.name===char.culture2) : null;
@@ -1198,15 +1269,16 @@ function ExportPanel({ char, setChar }: {
     function skillRows(skills: PrintSkill[]): string {
       return skills.map((s: PrintSkill) => {
         const isExtra = /extra thread/i.test((s.description||"")+(s.attribute||""));
-        const isThread = /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
+        const isThreadSkill = isThread(s);
         const badge = s.cost===0 ? '<span style="font-size:7pt;border:0.5pt solid #9a8c6e;padding:1pt 3pt;color:#5a4e3a;">free</span>'
           : `<span style="font-size:7pt;background:#1a1410;color:white;padding:1pt 3pt;">${s.cost} CP</span>`;
         const threadBadge = isExtra ? '<span style="font-size:7pt;background:#7a1e1e;color:white;padding:1pt 3pt;margin-left:3pt;">Extra Thread</span>'
-          : isThread ? '<span style="font-size:7pt;background:#555;color:white;padding:1pt 3pt;margin-left:3pt;">Thread</span>' : "";
+          : isThreadSkill ? '<span style="font-size:7pt;background:#555;color:white;padding:1pt 3pt;margin-left:3pt;">Thread</span>' : "";
         const srcBadge = s.source ? `<span style="font-size:7.5pt;color:#5a4e3a;font-style:italic;margin-left:4pt;">· ${s.source}</span>` : "";
+        const attrBadge = s.attribute ? `<span style="font-size:7.5pt;font-weight:600;color:#7a4e1e;border-bottom:1.5px solid #7a4e1e;margin-left:4pt;">[${s.attribute}]</span>` : "";
         return `<div style="margin-bottom:5pt;padding-bottom:5pt;border-bottom:0.5pt dashed #c8bca0;">
-          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${srcBadge}</div>
-          ${s.verbal&&s.verbal!=="N/A"?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
+          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${attrBadge}${srcBadge}</div>
+          ${s.verbal&&s.verbal!=="N/A"&&!/^thread skill$/i.test(s.verbal.trim())?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
           ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${s.description}</div>`:""}
         </div>`;
       }).join("");
@@ -1280,8 +1352,8 @@ hr{border:none;border-top:1pt solid #c8bca0;margin:9pt 0;}
       ${[["Prowess",prowess],["Insight",insight],["Fortitude",fortitude],["Void",2],["Purpose",purpose],["Vitality",vitality]].map(([n,v])=>`<div class="stat"><div class="stat-v">${v}</div><div class="stat-n">${n}</div></div>`).join("")}
     </div>
   </div>
-  ${char.excellencies.length?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}</div>`:""}
-  ${char.expressions.length?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}</div>`:""}
+  ${(char.excellencies.length||(char.hiddenExcellencies||[]).length)?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}${(char.hiddenExcellencies||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXCELLENCY_COSTS[e]||1} CP`)).join("")}</div>`:""}
+  ${(char.expressions.length||(char.hiddenExpressions||[]).length)?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}${(char.hiddenExpressions||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXPRESSION_COSTS[e]||1} CP`)).join("")}</div>`:""}
 </div>
 </div>
 
@@ -1290,21 +1362,24 @@ ${threadSkills.length?`<hr><div class="sec"><div class="sec-t">Thread Skills</di
 <hr>
 <div class="cols">
 <div>
-  ${allExcSkills.length?`<div class="sec"><div class="sec-t">Excellency Skills</div>${skillRows(allExcSkills)}</div>`:""}
-  ${allExprSkills.length?`<div class="sec"><div class="sec-t">Expression Skills</div>${skillRows(allExprSkills)}</div>`:""}
+  ${allExcSkills.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Excellency Skills</div>${skillRows(allExcSkills.filter(s=>!isThread(s)))}</div>`:""}
+  ${allExprSkills.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Expression Skills</div>${skillRows(allExprSkills.filter(s=>!isThread(s)))}</div>`:""}
 </div>
 <div>
-  ${domainDefs.length?`<div class="sec"><div class="sec-t">${char.domain} Domain Skills</div>${skillRows(domainDefs)}</div>`:""}
-  ${aspectDefs.length?`<div class="sec"><div class="sec-t">Aspect Skills</div>${skillRows(aspectDefs)}</div>`:""}
-  ${foundDefs.length?`<div class="sec"><div class="sec-t">Foundation Skills</div>${skillRows(foundDefs)}</div>`:""}
-  ${cultDefs.length?`<div class="sec"><div class="sec-t">Culture Skills</div>${skillRows(cultDefs)}</div>`:""}
-  ${openDefs.length?`<div class="sec"><div class="sec-t">Open Skills</div>${skillRows(openDefs)}</div>`:""}
+  ${domainDefs.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">${char.domain} Domain Skills</div>${skillRows(domainDefs.filter(s=>!isThread(s)))}</div>`:""}
+  ${aspectDefs.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Aspect Skills</div>${skillRows(aspectDefs.filter(s=>!isThread(s)))}</div>`:""}
+  ${foundDefs.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Foundation Skills</div>${skillRows(foundDefs.filter(s=>!isThread(s)))}</div>`:""}
+  ${cultDefs.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Culture Skills</div>${skillRows(cultDefs.filter(s=>!isThread(s)))}</div>`:""}
+  ${openDefs.filter(s=>!isThread(s)).length?`<div class="sec"><div class="sec-t">Open Skills</div>${skillRows(openDefs.filter(s=>!isThread(s)))}</div>`:""}
 </div>
 </div>
 
-${char.abilitiesNotes||char.notes?`<hr><div class="cols">
+${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
   ${char.abilitiesNotes?`<div><div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Ability Tracker</div><div class="notes">${char.abilitiesNotes}</div></div>`:"<div></div>"}
-  ${char.notes?`<div><div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Notes</div><div class="notes">${char.notes}</div></div>`:"<div></div>"}
+  <div>
+    ${char.notes?`<div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Notes</div><div class="notes" style="margin-bottom:9pt;">${char.notes}</div>`:""}
+    ${char.threadNotes?`<div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Thread Notes</div><div class="notes">${char.threadNotes}</div>`:""}
+  </div>
 </div>`:""}
 
 <div style="margin-top:18pt;font-size:8pt;color:#9a8c6e;text-align:center;border-top:0.5pt solid #c8bca0;padding-top:5pt;font-style:italic;">
@@ -1329,24 +1404,15 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
       <div style={ss.section}>
         <div style={ss.title}>Print / Save as PDF</div>
         <div style={ss.body}>
-          Renders a formatted print-ready character sheet below. Use your browser's <strong>Print</strong> function (Ctrl/Cmd+P) or right-click → Print to save as PDF.
+          Opens a full-screen print preview. Press <strong>Ctrl/Cmd+P</strong> or click "Print" to save as PDF — only the character sheet will be captured.
         </div>
-        <button style={ss.btn} onClick={() => setShowPrint(p => !p)}>
-          {showPrint ? "▲ Hide Print View" : "⎙ Show Print View"}
+        <button style={ss.btn} onClick={() => setShowPrint(true)}>
+          ⎙ Open Print Preview
         </button>
-        {showPrint && (
-          <div style={{ marginTop:16 }}>
-            <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginBottom:8 }}>
-              The sheet below is print-ready. Press <strong>Ctrl/Cmd+P</strong> and choose "Save as PDF" as the destination.
-            </div>
-            <iframe
-              srcDoc={buildPrintHTML()}
-              style={{ width:"100%", height:900, border:"1px solid var(--ink-light)", background:"white" }}
-              title="Print Preview"
-            />
-          </div>
-        )}
       </div>
+
+      {/* PRINT MODAL */}
+      {showPrint && <PrintModal html={buildPrintHTML()} onClose={() => setShowPrint(false)} />}
 
       {/* JSON EXPORT */}
       <div style={ss.section}>
@@ -2323,7 +2389,6 @@ export default function NuminaSheet() {
                 <Section title="Skill Activations Summary" accent>
                   <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12, lineHeight:1.5 }}>
                     All skills available to this character, grouped by when they refresh.
-                    Attribute pools restore on Short Rest — <strong style={{color:"var(--prowess)"}}>Prowess {prowess}</strong> · <strong style={{color:"var(--insight)"}}>Insight {insight}</strong> · <strong style={{color:"var(--fortitude)"}}>Fortitude {fortitude}</strong>.
                   </div>
                   {ORDER.map(freqType => {
                     const group = byFreq[freqType];
@@ -2419,87 +2484,82 @@ export default function NuminaSheet() {
                     </>
                   )}
                 </Section>
+
+                <Section title="Spellcasting & Abilities Summary" accent>
+                  <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", lineHeight:1.7 }}>
+                    <strong>Method:</strong> Verbal (3s incantation), Somatic (visible 3s gesture), or Preparation (Alchemy/Tinkering/Arcaneering).<br/>
+                    <strong>Packet Flurry:</strong> You may throw 3 packets without a break. After 3 you must roleplay ≥3 seconds to reset.<br/>
+                    <strong>Casting Rule:</strong> By default, both hands must be free of everything except packets while casting.
+                  </div>
+                </Section>
+
+                <Section title="Thread Skills">
+                  <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:8, lineHeight:1.5 }}>
+                    Thread Skills enhance other skills. You may apply up to 3 Thread Skills to a single effect (plus 1 Extra Thread Skill). Thread Skills cannot be applied to uncalled damage, grants, or item effects.
+                  </div>
+                  {(() => {
+                    const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean }[] = [];
+                    const allSourceSkills = [
+                      ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
+                      ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),
+                      ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
+                      ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
+                      ...char.domainSkillsPurchased.map(s => ({...s, source:`${char.domain} Domain`, skillDefs:DOMAIN_SKILLS[char.domain]||[]})),
+                      ...char.aspectSkillsPurchased.map(s => ({...s, source:"Aspect", skillDefs:ASPECT_SKILLS})),
+                      ...char.foundationSkillsPurchased.map(s => { const defs = getFoundationSkills(); return {...s, source:`${char.foundation} Foundation`, skillDefs:defs}; }),
+                      ...char.cultureSkillsPurchased.map(s => ({...s, source:`${char.culture} Culture`, skillDefs:CULTURE_SKILLS})),
+                    ];
+                    allSourceSkills.forEach(({name, source, skillDefs}) => {
+                      const def = skillDefs.find(d => d.name === name);
+                      if (!def) return;
+                      const combined = (def.description||"") + " " + (def.attribute||"") + " " + (def.verbal||"");
+                      const isExtra = /extra thread/i.test(combined);
+                      const isThread = isExtra || /thread skill/i.test(combined);
+                      if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra});
+                    });
+
+                    if (threadSkills.length === 0) {
+                      return <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",fontStyle:"italic",padding:"6px 0"}}>No Thread Skills purchased yet. Select skills marked as "Thread Skill" to see them listed here automatically.</div>;
+                    }
+                    return (
+                      <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
+                        {threadSkills.map((ts,i) => (
+                          <div key={i} style={{padding:"8px 10px",background:"var(--paper-warm)",border:"1px solid var(--ink-faint)",display:"flex",gap:10,alignItems:"flex-start"}}>
+                            <div style={{flex:1}}>
+                              <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
+                                <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--ink)"}}>{ts.name}</span>
+                                {ts.isExtra
+                                  ? <span style={{fontSize:9,padding:"1px 5px",background:"var(--red)",color:"white"}}>Extra Thread</span>
+                                  : <span style={{fontSize:9,padding:"1px 5px",background:"var(--ink)",color:"var(--paper)"}}>Thread Skill</span>}
+                                <span style={{fontSize:9,fontStyle:"italic",color:"var(--ink-mid)"}}>from {ts.source}</span>
+                                {ts.verbal && ts.verbal !== "N/A" && !/^thread skill$/i.test(ts.verbal.trim()) && <span style={{fontSize:9,fontStyle:"italic",color:"var(--ink-mid)"}}>"{ts.verbal}"</span>}
+                              </div>
+                              {ts.description && <div style={{fontSize:10,color:"var(--ink-mid)",marginTop:2,lineHeight:1.4}}>{ts.description}</div>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                  <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)",marginTop:10,lineHeight:1.5}}>Additional notes on Thread Skill combinations:</div>
+                  <textarea value={char.threadNotes||""} onChange={e => update("threadNotes",e.target.value)} placeholder="e.g. Storm of Blows + Enhance Lightning = extra attack on multi-attack skills..." style={{...inputStyle,width:"100%",minHeight:60,resize:"vertical",lineHeight:1.6,marginTop:6}} />
+                </Section>
+
+                <Section title="Ability Tracker">
+                  <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",marginBottom:10}}>Track uses of per-rest and per-event abilities.</div>
+                  <textarea value={char.abilitiesNotes} onChange={e => update("abilitiesNotes",e.target.value)} placeholder={`Example:\n[ ] Immolate (1x/event) — "Death by Fire"\n[ ][ ] Blast of Flame (1 Insight each) — "3 Damage by Fire"\n[ ][ ][ ] Water's Determination heals (Short Rest) — "Heal 1 by Faith"`} style={{...inputStyle,width:"100%",minHeight:200,resize:"vertical",lineHeight:1.7,fontFamily:"var(--font-body)",fontSize:12}} />
+                </Section>
+
+                <Section title="Alchemy / Crafting">
+                  <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",lineHeight:1.7}}><strong>Crafted items last 1 event.</strong> They require attribute expenditure + 1 Drakar (minimum) per item.</div>
+                  <textarea value={char.craftingNotes||""} onChange={e => update("craftingNotes",e.target.value)} placeholder="List your known formulas, components on hand, or crafting plans..." style={{...inputStyle,width:"100%",minHeight:80,resize:"vertical",lineHeight:1.6,marginTop:10}} />
+                </Section>
               </>
             );
           })()}
 
-          {/* ── TAB 7: SPELLS & ABILITIES ── */}
+          {/* ── TAB 7: EXPORT / PRINT ── */}
           {tab === 7 && (
-            <>
-              <Section title="Spellcasting & Abilities Summary" accent>
-                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", lineHeight:1.7 }}>
-                  <strong>Method:</strong> Verbal (3s incantation), Somatic (visible 3s gesture), or Preparation (Alchemy/Tinkering/Arcaneering).<br/>
-                  <strong>Packet Flurry:</strong> You may throw 3 packets without a break. After 3 you must roleplay ≥3 seconds to reset.<br/>
-                  <strong>Casting Rule:</strong> By default, both hands must be free of everything except packets while casting.
-                </div>
-              </Section>
-
-              <Section title="Thread Skills">
-                <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:8, lineHeight:1.5 }}>
-                  Thread Skills enhance other skills. You may apply up to 3 Thread Skills to a single effect (plus 1 Extra Thread Skill). Thread Skills cannot be applied to uncalled damage, grants, or item effects.
-                </div>
-                {(() => {
-                  const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean }[] = [];
-                  const allSourceSkills = [
-                    ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
-                    ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),
-                    ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
-                    ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
-                    ...char.domainSkillsPurchased.map(s => ({...s, source:`${char.domain} Domain`, skillDefs:DOMAIN_SKILLS[char.domain]||[]})),
-                    ...char.aspectSkillsPurchased.map(s => ({...s, source:"Aspect", skillDefs:ASPECT_SKILLS})),
-                    ...char.foundationSkillsPurchased.map(s => { const defs = getFoundationSkills(); return {...s, source:`${char.foundation} Foundation`, skillDefs:defs}; }),
-                    ...char.cultureSkillsPurchased.map(s => ({...s, source:`${char.culture} Culture`, skillDefs:CULTURE_SKILLS})),
-                  ];
-                  allSourceSkills.forEach(({name, source, skillDefs}) => {
-                    const def = skillDefs.find(d => d.name === name);
-                    if (!def) return;
-                    const combined = (def.description||"") + " " + (def.attribute||"") + " " + (def.verbal||"");
-                    const isExtra = /extra thread/i.test(combined);
-                    const isThread = isExtra || /thread skill/i.test(combined);
-                    if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra});
-                  });
-
-                  if (threadSkills.length === 0) {
-                    return <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",fontStyle:"italic",padding:"6px 0"}}>No Thread Skills purchased yet. Select skills marked as "Thread Skill" to see them listed here automatically.</div>;
-                  }
-                  return (
-                    <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
-                      {threadSkills.map((ts,i) => (
-                        <div key={i} style={{padding:"8px 10px",background:"var(--paper-warm)",border:"1px solid var(--ink-faint)",display:"flex",gap:10,alignItems:"flex-start"}}>
-                          <div style={{flex:1}}>
-                            <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
-                              <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--ink)"}}>{ts.name}</span>
-                              {ts.isExtra
-                                ? <span style={{fontSize:9,padding:"1px 5px",background:"var(--red)",color:"white"}}>Extra Thread</span>
-                                : <span style={{fontSize:9,padding:"1px 5px",background:"var(--ink)",color:"var(--paper)"}}>Thread Skill</span>}
-                              <span style={{fontSize:9,fontStyle:"italic",color:"var(--ink-mid)"}}>from {ts.source}</span>
-                              {ts.verbal && ts.verbal !== "N/A" && <span style={{fontSize:9,fontStyle:"italic",color:"var(--ink-mid)"}}>"{ts.verbal}"</span>}
-                            </div>
-                            {ts.description && <div style={{fontSize:10,color:"var(--ink-mid)",marginTop:2,lineHeight:1.4}}>{ts.description}</div>}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-                <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)",marginTop:10,lineHeight:1.5}}>Additional notes on Thread Skill combinations:</div>
-                <textarea value={char.threadNotes||""} onChange={e => update("threadNotes",e.target.value)} placeholder="e.g. Storm of Blows + Enhance Lightning = extra attack on multi-attack skills..." style={{...inputStyle,width:"100%",minHeight:60,resize:"vertical",lineHeight:1.6,marginTop:6}} />
-              </Section>
-
-              <Section title="Ability Tracker">
-                <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",marginBottom:10}}>Track uses of per-rest and per-event abilities.</div>
-                <textarea value={char.abilitiesNotes} onChange={e => update("abilitiesNotes",e.target.value)} placeholder={`Example:\n[ ] Immolate (1x/event) — "Death by Fire"\n[ ][ ] Blast of Flame (1 Insight each) — "3 Damage by Fire"\n[ ][ ][ ] Water's Determination heals (Short Rest) — "Heal 1 by Faith"`} style={{...inputStyle,width:"100%",minHeight:200,resize:"vertical",lineHeight:1.7,fontFamily:"var(--font-body)",fontSize:12}} />
-              </Section>
-
-              <Section title="Alchemy / Crafting">
-                <div style={{fontFamily:"var(--font-body)",fontSize:12,color:"var(--ink-mid)",lineHeight:1.7}}><strong>Crafted items last 1 event.</strong> They require attribute expenditure + 1 Drakar (minimum) per item.</div>
-                <textarea value={char.craftingNotes||""} onChange={e => update("craftingNotes",e.target.value)} placeholder="List your known formulas, components on hand, or crafting plans..." style={{...inputStyle,width:"100%",minHeight:80,resize:"vertical",lineHeight:1.6,marginTop:10}} />
-              </Section>
-            </>
-          )}
-
-          {/* ── TAB 9: EXPORT / PRINT ── */}
-          {tab === 9 && (
             <ExportPanel char={char} setChar={setChar} />
           )}
 

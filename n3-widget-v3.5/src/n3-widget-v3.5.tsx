@@ -1241,8 +1241,20 @@ function ExportPanel({ char, setChar }: {
       const def = OPEN_SKILLS.find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
       return {...s,...def};
     });
+    const allHiddenExcSkills: PrintSkill[] = (char.hiddenExcellencies||[]).flatMap((n: string) =>
+      (char.hiddenExcellencySkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+        const def = (HIDDEN_EXCELLENCY_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+        return {...s,...def,source:`${n} (Hidden)`};
+      })
+    );
+    const allHiddenExprSkills: PrintSkill[] = (char.hiddenExpressions||[]).flatMap((n: string) =>
+      (char.hiddenExpressionSkillsPurchased[n]||[]).map((s: PurchasedSkill) => {
+        const def = (HIDDEN_EXPRESSION_SKILLS[n]||[]).find((d: SkillDef) => d.name===s.name) as Partial<SkillDef>|undefined ?? {};
+        return {...s,...def,source:`${n} (Hidden)`};
+      })
+    );
 
-    const threadSkills = [...allExcSkills,...allExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
+    const threadSkills = [...allExcSkills,...allExprSkills,...allHiddenExcSkills,...allHiddenExprSkills,...domainDefs,...aspectDefs,...foundDefs,...cultDefs].filter((s: PrintSkill) => {
       return /thread skill/i.test((s.description||"")+(s.attribute||"")+(s.verbal||""));
     });
 
@@ -1335,8 +1347,8 @@ hr{border:none;border-top:1pt solid #c8bca0;margin:9pt 0;}
       ${[["Prowess",prowess],["Insight",insight],["Fortitude",fortitude],["Void",2],["Purpose",purpose],["Vitality",vitality]].map(([n,v])=>`<div class="stat"><div class="stat-v">${v}</div><div class="stat-n">${n}</div></div>`).join("")}
     </div>
   </div>
-  ${char.excellencies.length?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}</div>`:""}
-  ${char.expressions.length?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}</div>`:""}
+  ${(char.excellencies.length||(char.hiddenExcellencies||[]).length)?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}${(char.hiddenExcellencies||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXCELLENCY_COSTS[e]||1} CP`)).join("")}</div>`:""}
+  ${(char.expressions.length||(char.hiddenExpressions||[]).length)?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}${(char.hiddenExpressions||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXPRESSION_COSTS[e]||1} CP`)).join("")}</div>`:""}
 </div>
 </div>
 
@@ -1347,6 +1359,8 @@ ${threadSkills.length?`<hr><div class="sec"><div class="sec-t">Thread Skills</di
 <div>
   ${allExcSkills.length?`<div class="sec"><div class="sec-t">Excellency Skills</div>${skillRows(allExcSkills)}</div>`:""}
   ${allExprSkills.length?`<div class="sec"><div class="sec-t">Expression Skills</div>${skillRows(allExprSkills)}</div>`:""}
+  ${allHiddenExcSkills.length?`<div class="sec"><div class="sec-t">Hidden Excellency Skills</div>${skillRows(allHiddenExcSkills)}</div>`:""}
+  ${allHiddenExprSkills.length?`<div class="sec"><div class="sec-t">Hidden Expression Skills</div>${skillRows(allHiddenExprSkills)}</div>`:""}
 </div>
 <div>
   ${domainDefs.length?`<div class="sec"><div class="sec-t">${char.domain} Domain Skills</div>${skillRows(domainDefs)}</div>`:""}
@@ -1357,9 +1371,12 @@ ${threadSkills.length?`<hr><div class="sec"><div class="sec-t">Thread Skills</di
 </div>
 </div>
 
-${char.abilitiesNotes||char.notes?`<hr><div class="cols">
+${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
   ${char.abilitiesNotes?`<div><div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Ability Tracker</div><div class="notes">${char.abilitiesNotes}</div></div>`:"<div></div>"}
-  ${char.notes?`<div><div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Notes</div><div class="notes">${char.notes}</div></div>`:"<div></div>"}
+  <div>
+    ${char.notes?`<div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Notes</div><div class="notes" style="margin-bottom:9pt;">${char.notes}</div>`:""}
+    ${char.threadNotes?`<div class="sec-t" style="font-family:'IM Fell English',serif;font-size:8pt;letter-spacing:.15em;text-transform:uppercase;color:#9a8c6e;margin-bottom:4pt;">Thread Notes</div><div class="notes">${char.threadNotes}</div>`:""}
+  </div>
 </div>`:""}
 
 <div style="margin-top:18pt;font-size:8pt;color:#9a8c6e;text-align:center;border-top:0.5pt solid #c8bca0;padding-top:5pt;font-style:italic;">

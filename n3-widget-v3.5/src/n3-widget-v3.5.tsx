@@ -2389,7 +2389,6 @@ export default function NuminaSheet() {
                 <Section title="Skill Activations Summary" accent>
                   <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12, lineHeight:1.5 }}>
                     All skills available to this character, grouped by when they refresh.
-                    Attribute pools restore on Short Rest — <strong style={{color:"var(--prowess)"}}>Prowess {prowess}</strong> · <strong style={{color:"var(--insight)"}}>Insight {insight}</strong> · <strong style={{color:"var(--fortitude)"}}>Fortitude {fortitude}</strong>.
                   </div>
                   {ORDER.map(freqType => {
                     const group = byFreq[freqType];

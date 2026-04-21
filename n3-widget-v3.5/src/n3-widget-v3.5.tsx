@@ -457,7 +457,7 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisper": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
@@ -481,13 +481,13 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Remove Obstacles", cost:4, verbal:"'Repel by Will'", description:"Spend 1 Insight to call 'Repel by Will'.", attribute:"1 Insight" },
     { name:"Shift", cost:4, verbal:"'Avoid'", description:"If you are in the process of aiming and are hit by a melee, missile, or spell attack, spend 1 Insight to call 'Avoid'.", attribute:"1 Insight" },
   ],
-  "Whisper": [
+  "Whisperer": [
+    { name:"Metal Shards", cost:0, verbal:"'3 Damage by Force'", description:"Free. Spend 1 Prowess to make two packet attacks, each calling '3 Damage by Force'.", attribute:"1 Prowess" },
     { name:"Fade Away", cost:2, verbal:"'Cure Spirit to Self'", description:"Once per long rest: spend 1 Fortitude and take Spirit Form for up to 1 minute (arms crossed over torso). When exiting, say 'Cure Spirit to Self.' Any effect 'to spirit' or similar breaks the form.", attribute:"1 Fortitude" },
     { name:"Flechette", cost:3, verbal:"N/A", description:"When making a packet attack, expend up to 2 points of armor to deal +1 damage per point of armor spent.", attribute:"Thread Skill" },
     { name:"Strong Will", cost:3, verbal:"N/A", description:"Your non-physical armor is increased by 1 point.", attribute:"Thread Skill" },
     { name:"Repair Armor", cost:4, verbal:"'Repair Armor'", description:"Spend 1 Prowess to gain four uses of 'Repair Armor'.", attribute:"1 Prowess" },
     { name:"Shatter Blade", cost:4, verbal:"'Short Destroy Weapon'", description:"Spend 1 Fortitude to make a packet attack calling 'Short Destroy Weapon'.", attribute:"1 Fortitude" },
-    { name:"Metal Shards", cost:4, verbal:"'3 Damage by Force'", description:"Spend 1 Prowess to make two packet attacks, each calling '3 Damage by Force'.", attribute:"1 Prowess" },
     { name:"Shrug It Off", cost:4, verbal:"'Avoid'", description:"Once per short rest: spend 1 Fortitude to resist any melee, missile, or packet attack.", attribute:"1 Fortitude" },
     { name:"Armored Spell", cost:2, verbal:"N/A", description:"Once per event: for your next 10 packet attacks, each time you successfully strike an opponent and they register the hit, you may repair 1 armor." },
   ],

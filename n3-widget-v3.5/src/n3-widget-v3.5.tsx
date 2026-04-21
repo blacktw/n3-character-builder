@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { SkillDef, PurchasedSkill, CharState } from "./char-types";
 import { DEFAULT_CHAR } from "./char-types";
 
@@ -1087,6 +1087,61 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove }: {
 
 // ─── EXPORT PANEL ────────────────────────────────────────────────────────────
 
+function PrintModal({ html, onClose }: { html: string; onClose: () => void }) {
+  function doPrint() {
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, "_blank", "width=900,height=700");
+    if (w) w.addEventListener("load", () => { w.print(); URL.revokeObjectURL(url); });
+  }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+        e.preventDefault();
+        doPrint();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const toolbarBtn = (primary: boolean): React.CSSProperties => ({
+    fontFamily: "var(--font-display)", fontSize: 11, letterSpacing: "0.08em",
+    textTransform: "uppercase", cursor: "pointer", padding: "6px 14px",
+    border: primary ? "2px solid #c8bca0" : "2px solid #9a8c6e",
+    background: primary ? "#1a1410" : "transparent",
+    color: primary ? "#c8bca0" : "#9a8c6e",
+  });
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.85)",
+      display: "flex", flexDirection: "column",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 16px", background: "#1a1410", flexShrink: 0,
+      }}>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "#c8bca0" }}>
+          Print Preview — Ctrl/Cmd+P to print or save as PDF
+        </span>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={doPrint} style={toolbarBtn(true)}>⎙ Print / Save PDF</button>
+          <button onClick={onClose} style={toolbarBtn(false)}>✕ Close</button>
+        </div>
+      </div>
+      <iframe
+        srcDoc={html}
+        style={{ flex: 1, border: "none", background: "white" }}
+        title="Print Preview"
+      />
+    </div>
+  );
+}
+
 function ExportPanel({ char, setChar }: {
   char: CharState;
   setChar: React.Dispatch<React.SetStateAction<CharState>>;
@@ -1329,24 +1384,15 @@ ${char.abilitiesNotes||char.notes?`<hr><div class="cols">
       <div style={ss.section}>
         <div style={ss.title}>Print / Save as PDF</div>
         <div style={ss.body}>
-          Renders a formatted print-ready character sheet below. Use your browser's <strong>Print</strong> function (Ctrl/Cmd+P) or right-click → Print to save as PDF.
+          Opens a full-screen print preview. Press <strong>Ctrl/Cmd+P</strong> or click "Print" to save as PDF — only the character sheet will be captured.
         </div>
-        <button style={ss.btn} onClick={() => setShowPrint(p => !p)}>
-          {showPrint ? "▲ Hide Print View" : "⎙ Show Print View"}
+        <button style={ss.btn} onClick={() => setShowPrint(true)}>
+          ⎙ Open Print Preview
         </button>
-        {showPrint && (
-          <div style={{ marginTop:16 }}>
-            <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginBottom:8 }}>
-              The sheet below is print-ready. Press <strong>Ctrl/Cmd+P</strong> and choose "Save as PDF" as the destination.
-            </div>
-            <iframe
-              srcDoc={buildPrintHTML()}
-              style={{ width:"100%", height:900, border:"1px solid var(--ink-light)", background:"white" }}
-              title="Print Preview"
-            />
-          </div>
-        )}
       </div>
+
+      {/* PRINT MODAL */}
+      {showPrint && <PrintModal html={buildPrintHTML()} onClose={() => setShowPrint(false)} />}
 
       {/* JSON EXPORT */}
       <div style={ss.section}>

@@ -55,7 +55,7 @@ const ALL_EXCELLENCIES = [
 
 const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   "Ballista": [
-    { name:"Trio of Arrows", cost:0, verbal:"'3 Damage'", description:"Free. Spend 1 Attribute to make two archery attacks of 3 damage.", attribute:"1 Insight" },
+    { name:"Trio of Arrows", cost:0, verbal:"'3 Damage'", description:"Spend 1 Attribute to make two archery attacks of 3 damage.", attribute:"1 Insight" },
     { name:"Refresh Quiver", cost:4, verbal:"'Refresh Quiver to self'", description:"Spend 1 Attribute to instantly refresh your quiver. Effects triggered by quiver refresh are activated.", attribute:"1 Prowess" },
     { name:"Extended Quiver", cost:2, verbal:"N/A", description:"Once per Short Rest, refresh your quiver with a 10-second focus." },
     { name:"Prepare Arrow", cost:3, verbal:"N/A", description:"Once per Short Rest, add +3 damage to a called damage archery attack. Thread Skill.", attribute:"Thread Skill" },
@@ -65,7 +65,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Refresh Ally", cost:4, verbal:"'Refresh Quiver'", description:"Use a touch packet to refresh another person's quiver.", attribute:"1 Insight" },
   ],
   "Stalker": [
-    { name:"Sharpened Arrow", cost:0, verbal:"'4 Damage'", description:"Free. Make a basic archery attack of 4 damage.", attribute:"1 Insight" },
+    { name:"Sharpened Arrow", cost:0, verbal:"'4 Damage'", description:"Make a basic archery attack of 4 damage.", attribute:"1 Insight" },
     { name:"First Blood", cost:3, verbal:"See description", description:"The first archery attack after refreshing your quiver is +3 damage. If your first arrow is uncalled, you may use a called '4 Damage' attack. Thread Skill.", attribute:"Thread Skill" },
     { name:"Target of Ire", cost:3, verbal:"'Imbue to self'", description:"Once per Short Rest, take 10 seconds to identify a target (cannot move, attack, or use skills). All called damage archery attacks toward that target are +2 damage until you hit anyone else. Thread Skill.", attribute:"Thread Skill" },
     { name:"Hooked Arrow", cost:4, verbal:"'Agony'", description:"Use an arrow with barbed ends to distract your foe.", attribute:"1 Fortitude" },
@@ -75,7 +75,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Celebration of a Kill", cost:3, verbal:"'Heal 2 to Self'", description:"If you kill your target, heal 2 to self." },
   ],
   "Forge Fire": [
-    { name:"Serrated Blade", cost:0, verbal:"'Grant Melee attack Agony'", description:"Free. Grant Melee Attack 'Agony.'", attribute:"1 Insight" },
+    { name:"Serrated Blade", cost:0, verbal:"'Grant Melee attack Agony'", description:"Grant Melee Attack 'Agony.'", attribute:"1 Insight" },
     { name:"Armor Repair", cost:4, verbal:"'Repair 1 Armor'", description:"When Centered, gain 4 uses of 'Repair Armor'. If not Centered, gain 2 uses. New activation discards unused uses.", attribute:"1 Fortitude" },
     { name:"Weapon Repair", cost:2, verbal:"'Repair Weapon'", description:"When Centered, spend 30 seconds to repair a destroyed weapon or shield. If not Centered, spend 1 minute." },
     { name:"Sharpen Weapon", cost:4, verbal:"'Grant Melee Attack 3 Damage'", description:"Grant a melee attack to companions or yourself.", attribute:"1 Insight" },
@@ -84,7 +84,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Special Blade", cost:2, verbal:"'Grant melee attack 5 damage'", description:"Once per event, when Centered, gain three uses of 'Grant melee attack 5 damage' to give to allies." },
   ],
   "Locus": [
-    { name:"Channel Healing", cost:0, verbal:"'Heal by your <beneficial Trait>'", description:"Free. Gain 3 Heal effects if Centered; 1 if not Centered.", attribute:"1 Insight" },
+    { name:"Channel Healing", cost:0, verbal:"'Heal by your <beneficial Trait>'", description:"Gain 3 Heal effects if Centered; 1 if not Centered.", attribute:"1 Insight" },
     { name:"Watch the Battle", cost:4, verbal:"'Grant 4 protection to self'", description:"The first time after a Long Rest when you become Centered, gain 4 points of Protection." },
     { name:"Restore Limb", cost:4, verbal:"'Cure Maim or Cure All Maims'", description:"Spend 1 Attribute to 'Cure Maim'. If Centered, 'Cure All Maims' on the recipient.", attribute:"1 Insight" },
     { name:"Rejuvenate", cost:2, verbal:"'Imbue Long Rest'", description:"Once per event, if Centered, Imbue an ally a Long Rest." },
@@ -94,7 +94,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Strong Center", cost:3, verbal:"N/A", description:"While Centered, when you use a skill granting multiple healing effects, gain one extra effect. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Inferno": [
-    { name:"Blast of Flame", cost:0, verbal:"'3 Damage by Fire'", description:"Free. Spend 1 Attribute to gain two packet attacks of 3 Damage by Fire.", attribute:"1 Insight" },
+    { name:"Blast of Flame", cost:0, verbal:"'3 Damage by Fire'", description:"Spend 1 Attribute to gain two packet attacks of 3 Damage by Fire.", attribute:"1 Insight" },
     { name:"Fuel the Fire", cost:3, verbal:"N/A", description:"When you use a skill granting multiple damage packet effects, gain one extra effect. Thread Skill.", attribute:"Thread Skill" },
     { name:"Overdraft the Flame", cost:4, verbal:"'5 Damage by Fire'", description:"Once per Long Rest, spend 1 Fortitude for two packet attacks. Once per Long Rest, use the Surge skill.", attribute:"1 Fortitude" },
     { name:"Control the Elements", cost:3, verbal:"N/A", description:"Convert packet attacks to one additional element from the Elemental Trait Group. Switch between your original trait and the new element for all packet attacks." },
@@ -104,7 +104,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Overwhelm", cost:2, verbal:"'8 Damage by Fire'", description:"Once per event, make a packet attack with a great conflagration of flame." },
   ],
   "Slayer": [
-    { name:"Char the Flesh", cost:0, verbal:"'Agony by Fire'", description:"Free. Spend 1 Fortitude to make a packet attack of 'Agony by Fire'.", attribute:"1 Fortitude" },
+    { name:"Char the Flesh", cost:0, verbal:"'Agony by Fire'", description:"Spend 1 Fortitude to make a packet attack of 'Agony by Fire'.", attribute:"1 Fortitude" },
     { name:"Immolate", cost:2, verbal:"'Death by Fire'", description:"Once per event, make a packet attack to burn your foes to death." },
     { name:"Bank the Flames", cost:2, verbal:"'Refresh Immolate to self'", description:"Once per event, after a Long Rest, restore your use of Immolate. Thread Skill.", attribute:"Thread Skill" },
     { name:"Fiery Bolt", cost:4, verbal:"'5 Damage by Fire'", description:"Spend 1 Prowess to make a packet attack of 5 damage by Fire.", attribute:"1 Prowess" },
@@ -114,7 +114,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Death Washes Over", cost:4, verbal:"'Repel by Fear'", description:"Spend 1 Prowess to make a Packet attack to keep your foes at bay.", attribute:"1 Prowess" },
   ],
   "Bastion": [
-    { name:"Well Fitted Armor", cost:0, verbal:"'Grant Guard Called Damage to self'", description:"Free. When you spend a minute to reset your armor, invoke a 'Guard versus melee damage.'", attribute:"1 Insight" },
+    { name:"Well Fitted Armor", cost:0, verbal:"'Grant Guard Called Damage to self'", description:"When you spend a minute to reset your armor, invoke a 'Guard versus melee damage.'", attribute:"1 Insight" },
     { name:"Fully Armored", cost:3, verbal:"N/A", description:"Your heavy armor is now worth 5 points." },
     { name:"Extra Armor", cost:3, verbal:"'Grant Parry Called Damage to Self'", description:"Well Fitted Armor now provides a Parry instead of a Guard. Thread Skill.", attribute:"Thread Skill" },
     { name:"Quick Fix", cost:4, verbal:"'Repair 3 Armor to Self'", description:"Place your hand on your torso and roleplay for 3 seconds to repair 3 points of armor.", attribute:"1 Fortitude" },
@@ -124,7 +124,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Return the Blow", cost:4, verbal:"See description", description:"When hit by a damage attack of 5 or less and you take or resist it with a called defense, use that exact same attack against your attacker (same Trait).", attribute:"1 Fortitude" },
   ],
   "Defender": [
-    { name:"Guard", cost:0, verbal:"'Grant Guard Melee to self'", description:"Free. Protect yourself from melee attacks by granting yourself a Guard.", attribute:"1 Fortitude" },
+    { name:"Guard", cost:0, verbal:"'Grant Guard Melee to self'", description:"Protect yourself from melee attacks by granting yourself a Guard.", attribute:"1 Fortitude" },
     { name:"Well Guarded", cost:3, verbal:"'Grant Extra Guard Melee to self'", description:"When you receive a Guard grant you can instead treat it as 'Grant Extra Melee Defense, Guard.' Thread Skill.", attribute:"Thread Skill" },
     { name:"Parry", cost:4, verbal:"'Parry'", description:"Use this skill to Parry a melee blow.", attribute:"2 Fortitude" },
     { name:"Shrug It Off", cost:2, verbal:"'Reduce to 1 Damage'", description:"Once per event, reduce the next 3 called damage effects to 1 Damage each." },
@@ -134,7 +134,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Once More into the Fray", cost:3, verbal:"'Refresh Used to It to self'", description:"Twice per event, after a Long Rest, refresh your use of 'Used to It.'" },
   ],
   "Dervish": [
-    { name:"Flurry of Blows", cost:0, verbal:"'2 Damage'", description:"Free. Spend 1 Attribute to make two melee attacks of 2 damage.", attribute:"1 Fortitude" },
+    { name:"Flurry of Blows", cost:0, verbal:"'2 Damage'", description:"Spend 1 Attribute to make two melee attacks of 2 damage.", attribute:"1 Fortitude" },
     { name:"Storm of Blows", cost:3, verbal:"N/A", description:"When you use a skill granting multiple melee attacks, gain one extra attack. Thread Skill.", attribute:"Thread Skill" },
     { name:"Painful Strike", cost:4, verbal:"'Agony'", description:"Strike a painful blow to your opponent.", attribute:"1 Prowess" },
     { name:"Follow Up Blow", cost:3, verbal:"'2 Damage'", description:"When you hit an opponent with Painful Strike and they take it without a defense, gain a '2 Damage' to use against them while they are under the Agony effect. Thread Skill.", attribute:"Thread Skill" },
@@ -144,7 +144,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Drive Back the Attackers", cost:4, verbal:"'Disengage'", description:"Once per Short Rest, give yourself and allies a moment of calm on the battlefield by calling Disengage.", attribute:"1 Fortitude" },
   ],
   "Hurricane": [
-    { name:"Strong Strike", cost:0, verbal:"'5 Damage'", description:"Free. Melee attack for 5 Damage.", attribute:"1 Fortitude" },
+    { name:"Strong Strike", cost:0, verbal:"'5 Damage'", description:"Melee attack for 5 Damage.", attribute:"1 Fortitude" },
     { name:"Stunning Blow", cost:2, verbal:"'Stun'", description:"Once per event, when wielding a two-handed weapon with a single striking surface, strike an opponent with a melee 'Stun' attack." },
     { name:"Rest Up for Another Blow", cost:2, verbal:"'Refresh Stunning Blow to Self'", description:"Once per event, after a Long Rest in a Place of Peace, refresh your use of Stunning Blow." },
     { name:"Disabling Strike", cost:4, verbal:"'Maim'", description:"Make a melee attack of 'Maim.'", attribute:"1 Prowess" },
@@ -154,7 +154,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Storm's Fury", cost:3, verbal:"'5 Damage'", description:"Once per Short Rest, when your foe falls after a melee damage attack you made, gain a melee 5 Damage attack. Lost if you make any other called attack first." },
   ],
   "Tempest": [
-    { name:"Deadly Strike", cost:0, verbal:"'Death'", description:"Free. Melee Death. 1x per event.", attribute:"1x event" },
+    { name:"Deadly Strike", cost:0, verbal:"'Death'", description:"Melee Death. 1x per event.", attribute:"1x event" },
     { name:"Refocus", cost:3, verbal:"N/A", description:"After taking a Long Rest, refresh your use of Deadly Strike.", attribute:"1x/event" },
     { name:"Painful Strike", cost:3, verbal:"'Agony'", description:"Agony melee attack.", attribute:"1 Insight" },
     { name:"Quick Strike", cost:4, verbal:"'4 Damage'", description:"Melee attack for 4 Damage.", attribute:"1 Prowess" },
@@ -164,7 +164,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Seeing Another's Time", cost:3, verbal:"N/A", description:"During a Short Rest, study a single opponent; your damage melee attacks against them from any source are +2 damage. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Awakener": [
-    { name:"Restore the Dying", cost:0, verbal:"'Cure Death by Water'", description:"Free. 1x/event, make a touch packet to Cure Death." },
+    { name:"Restore the Dying", cost:0, verbal:"'Cure Death by Water'", description:"1x/event, make a touch packet to Cure Death." },
     { name:"A Second Chance", cost:2, verbal:"See description", description:"1x/event, after a Long Rest in a Place of Peace, refresh 'Restore the Dying.' Additionally, when you use 'Restore the Dying,' the effect is now 'Cure Death and Heal 5 by Water.' Thread Skill.", attribute:"Thread Skill" },
     { name:"Awaken the Afflicted", cost:3, verbal:"'Cure Metabolic by Water'", description:"Restore those affected by maladies of the body.", attribute:"1 Prowess" },
     { name:"Lifegiving Healing", cost:3, verbal:"N/A", description:"Your healing effects from Awakener are increased by 2. Thread Skill.", attribute:"Thread Skill" },
@@ -174,7 +174,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Prevent Death", cost:2, verbal:"'Stabilize by Water'", description:"At will, stabilize those who are unstable. Beneficial touch packet." },
   ],
   "Wellspring": [
-    { name:"Heal the World", cost:0, verbal:"'Heal 2 by Water'", description:"Free. Gain 3 Heal 2 effects, each must go to a different person. Second invocation discards unused effects.", attribute:"1 Prowess" },
+    { name:"Heal the World", cost:0, verbal:"'Heal 2 by Water'", description:"Gain 3 Heal 2 effects, each must go to a different person. Second invocation discards unused effects.", attribute:"1 Prowess" },
     { name:"Spread the Healing", cost:3, verbal:"N/A", description:"Gain 2 additional heal effects with Heal the World, and 2 additional protection effects with Protect the Line. Thread Skill.", attribute:"Thread Skill" },
     { name:"Balm to War", cost:3, verbal:"'Cure Physical by Magic'", description:"Undo afflictions caused by weapons of war and similar physical effects.", attribute:"1 Insight" },
     { name:"Heroic Healing", cost:2, verbal:"'By your name <n> Heal 4 by Water'", description:"Once per event, heal someone by their name. Thread Skill.", attribute:"Thread Skill" },
@@ -184,7 +184,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"All Is Not Lost", cost:3, verbal:"'Refresh to self'", description:"If someone attacks a downed person you just healed, spend 10 seconds of Focus to regain that effect. Cannot regain more than one lost effect this way; resets to lost after Short or Long Rest." },
   ],
   "Alchemist": [
-    { name:"Craft Elixirs", cost:0, verbal:"N/A", description:"Free. Craft alchemical elixirs (healing and curative). Each has a unique cost in coin/components. Spend on creation.", attribute:"See formula" },
+    { name:"Craft Elixirs", cost:0, verbal:"N/A", description:"Craft alchemical elixirs (healing and curative). Each has a unique cost in coin/components. Spend on creation.", attribute:"See formula" },
     { name:"Craft Volatiles", cost:4, verbal:"N/A", description:"Craft alchemical volatiles (damage and detrimental effects).", attribute:"See formula" },
     { name:"Tinged with Poison", cost:3, verbal:"'By Poison'", description:"Convert your non-beneficial packet attacks to 'By Poison'. Thread Skill.", attribute:"Thread Skill" },
     { name:"Volley of Poison", cost:4, verbal:"'2 Damage by Poison'", description:"Gain two packet attacks of 2 Damage by Poison.", attribute:"1 Prowess" },
@@ -194,7 +194,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Curative Mixture", cost:4, verbal:"'Cure Metabolic'", description:"Cure the body of poison, disease, and other ills.", attribute:"1 Prowess" },
   ],
   "Arcaneer": [
-    { name:"Harness Fire", cost:0, verbal:"N/A", description:"Free. Create Fire Arcaneering engines at an elemental node. Gain Arcaneering as a spellcasting method. Also create Air Arcaneering engines.", attribute:"See Formula" },
+    { name:"Harness Fire", cost:0, verbal:"N/A", description:"Create Fire Arcaneering engines at an elemental node. Gain Arcaneering as a spellcasting method. Also create Air Arcaneering engines.", attribute:"See Formula" },
     { name:"Harness Air", cost:4, verbal:"N/A", description:"Create Air Arcaneering engines at an elemental node.", attribute:"See Formula" },
     { name:"Harness Water", cost:4, verbal:"N/A", description:"Create Water Arcaneering engines at an elemental node.", attribute:"See Formula" },
     { name:"Harness Earth", cost:4, verbal:"N/A", description:"Create Earth and Ice Arcaneering engines at an elemental node.", attribute:"See Formula" },
@@ -205,7 +205,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Elemental Control", cost:3, verbal:"'By Elemental Power'", description:"3x per event, convert a Damage or Agony effect to the 'Elemental Power' Trait. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Armorsmith": [
-    { name:"Battlefield Repair", cost:0, verbal:"'Repair 1 Armor'", description:"Free. For each use of this Skill, gain two uses of 'Repair 2 Armor.'", attribute:"1 Insight" },
+    { name:"Battlefield Repair", cost:0, verbal:"'Repair 1 Armor'", description:"For each use of this Skill, gain two uses of 'Repair 2 Armor.'", attribute:"1 Insight" },
     { name:"Adjust Armor", cost:4, verbal:"'Grant 1 Protection'", description:"Gain two uses of 'Grant 2 Protection.'", attribute:"1 Prowess" },
     { name:"Ringing Hammer", cost:3, verbal:"N/A", description:"When using a Repair Armor or Grant Protection Skill with multiple uses while Centered, Increase the number of uses by 2. Thread Skill.", attribute:"Thread Skill" },
     { name:"Heat the Forge", cost:3, verbal:"N/A", description:"The first Repair Armor or Grant Protection you use after Centering has its effect increased by 2. Thread Skill.", attribute:"Thread Skill" },
@@ -215,7 +215,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Well Fit Armor", cost:3, verbal:"N/A", description:"When you are Centered, your Armor gains an additional point." },
   ],
   "Beguiler": [
-    { name:"Guard versus Weapons", cost:0, verbal:"'Grant Physical Defense to Self, Guard'", description:"Free. Provide yourself with a Guard versus physical effects.", attribute:"1 Insight" },
+    { name:"Guard versus Weapons", cost:0, verbal:"'Grant Physical Defense to Self, Guard'", description:"Provide yourself with a Guard versus physical effects.", attribute:"1 Insight" },
     { name:"Guard versus Elements", cost:4, verbal:"'Grant Elemental Defense to Self, Guard'", description:"Provide yourself with a Guard versus the elements.", attribute:"1 Insight" },
     { name:"Guard versus Ailments", cost:4, verbal:"'Grant Metabolic Defense to Self, Guard'", description:"Provide yourself with a Guard versus metabolic effects.", attribute:"1 Fortitude" },
     { name:"Reverse Protection", cost:3, verbal:"'4 Damage by <see description>'", description:"If you have a Guard active, expend it to make a 4-damage packet attack. Trait depends on Guard type (Elemental→Fire or Ice; Metabolic→Poison or Disease; Physical→Force; Mental→Will or Gloom)." },
@@ -225,7 +225,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Banish Foe", cost:4, verbal:"'Repel by Fire or Ice'", description:"Repel a foe by melee or packet.", attribute:"1 Fortitude" },
   ],
   "Bladesmith": [
-    { name:"Hand Out Weapons", cost:0, verbal:"'Grant Melee Attack 2 Damage'", description:"Free. Gain one use of 'Grant Melee Attack 3 Damage.'", attribute:"1 Insight" },
+    { name:"Hand Out Weapons", cost:0, verbal:"'Grant Melee Attack 2 Damage'", description:"Gain one use of 'Grant Melee Attack 3 Damage.'", attribute:"1 Insight" },
     { name:"Sharpen the Blade on the Forge", cost:3, verbal:"N/A", description:"If Centered, when you use a melee attack Grant damage effect, Increase the damage by 1. Thread Skill.", attribute:"Thread Skill" },
     { name:"Arm the Line", cost:3, verbal:"N/A", description:"If Centered and using 'Hand Out Weapons,' 'Dire Blades,' or 'Blade of Last Resort,' Grant an additional effect. Thread Skill.", attribute:"Thread Skill" },
     { name:"Dire Blades", cost:4, verbal:"'Grant Melee Attack Agony'", description:"Sharpen someone's blade so they cause extra pain when they strike.", attribute:"1 Fortitude" },
@@ -235,7 +235,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Hardened Steel", cost:4, verbal:"'Grant Resist Destroy'", description:"Gain two uses of 'Grant Resist Destroy.' Also gain the ability to spend 1 minute of roleplay to repair a weapon.", attribute:"1 Insight" },
   ],
   "Combatant": [
-    { name:"Simple Strike", cost:0, verbal:"N/A", description:"Free. Make a 4 damage melee attack.", attribute:"1 Prowess" },
+    { name:"Simple Strike", cost:0, verbal:"N/A", description:"Make a 4 damage melee attack.", attribute:"1 Prowess" },
     { name:"Parry", cost:4, verbal:"'Parry'", description:"Negate a melee attack made against you.", attribute:"2 Fortitude" },
     { name:"Weapon Style Prowess", cost:3, verbal:"N/A", description:"Fight with a basic one-handed melee weapon and any of: Buckler, Shield, another one-handed weapon, staff, or spear." },
     { name:"Armored for War", cost:4, verbal:"N/A", description:"Wear heavy armor. Prerequisite: medium armor. Thread Skill.", attribute:"Thread Skill" },
@@ -245,7 +245,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Turn the Blade", cost:3, verbal:"'3 Damage'", description:"When you Parry an attack against you, gain a 3-damage attack. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Devastator": [
-    { name:"Caster's Companion", cost:0, verbal:"N/A", description:"Free. Wield a single basic one-handed weapon while making packet attacks from your other hand." },
+    { name:"Caster's Companion", cost:0, verbal:"N/A", description:"Wield a single basic one-handed weapon while making packet attacks from your other hand." },
     { name:"Channel Sparks", cost:4, verbal:"'2 Damage by Fire'", description:"Gain two attacks of '2 Damage by Fire' as packet or melee.", attribute:"1 Fortitude" },
     { name:"Hand of Magics", cost:3, verbal:"N/A", description:"If you've had only a single one-handed weapon or packets since your last Short Rest, Packet attacks of 2 or greater are +1 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Hand of Steel", cost:3, verbal:"N/A", description:"If you've had only a single one-handed weapon or packets since your last Short Rest, Melee attacks of 2 or greater are +1 damage. Thread Skill.", attribute:"Thread Skill" },
@@ -255,7 +255,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Channel Storm", cost:2, verbal:"'6 Damage by Wind'", description:"Three times per event, make a melee or packet attack of 6 damage by Wind." },
   ],
   "Grenadier": [
-    { name:"Lightning Ammunition", cost:0, verbal:"'5 Damage by Lightning' or 'Weakness by Lightning'", description:"Free. Shocker: spend 1 Attribute for 1 packet attack of 5 damage. OR Stunner: spend 1 Attribute for 1 packet attack of Weakness.", attribute:"1 Insight" },
+    { name:"Lightning Ammunition", cost:0, verbal:"'5 Damage by Lightning' or 'Weakness by Lightning'", description:"Shocker: spend 1 Attribute for 1 packet attack of 5 damage. OR Stunner: spend 1 Attribute for 1 packet attack of Weakness.", attribute:"1 Insight" },
     { name:"Fire Ammunition", cost:4, verbal:"'3 damage by Fire' or 'Agony by Fire'", description:"Flamethrower: spend 1 Attribute for 2 packet attacks of 3 damage. OR Burn: spend 1 Attribute for 1 packet attack of Agony.", attribute:"1 Prowess" },
     { name:"Earth Ammunition", cost:4, verbal:"'2 damage by Earth' or 'Maim by Earth'", description:"Shardthrower: spend 1 Attribute for 4 packet attacks of 2 damage. OR Shatter: spend 1 Attribute for 1 packet attack of Maim.", attribute:"1 Insight" },
     { name:"Ice Ammunition", cost:4, verbal:"'Slow by Ice' or 'Short Paralyze by Ice'", description:"Icy Surface: spend 1 Attribute for a packet attack of Slow. OR Shatter: spend 1 Attribute for 1 packet attack of Short Paralyze.", attribute:"1 Prowess" },
@@ -265,7 +265,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Well-made Device", cost:3, verbal:"'No Effect' or 'Reduce to short destroy'", description:"Your Projector is immune to disarm or reduces destroy to short destroy. Twice per Long Rest, refresh your quiver with 10 seconds of Rest." },
   ],
   "Naturalist": [
-    { name:"Thorn Arrow", cost:0, verbal:"'4 Damage by Thorns'", description:"Free. Make a '4 Damage by Thorns' missile attack with a bow or crossbow.", attribute:"1 Fortitude" },
+    { name:"Thorn Arrow", cost:0, verbal:"'4 Damage by Thorns'", description:"Make a '4 Damage by Thorns' missile attack with a bow or crossbow.", attribute:"1 Fortitude" },
     { name:"Wild Fletching", cost:3, verbal:"N/A", description:"Your called damage missile attacks (archery only) do damage by Thorns; +1 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Curative Bolt", cost:3, verbal:"N/A", description:"Use arrows to cast healing or cure effects. If you miss with a healing packet, spend 10 seconds to regain the effect. If you use another skill before Resting, the missed one is lost." },
     { name:"Shade of the Forest", cost:3, verbal:"N/A", description:"Your healing effects by 'Salve' are +1. Thread Skill.", attribute:"Thread Skill" },
@@ -275,7 +275,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Nature's Touch", cost:4, verbal:"'6 Damage by Thorns'", description:"Once per Short Rest, touch a tree and gain a special missile attack of '6 Damage by Thorns.'", attribute:"1 Fortitude" },
   ],
   "Ordinator": [
-    { name:"Continuous Healing", cost:0, verbal:"'Heal 2 by Water'", description:"Free. When Centered, spend 1 Attribute for one Heal 2. Refresh twice with 10 seconds of roleplay.", attribute:"1 Insight" },
+    { name:"Continuous Healing", cost:0, verbal:"'Heal 2 by Water'", description:"When Centered, spend 1 Attribute for one Heal 2. Refresh twice with 10 seconds of roleplay.", attribute:"1 Insight" },
     { name:"Extended Healing", cost:3, verbal:"N/A", description:"Gain two additional refreshes for Continuous Protection and Continuous Healing. Can be purchased twice (total +4 refreshes). Thread Skill.", attribute:"Thread Skill" },
     { name:"Continuous Protection", cost:4, verbal:"'Grant 2 Protection by Water'", description:"When Centered, spend 1 Attribute to 'Grant 2 Protection.' Refresh once with 10 seconds of roleplay.", attribute:"1 Fortitude" },
     { name:"Instantaneous Casting", cost:2, verbal:"'Imbue by Earth'", description:"Twice per event, forego the roleplay requirement to refresh a skill." },
@@ -284,7 +284,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Greater Healing", cost:3, verbal:"N/A", description:"Once per Long Rest, Increase the effect of Continuous Healing by 3. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Paladin": [
-    { name:"Shield of Protection", cost:0, verbal:"N/A", description:"Free. When casting beneficial effects, you may have a shield on your arm, or a shield and one-handed weapon tucked beneath the shield arm." },
+    { name:"Shield of Protection", cost:0, verbal:"N/A", description:"When casting beneficial effects, you may have a shield on your arm, or a shield and one-handed weapon tucked beneath the shield arm." },
     { name:"Share the Bounty", cost:4, verbal:"'Heal 2 by Water'", description:"Gain one packet effect usable only on yourself and one only on another. Second invocation discards unused effects from the first.", attribute:"1 Prowess" },
     { name:"Overflowing Bounty", cost:3, verbal:"N/A", description:"When you use 'Share the Bounty,' gain a second packet healing effect to use on someone else. Thread Skill.", attribute:"Thread Skill" },
     { name:"Companion Blessing", cost:2, verbal:"'By your name <n> Heal'", description:"3 times per event, Heal an ally by their name." },
@@ -294,7 +294,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Greater Healing", cost:3, verbal:"'Heal 5 by Water'", description:"Once per Long Rest, Increase the effect of Share the Bounty to a 'Heal 5 by Water.' Thread Skill.", attribute:"Thread Skill" },
   ],
   "Poison Blade": [
-    { name:"Craft Blade Venoms", cost:0, verbal:"N/A", description:"Free. Craft alchemical venoms (blade and missile). Each has a unique cost in coin, components and/or attributes. Spend on crafting.", attribute:"See Formula" },
+    { name:"Craft Blade Venoms", cost:0, verbal:"N/A", description:"Craft alchemical venoms (blade and missile). Each has a unique cost in coin, components and/or attributes. Spend on crafting.", attribute:"See Formula" },
     { name:"Craft Elixirs", cost:4, verbal:"N/A", description:"Craft alchemical elixirs (healing and curative). Spend requirements on crafting.", attribute:"See Formula" },
     { name:"Quick Toxin", cost:4, verbal:"'Grant Melee Attack to self, 5 Damage by Poison'", description:"Mix a quick poison attack to affix to your blade.", attribute:"1 Prowess" },
     { name:"Lingering Venom", cost:3, verbal:"'…by Poison'", description:"Your weapon has a lingering toxin; convert all melee attacks to 'by Poison.' Thread Skill.", attribute:"Thread Skill" },
@@ -304,7 +304,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Poison Blood", cost:3, verbal:"'Absorb and Heal 2 to self'", description:"Once per Short Rest, if affected by a Poison effect, absorb it and 'Heal 2 Damage' instead." },
   ],
   "Retributor": [
-    { name:"Strike First", cost:0, verbal:"'4 Damage'", description:"Free. Make a missile attack for 4 damage.", attribute:"1 Fortitude" },
+    { name:"Strike First", cost:0, verbal:"'4 Damage'", description:"Make a missile attack for 4 damage.", attribute:"1 Fortitude" },
     { name:"Bloody Arrow", cost:3, verbal:"N/A", description:"When you take Vitality damage, your next called damage missile attack is +2 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Capture Momentum", cost:4, verbal:"See Description", description:"Twice per Long Rest, when struck by a damage attack, store it and return it as a missile attack (just calling the damage, not the trait) as your next attack. Lost if you make another attack first.", attribute:"1 Insight" },
     { name:"Fit Combatant", cost:3, verbal:"N/A", description:"You have +1 Vitality when wielding a bow." },
@@ -314,7 +314,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Duel Ender", cost:4, verbal:"'Reflect'", description:"Once per event, reflect a missile attack." },
   ],
   "Sirocco": [
-    { name:"Dual Arrows", cost:0, verbal:"'3 Damage'", description:"Free. Make a missile attack for 3 damage.", attribute:"1 Insight" },
+    { name:"Dual Arrows", cost:0, verbal:"'3 Damage'", description:"Make a missile attack for 3 damage.", attribute:"1 Insight" },
     { name:"Ready to Fire", cost:3, verbal:"N/A", description:"When Centered, get an extra attack for any of 'Dual Arrows,' 'Serrated Arrow,' 'Piercing Arrow,' or 'Bullseye.' Thread Skill.", attribute:"Thread Skill" },
     { name:"Set Your Feet", cost:3, verbal:"N/A", description:"While Centered, called damage archery attacks do +1 damage. Thread Skill.", attribute:"Thread Skill" },
     { name:"Serrated Arrow", cost:4, verbal:"'Agony'", description:"Shoot an arrow to cause pain. Counts as multiple attacks for Thread Skills granting additional attacks.", attribute:"1 Prowess" },
@@ -324,7 +324,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Instant Restring", cost:3, verbal:"'Restring bow'", description:"Once per Short Rest, if Centered, instantly restring your bow. May be done in combat." },
   ],
   "Tinkerer": [
-    { name:"Craft Armament", cost:0, verbal:"N/A", description:"Free. Craft Armaments (damage via projectiles). Unique cost in gold, components, and/or Attributes. Spend on creation.", attribute:"See Formula" },
+    { name:"Craft Armament", cost:0, verbal:"N/A", description:"Craft Armaments (damage via projectiles). Unique cost in gold, components, and/or Attributes. Spend on creation.", attribute:"See Formula" },
     { name:"Craft Defensive Implement", cost:4, verbal:"N/A", description:"Craft Defensive Implements (protect from damage and effects). Spend requirements on creation.", attribute:"See Formula" },
     { name:"Craft Utility Device", cost:4, verbal:"N/A", description:"Craft Utility Devices (opening locks, holding doors, crossing pits, etc.). Spend requirements on creation.", attribute:"See Formula" },
     { name:"Craft Weapon Enhancement", cost:4, verbal:"N/A", description:"Craft Weapon Enhancements that improve bows and crossbows.", attribute:"See Formula" },
@@ -334,7 +334,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Just Use Anything", cost:3, verbal:"'Resist'", description:"Once per Long Rest, when hit by a melee, missile, or packet attack, expend a charge from a tinkered item to Resist the effect.", attribute:"Expend 1 tinkered item" },
   ],
   "Tornado": [
-    { name:"Bow and Sword", cost:0, verbal:"N/A", description:"Free. Fight with an offensive one-handed weapon and use a bow to block in your other hand. All skills can be melee or missile. Prerequisite: Archery skill." },
+    { name:"Bow and Sword", cost:0, verbal:"N/A", description:"Fight with an offensive one-handed weapon and use a bow to block in your other hand. All skills can be melee or missile. Prerequisite: Archery skill." },
     { name:"Simple Strike", cost:4, verbal:"'4 Damage'", description:"Attack your foes with a basic attack.", attribute:"1 Prowess" },
     { name:"Specialized in Bow and Sword", cost:3, verbal:"N/A", description:"When wielding both a one-handed weapon and a Bow, gain +1 damage to all melee attacks. Thread Skill.", attribute:"Thread Skill" },
     { name:"Flowing Strikes", cost:4, verbal:"'2 Damage'", description:"Spend 1 Attribute to gain three '2 Damage' attacks.", attribute:"1 Fortitude" },
@@ -344,7 +344,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Crushing Strike", cost:4, verbal:"'Short Destroy Weapon'", description:"Once per Long Rest, make an attack for Short Destroy.", attribute:"1 Fortitude" },
   ],
   "Volcano": [
-    { name:"Lava Burst", cost:0, verbal:"'Grant Packet Attack 2/4 Damage by Fire'", description:"Free. Grant a fiery packet attack to yourself or companions. When Centered, the strength doubles to 4 damage.", attribute:"1 Insight" },
+    { name:"Lava Burst", cost:0, verbal:"'Grant Packet Attack 2/4 Damage by Fire'", description:"Grant a fiery packet attack to yourself or companions. When Centered, the strength doubles to 4 damage.", attribute:"1 Insight" },
     { name:"Lava Blade", cost:4, verbal:"'Grant Melee Attack 2/4 Damage by Fire'", description:"Grant a fiery melee attack to yourself or companions. When Centered, the strength doubles.", attribute:"1 Prowess" },
     { name:"Lava Shard", cost:4, verbal:"'Grant Missile Attack 2/4 Damage by Fire'", description:"Grant a fiery missile attack to yourself or companions. When Centered, the strength doubles.", attribute:"1 Insight" },
     { name:"Lava Flows", cost:3, verbal:"N/A", description:"When you use a packet attack from a Grant effect, apply Thread Skills as if it were a skill. If you miss with a Grant packet and are Centered, expend your Center to regain it — must use it as your next called attack. Thread Skill.", attribute:"Thread Skill" },
@@ -363,91 +363,91 @@ const EXPRESSIONS = [
 
 const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
   "Aspected": [
-    { name:"Third Aspect", cost:0, verbal:"See Description", description:"Free. Choose a 3rd Aspect. Gain one ability usable via any of your three Aspect Traits: Bane (5 Damage Packet/Melee/Missile, 1 Fortitude), Balm (Heal 5 touch packet, 1 Fortitude), or Repulse (Repel Packet/Melee/Missile attack, 1 attribute). Grants a Third Aspect selector on the Background tab.", attribute:"1 Fortitude" },
+    { name:"Third Aspect", cost:0, verbal:"See Description", description:"Choose a 3rd Aspect. Gain one ability usable via any of your three Aspect Traits: Bane (5 Damage Packet/Melee/Missile, 1 Fortitude), Balm (Heal 5 touch packet, 1 Fortitude), or Repulse (Repel Packet/Melee/Missile attack, 1 attribute). Grants a Third Aspect selector on the Background tab.", attribute:"1 Fortitude" },
     { name:"Gather Aspect", cost:4, verbal:"'Heal All by <trait>'", description:"Once per Long Rest, when presented with a source of any of your aspects, spend 10 seconds of rest at the source and restore all your Vitality." },
     { name:"Commune with Aspects", cost:2, verbal:"N/A", description:"Once per event, after taking a Long Rest you can refresh a single 1x/event skill you used." },
-    { name:"Aspect Versatility", cost:0, verbal:"N/A", description:"Free. Purchase up to 3 additional abilities from your available Aspect skill list." },
+    { name:"Aspect Versatility", cost:0, verbal:"N/A", description:"Purchase up to 3 additional abilities from your available Aspect skill list." },
   ],
   "Cultural Expertise": [
-    { name:"Garb", cost:0, verbal:"N/A", description:"Free. When you dress in the style of your culture you gain +1 point of value for the armor type you are wearing." },
+    { name:"Garb", cost:0, verbal:"N/A", description:"When you dress in the style of your culture you gain +1 point of value for the armor type you are wearing." },
     { name:"Bringing the Good Word of the Country", cost:3, verbal:"N/A", description:"You may use your culture as your beneficial trait for effects. When you use your culture as your beneficial trait for healing effects, they are increased by 1. Thread Skill.", attribute:"Thread Skill" },
     { name:"The Ties That Bind", cost:4, verbal:"N/A", description:"1x/Long Rest, turn to spirit and go directly to someone you can see who you know to be the same culture as you.", attribute:"1 Prowess" },
-    { name:"Cultural Versatility", cost:0, verbal:"N/A", description:"Free. Purchase up to 3 additional abilities from your available cultural skill list." },
+    { name:"Cultural Versatility", cost:0, verbal:"N/A", description:"Purchase up to 3 additional abilities from your available cultural skill list." },
   ],
   "Empowered Aspect": [
-    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Free. Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill" },
     { name:"Greater Aspect Weapons", cost:4, verbal:"N/A", description:"Gain the Aspect weapon skill of one of your Aspects. Your Aspect weapons are immune to Destroy and Disarm effects." },
     { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess" },
     { name:"Greater Aspect Balm", cost:4, verbal:"See Description", description:"You can 'Absorb to Heal 2', 'Cure', or 'Purge' an effect by your Chosen Aspect Trait.", attribute:"1 Fortitude" },
   ],
   "Far Traveler": [
-    { name:"Dual Citizenship", cost:0, verbal:"See Description", description:"Free. Select a second culture, gain its trait, and may purchase its skills. Spend 1 Fortitude and use a touch packet of 'Grant (melee/missile/packet) attack to Culture 5 Damage by Presence'.", attribute:"1 Fortitude" },
+    { name:"Dual Citizenship", cost:0, verbal:"See Description", description:"Select a second culture, gain its trait, and may purchase its skills. Spend 1 Fortitude and use a touch packet of 'Grant (melee/missile/packet) attack to Culture 5 Damage by Presence'.", attribute:"1 Fortitude" },
     { name:"Multinational", cost:4, verbal:"See Description", description:"Select a third culture, gain its trait, and may purchase its skills. Once per event: touch packet 'Cure Death to [Culture]'." },
     { name:"Spreading Appreciation", cost:4, verbal:"'Grant <attack> 4 damage by Will'", description:"Perform an action exemplifying a culture you belong to, then grant an attack (melee, missile, or magic) to yourself or another.", attribute:"1 Insight" },
     { name:"Hardy Traveler", cost:3, verbal:"N/A", description:"Gain +1 point to one attribute of your choice (Prowess, Fortitude, or Insight)." },
   ],
   "Fortune Teller": [
-    { name:"Prophecy", cost:0, verbal:"See skill description", description:"Free. Do a reading in a Place of Peace. Choose one grant: (1) Grant 2 Protection by Trance to target and self, (2) Grant Melee Attack 2 Damage to target and self, or (3) Grant Heal 2 by Trance to target and self.", attribute:"1 Insight" },
+    { name:"Prophecy", cost:0, verbal:"See skill description", description:"Do a reading in a Place of Peace. Choose one grant: (1) Grant 2 Protection by Trance to target and self, (2) Grant Melee Attack 2 Damage to target and self, or (3) Grant Heal 2 by Trance to target and self.", attribute:"1 Insight" },
     { name:"Greater Prophecy", cost:3, verbal:"N/A", description:"Grants from the Prophecy skill are all increased by +1. Thread Skill.", attribute:"Thread Skill" },
     { name:"Healing a Friend", cost:3, verbal:"'Heal 2 to <n>'", description:"Once per Short Rest, heal one person whose fortune you told this gather as your vision predicted their time of need. Beneficial packet attack." },
     { name:"Hear a New Tale", cost:4, verbal:"N/A", description:"Listen to a tale from a group who went on an adventure you were not on. Send an Info Skill about that adventure — this counts as an additional Info Skill beyond your normal two." },
   ],
   "Heartbinder": [
-    { name:"Empowered Time of Rest", cost:0, verbal:"'Grant 2 protection to self by Sleep'", description:"Free. Enchant a dwelling so that everyone who sleeps there gains 2 Protection when they awaken and leave. Put a sign on the door." },
+    { name:"Empowered Time of Rest", cost:0, verbal:"'Grant 2 protection to self by Sleep'", description:"Enchant a dwelling so that everyone who sleeps there gains 2 Protection when they awaken and leave. Put a sign on the door." },
     { name:"Empowered Feast", cost:4, verbal:"'Grant one Vitality by inspiration'", description:"Once per event, when you sit with someone else to eat a full meal, grant 1 Vitality to yourself and your companion." },
     { name:"Empowered Audience", cost:2, verbal:"'Refresh 1 <Prowess/Insight/Fortitude> by Harmony'", description:"Once per Long Rest, when you are an audience for a performance, imbue the performer by clapping and speaking with them afterwards — refresh 1 Prowess, Insight, or Fortitude to them." },
     { name:"Empowered Game", cost:2, verbal:"'Heal All'", description:"When, in a Place of Peace, you play or watch a game of up to 6 people, at the end of the round 'Heal All' to everyone in the game." },
   ],
   "Foreseer": [
-    { name:"Ward Misfortune", cost:0, verbal:"'Grant Guard to Self by Trance'", description:"Free. After a Short Rest, spend 1 Fortitude for a Guard that blocks the first called melee, missile, or packet attack. After a Long Rest, gain the Guard without spending the attribute.", attribute:"1 Fortitude" },
+    { name:"Ward Misfortune", cost:0, verbal:"'Grant Guard to Self by Trance'", description:"After a Short Rest, spend 1 Fortitude for a Guard that blocks the first called melee, missile, or packet attack. After a Long Rest, gain the Guard without spending the attribute.", attribute:"1 Fortitude" },
     { name:"Certainty is Strength", cost:2, verbal:"N/A", description:"Gain +1 point of Purpose. If a vision is presented to you by plot, you can fully refresh one of Prowess, Insight, or Fortitude." },
     { name:"Avoid Ill Fortune", cost:3, verbal:"'Stabilize to Self' or 'Reduce to 10 Damage'", description:"If you are unstable and hit 59 seconds, spend 1 Prowess to stabilize. Also: if hit by a death effect, spend 1 Prowess to reduce it to '10 damage'.", attribute:"1 Prowess" },
     { name:"Erase the Wounds of the Past", cost:4, verbal:"'Heal all by Trance'", description:"If you listen to a PC's story (30+ seconds) about something they did this gather in a Place of Peace, call upon the gravitas of their actions — beneficial packet attack to heal them." },
   ],
   "Oracle": [
-    { name:"See the Question", cost:0, verbal:"N/A", description:"Free. Write your research skill as: 'I don't know the exact question I'm looking to ask, but I want to accomplish something plot relevant.' Example: 'Who can I talk to about this?' or 'I want to learn something impactful about <n> plot.'", attribute:"1 Fortitude" },
+    { name:"See the Question", cost:0, verbal:"N/A", description:"Write your research skill as: 'I don't know the exact question I'm looking to ask, but I want to accomplish something plot relevant.' Example: 'Who can I talk to about this?' or 'I want to learn something impactful about <n> plot.'", attribute:"1 Fortitude" },
     { name:"Speak in Tongues", cost:3, verbal:"'Gibberish'", description:"When affected by the Silence spell, you can still use skills and spells that normally require a verbal — say a short phrase in gibberish before calling the effect." },
     { name:"Drinking Away the Future", cost:4, verbal:"'Grant 2 Protection'", description:"When in the tavern drinking with a group of companions (no more than 6 total), grant 2 Protection to the whole group.", attribute:"1 Insight" },
     { name:"Blessed of the Constellations", cost:2, verbal:"'1x / Event'", description:"Start a negotiation with Shade beings: your group takes Spirit form and approaches saying 'Negotiations'. If accepted, remain spirit until negotiations end. If refused ('No Effect'), return to previous location and lose Spirit form." },
   ],
   "Performer": [
-    { name:"Protective Performance", cost:0, verbal:"'Grant 2 protection'", description:"Free. In a Place of Peace, grant 2 Protection to one person. If used after giving a Performance, grant to all performers.", attribute:"1 Insight" },
+    { name:"Protective Performance", cost:0, verbal:"'Grant 2 protection'", description:"In a Place of Peace, grant 2 Protection to one person. If used after giving a Performance, grant to all performers.", attribute:"1 Insight" },
     { name:"Set the Scene", cost:4, verbal:"'Grant Defense, Guard'", description:"When you return from an adventure, sing or tell a tale to set the scene. Gain two 'Grant Guard' effects to use on yourself or companions. Once per Long Rest; if not used before your next Long Rest after returning, it is lost." },
     { name:"Composition", cost:3, verbal:"'Refresh Ability X'", description:"Once per event, refresh one Long Rest skill. Once per Long Rest, if you create a new or expand upon an existing performance art script or lyrics, you can refresh this skill." },
     { name:"Grand Performance", cost:3, verbal:"'Grant One Prowess/Insight/Fortitude to self'", description:"Once per event, when there is a concert, show, or grand performance and you perform in that venue, grant yourself 1 Prowess, Insight, or Fortitude." },
   ],
   "Prodigy": [
-    { name:"Complete Focus", cost:0, verbal:"'Purge Mental'", description:"Free. Carry an item representative of your Foundation. Roleplay 3 seconds touching the item, spend 1 attribute, and Purge any mental effect. Can be used even while Paralyzed if the item is on your person.", attribute:"1 Fortitude" },
+    { name:"Complete Focus", cost:0, verbal:"'Purge Mental'", description:"Carry an item representative of your Foundation. Roleplay 3 seconds touching the item, spend 1 attribute, and Purge any mental effect. Can be used even while Paralyzed if the item is on your person.", attribute:"1 Fortitude" },
     { name:"Complimentary Exchange", cost:4, verbal:"'Grant 4 protection by Inspiration'", description:"Show appreciation to someone for their skill in their Foundation (roleplaying choice). After showing appreciation, use a Touch Packet on them for the effect.", attribute:"1 Insight" },
     { name:"Well Founded", cost:4, verbal:"N/A", description:"Gain one additional use per event of each of your per-event Foundation Skills." },
     { name:"Tricks of the Trade", cost:4, verbal:"See description", description:"Once per Long Rest, if you hold an item of your Foundation while taking a Short Rest, you can use the skill 'Fire's Touch, Air's Touch, Water's Touch, Ice's Touch, or Lightning's Touch' without having to spend Void." },
   ],
   "Remembrancer": [
-    { name:"Tongue of the Moth", cost:0, verbal:"'Speak to Dead'", description:"Free. Gain the ability to 'Speak to Dead' and 'Speak to Spirit of the Dead', allowing you to speak to someone lying dead in front of you or who has turned to spirit after dying." },
+    { name:"Tongue of the Moth", cost:0, verbal:"'Speak to Dead'", description:"Gain the ability to 'Speak to Dead' and 'Speak to Spirit of the Dead', allowing you to speak to someone lying dead in front of you or who has turned to spirit after dying." },
     { name:"Carry Token", cost:3, verbal:"Unique — based on chosen Memento Mori", description:"Carry one of three tokens (switch after Long Rest in Place of Peace): (1) Token of Joy: 1x/Long Rest, stabilize at 59 seconds if unstable. (2) Token of Sorrow: 1x/Long Rest, increase a melee/missile/packet attack to include 'and Agony by Fear' (Thread Skill). (3) Token of Wonder: 1x/Long Rest, spend 2 Prowess and grant 'Melee attack Five Damage and Grant Extra Melee attack Five Damage'." },
     { name:"Friend of Death", cost:4, verbal:"N/A", description:"When you die, you are known to Death as a Remembrancer and may gain additional concessions from Death while in Death's realm. Invoke upon meeting Death as a spirit by saying 'I carry the memories of the dead'." },
     { name:"Sooth Memory", cost:4, verbal:"'Cure Mental by Memory'", description:"Soothe those whose minds are disrupted. Spend one point of Insight to 'Cure Mental by Memory'.", attribute:"1 Insight" },
   ],
   "Savant": [
-    { name:"Skilled Learner", cost:0, verbal:"N/A", description:"Free. Select a second Foundation — gain its trait and may purchase its skills (max Foundation skills increases by 1). If the second Foundation is a different category from your first, you may buy skills from both category lists. Choose one free Open Skill: Buckler, Disarm Trap, Pick Locks, Cornucopia, Merchant, Platform, Resourceful, or Two Weapons." },
+    { name:"Skilled Learner", cost:0, verbal:"N/A", description:"Select a second Foundation — gain its trait and may purchase its skills (max Foundation skills increases by 1). If the second Foundation is a different category from your first, you may buy skills from both category lists. Choose one free Open Skill: Buckler, Disarm Trap, Pick Locks, Cornucopia, Merchant, Platform, Resourceful, or Two Weapons." },
     { name:"Fast Learner", cost:4, verbal:"N/A", description:"Once per Long Rest, use any crafting skill or attribute-cost skill you know the rules for — without having purchased it. If it has an attribute cost, you must still spend it." },
     { name:"Multi-talented", cost:4, verbal:"N/A", description:"Select a third Foundation — gain its trait and may purchase its skills (max Foundation skills increases by 1 again). Choose another free Open Skill from the Skilled Learner list." },
     { name:"Hard at Work", cost:4, verbal:"N/A", description:"Gain +1 Vitality. This point can allow you to go above the normal maximum." },
   ],
   "Songsmith": [
-    { name:"Revel in Yourself", cost:0, verbal:"'2 Damage by Force' or 'Heal 2 by Harmony'", description:"Free. Gain a pool of two effects: two 'Heal 2 by Harmony' beneficial packets OR two '2 Damage by Force' packet attacks. Pool starts empty. Once per Short Rest, when you sing for no less than 1 minute (no audience required), refresh this pool. May be used during a Long or Short Rest." },
+    { name:"Revel in Yourself", cost:0, verbal:"'2 Damage by Force' or 'Heal 2 by Harmony'", description:"Gain a pool of two effects: two 'Heal 2 by Harmony' beneficial packets OR two '2 Damage by Force' packet attacks. Pool starts empty. Once per Short Rest, when you sing for no less than 1 minute (no audience required), refresh this pool. May be used during a Long or Short Rest." },
     { name:"The Song Game", cost:4, verbal:"'Purge Mental to self'", description:"When you play a song game or sing a childish tune, Purge a mental effect upon completion of the song.", attribute:"1x Insight" },
     { name:"Answer with a Song", cost:4, verbal:"'Heal 3 to Self'", description:"When someone speaks or sings at you and you answer back with a song or verse, Heal 3 to self. Not a spell — no need to have hands free; can be used in combat.", attribute:"1x Prowess" },
     { name:"Choral", cost:4, verbal:"N/A", description:"When you get a group of people to join you in a song of no less than 30 seconds, your next called damage or healing effect is increased by 3. Thread Skill.", attribute:"Thread Skill" },
   ],
   "Strategist": [
-    { name:"Better a Forfeit than a Loss", cost:0, verbal:"'Resist'", description:"Free. Keep a chess board, cards, or other game in half-played state in your cabin or a public area (no more than 1 foot on a side). 'Resist' one effect, forfeiting the game. Reset and replay to half-played state to refresh." },
+    { name:"Better a Forfeit than a Loss", cost:0, verbal:"'Resist'", description:"Keep a chess board, cards, or other game in half-played state in your cabin or a public area (no more than 1 foot on a side). 'Resist' one effect, forfeiting the game. Reset and replay to half-played state to refresh." },
     { name:"Enjoying the Game", cost:3, verbal:"'Imbue Short Rest'", description:"Once per event, 'Imbue Short Rest' to another person. Once per Long Rest, while in a Place of Peace, renew this ability by playing a game of strategy, insight, or luck with one or more opponents." },
     { name:"The Joy of Victory", cost:4, verbal:"'Grant 2 protection'", description:"Pool of 3 Grant 2 Protection effects. Starts game full. Refresh by spending 1 Fortitude when you win a game with another person in a Place of Peace.", attribute:"1 Fortitude" },
     { name:"Breaking the Rules", cost:3, verbal:"'By Luck..'", description:"Four times per event, use a skill that requires Fortitude, Insight, or Prowess without spending the attribute. Start by saying 'By Luck..'" },
   ],
   "Virtuoso": [
-    { name:"Performance of Battle", cost:0, verbal:"'Grant Melee attack 2 Damage'", description:"Free. In a Place of Peace, grant a melee attack of 2 damage. If you have just completed a Performance, use this skill on up to 4 people.", attribute:"1 Fortitude" },
+    { name:"Performance of Battle", cost:0, verbal:"'Grant Melee attack 2 Damage'", description:"In a Place of Peace, grant a melee attack of 2 damage. If you have just completed a Performance, use this skill on up to 4 people.", attribute:"1 Fortitude" },
     { name:"Climactic Moment", cost:3, verbal:"N/A", description:"When in a Place of Peace, skills that allow you to provide multiple beneficial effects gain one additional effect. Thread Skill.", attribute:"Thread Skill" },
     { name:"Performance of Recovery", cost:4, verbal:"'Heal 5 by Water'", description:"In a Place of Peace, upon completing a Short Rest, Heal 5 by Water to one person. If you have just completed a performance instead, use this skill on up to 4 people." },
     { name:"Find the Stage", cost:4, verbal:"N/A", description:"Once per Long Rest, take a Short Rest and upon completion treat your current location as a Place of Peace for one skill from this Expression. Also allows you to perform while taking a Short Rest." },
@@ -482,7 +482,7 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Shift", cost:4, verbal:"'Avoid'", description:"If you are in the process of aiming and are hit by a melee, missile, or spell attack, spend 1 Insight to call 'Avoid'.", attribute:"1 Insight" },
   ],
   "Whisperer": [
-    { name:"Metal Shards", cost:0, verbal:"'3 Damage by Force'", description:"Free. Spend 1 Prowess to make two packet attacks, each calling '3 Damage by Force'.", attribute:"1 Prowess" },
+    { name:"Metal Shards", cost:0, verbal:"'3 Damage by Force'", description:"Spend 1 Prowess to make two packet attacks, each calling '3 Damage by Force'.", attribute:"1 Prowess" },
     { name:"Fade Away", cost:2, verbal:"'Cure Spirit to Self'", description:"Once per long rest: spend 1 Fortitude and take Spirit Form for up to 1 minute (arms crossed over torso). When exiting, say 'Cure Spirit to Self.' Any effect 'to spirit' or similar breaks the form.", attribute:"1 Fortitude" },
     { name:"Flechette", cost:3, verbal:"N/A", description:"When making a packet attack, expend up to 2 points of armor to deal +1 damage per point of armor spent.", attribute:"Thread Skill" },
     { name:"Strong Will", cost:3, verbal:"N/A", description:"Your non-physical armor is increased by 1 point.", attribute:"Thread Skill" },
@@ -631,7 +631,7 @@ const CULTURE_SKILLS: SkillDef[] = [
 
 const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
   Air: [
-    { name:"Air's Determination", cost:0, verbal:"'2 Damage'", description:"Free. When you take a Short Rest you gain three Archery attacks of 2 damage." },
+    { name:"Air's Determination", cost:0, verbal:"'2 Damage'", description:"When you take a Short Rest you gain three Archery attacks of 2 damage." },
     { name:"Air's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next Missile attack that costs an attribute is free." },
     { name:"Air's Grace", cost:4, verbal:"N/A", description:"You can refresh your quiver in 30 seconds instead of a minute." },
     { name:"Air's Skill", cost:2, verbal:"N/A", description:"Your quiver holds 10 arrows instead of 5. Once per Short Rest, refresh your quiver with a 10-second Rest." },
@@ -642,7 +642,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Enhance Air", cost:3, verbal:"Thread Skill", description:"When you use a skill granting multiple Missile damage attacks, gain 1 extra Missile Attack." },
   ],
   Earth: [
-    { name:"Earth's Determination", cost:0, verbal:"(See description)", description:"Free. When you complete First Aid on an Unconscious person, you also heal them for 1 Vitality." },
+    { name:"Earth's Determination", cost:0, verbal:"(See description)", description:"When you complete First Aid on an Unconscious person, you also heal them for 1 Vitality." },
     { name:"Earth's Touch", cost:4, verbal:"(See description)", description:"If at a Place of Peace, you take a Short Rest, and are Centered: gain two uses of 'Heal 2' and 'Grant 2 Protection by [your Trait]'." },
     { name:"Earth's Grace", cost:4, verbal:"N/A", description:"Each time you Center, you gain a point of Protection." },
     { name:"Earth's Skill", cost:4, verbal:"N/A", description:"You gain double from any Skill which grants resources or coin." },
@@ -653,7 +653,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Enhance Earth", cost:3, verbal:"Thread Skill", description:"When Centered, your Skills that allow you to give two or more Grant effects gain 1 additional effect." },
   ],
   Fire: [
-    { name:"Fire's Determination", cost:0, verbal:"'2 Damage by Fire'", description:"Free. When you take a Short Rest you gain three packet attacks of 2 Damage by Fire." },
+    { name:"Fire's Determination", cost:0, verbal:"'2 Damage by Fire'", description:"When you take a Short Rest you gain three packet attacks of 2 Damage by Fire." },
     { name:"Fire's Touch", cost:4, verbal:"N/A", description:"When you take a short rest, your next Non-Beneficial Packet attack that costs an attribute is free." },
     { name:"Fire's Grace", cost:3, verbal:"N/A", description:"Once each Short Rest, you can call 'Surge' and refresh your packet Flurry." },
     { name:"Fire's Skill", cost:4, verbal:"N/A", description:"You can use packet attacks while holding a staff or Basic single-handed weapon in one hand." },
@@ -664,7 +664,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Enhance Fire", cost:3, verbal:"N/A", description:"When you use a Skill granting multiple packet damage attacks, gain one extra packet attack." },
   ],
   Ice: [
-    { name:"Ice's Determination", cost:0, verbal:"'Repair 1 Armor to self'", description:"Free. When you take a Short Rest, gain three uses of 'Repair 1 Armor to self'." },
+    { name:"Ice's Determination", cost:0, verbal:"'Repair 1 Armor to self'", description:"When you take a Short Rest, gain three uses of 'Repair 1 Armor to self'." },
     { name:"Ice's Touch", cost:4, verbal:"'Repair 1 Armor'", description:"When you take a Short Rest, gain three uses of 'Repair 1 Armor'. Stacks with Ice's Determination." },
     { name:"Ice's Grace", cost:4, verbal:"'Resist'", description:"Once per Short Rest, Resist an effect that would destroy your shield or armor." },
     { name:"Ice's Skill", cost:4, verbal:"N/A", description:"You gain the ability to use Heavy Armor. Prerequisite: medium armor." },
@@ -675,7 +675,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Enhance Ice", cost:3, verbal:"Thread Skill", description:"Applies a Thread Skill to your armor reducing attacks of 5+ damage by 1. Requires heavy armor. Say 'Reduce' when used." },
   ],
   Lightning: [
-    { name:"Lightning's Determination", cost:0, verbal:"'2 Damage'", description:"Free. When you take a Short Rest you gain three Melee attacks of 2 Damage." },
+    { name:"Lightning's Determination", cost:0, verbal:"'2 Damage'", description:"When you take a Short Rest you gain three Melee attacks of 2 Damage." },
     { name:"Lightning's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next Melee attack that costs an attribute is free." },
     { name:"Lightning's Grace", cost:4, verbal:"'Resist'", description:"Once per Short Rest, Resist a 'Destroy weapon' effect." },
     { name:"Lightning's Skill", cost:4, verbal:"N/A", description:"Use called melee attacks 'by Force' instead of the Weapon trait. Gain weapon styles: two one-handed weapons, spear + one-handed, spear + buckler." },
@@ -686,7 +686,7 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Enhance Lightning", cost:3, verbal:"Thread Skill", description:"When you use a Skill granting multiple melee damage attacks, gain 1 extra melee attack." },
   ],
   Water: [
-    { name:"Water's Determination", cost:0, verbal:"'Heal 1'", description:"Free. When you take a Short Rest you gain five 'Heal 1 by <Trait>' beneficial effects." },
+    { name:"Water's Determination", cost:0, verbal:"'Heal 1'", description:"When you take a Short Rest you gain five 'Heal 1 by <Trait>' beneficial effects." },
     { name:"Water's Touch", cost:4, verbal:"N/A", description:"When you take a Short Rest, your next beneficial effect Skill that costs an attribute is free." },
     { name:"Water's Grace", cost:4, verbal:"'… and heal 2…'", description:"Once per Short Rest, when you use a Skill (other than First Aid) with a Cure effect, improve it to 'Cure X and Heal 2'." },
     { name:"Water's Skill", cost:4, verbal:"N/A", description:"Use packets (beneficial or non-beneficial) while holding a staff or single-handed weapon in your off hand." },

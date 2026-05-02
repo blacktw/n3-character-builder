@@ -700,6 +700,42 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
+// Sorted list of every known skill name (longest first), so that scanning a
+// description for a substring match prefers "Continuous Healing" over "Healing".
+const ALL_KNOWN_SKILL_NAMES: string[] = (() => {
+  const set = new Set<string>();
+  ADVENTURER_SKILLS.forEach(s => set.add(s.name));
+  ASPECT_SKILLS.forEach(s => set.add(s.name));
+  OPEN_SKILLS.forEach(s => set.add(s.name));
+  CULTURE_SKILLS.forEach(s => set.add(s.name));
+  PLACE_SKILLS.forEach(s => set.add(s.name));
+  SPECIALTY_SKILLS.forEach(s => set.add(s.name));
+  RESOURCE_SKILLS.forEach(s => set.add(s.name));
+  INTERACTION_SKILLS.forEach(s => set.add(s.name));
+  Object.values(EXCELLENCY_SKILLS).flat().forEach(s => set.add(s.name));
+  Object.values(EXPRESSION_SKILLS).flat().forEach(s => set.add(s.name));
+  Object.values(HIDDEN_EXCELLENCY_SKILLS).flat().forEach(s => set.add(s.name));
+  Object.values(HIDDEN_EXPRESSION_SKILLS).flat().forEach(s => set.add(s.name));
+  Object.values(DOMAIN_SKILLS).flat().forEach(s => set.add(s.name));
+  return Array.from(set).sort((a, b) => b.length - a.length);
+})();
+
+// Parent group names that may be referenced collectively in thread descriptions
+// (e.g., "your Reservoirs" → all skills in the Reservoir excellency).
+const PARENT_CATEGORY_NAMES: Set<string> = (() => {
+  const set = new Set<string>();
+  Object.keys(EXCELLENCY_SKILLS).forEach(n => set.add(n));
+  Object.keys(EXPRESSION_SKILLS).forEach(n => set.add(n));
+  Object.keys(HIDDEN_EXCELLENCY_SKILLS).forEach(n => set.add(n));
+  Object.keys(HIDDEN_EXPRESSION_SKILLS).forEach(n => set.add(n));
+  Object.keys(DOMAIN_SKILLS).forEach(n => set.add(n));
+  return set;
+})();
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function getFoundationSkillList(foundation: string): SkillDef[] {
   const fType = FOUNDATION_TYPES[foundation] || "Place";
   return fType === "Place" ? PLACE_SKILLS
@@ -831,34 +867,84 @@ function skillHasMultipleEffects(def: SkillDef): boolean {
   return false;
 }
 
-function threadAppliesTo(thread: SkillDef, target: SkillDef): boolean {
-  if (isSkillThread(target)) return false;
+// Find every known full skill name (case-sensitive, word-boundary, optional
+// plural "s") referenced in the thread description, excluding the thread's own
+// name. Sorted longest-first so e.g. "Continuous Healing" is matched before
+// "Healing" alone — though no skill is literally named "Healing", future data
+// may introduce shorter overlapping names.
+function findReferencedSkillNames(thread: SkillDef): string[] {
+  const desc = thread.description || '';
+  const found: string[] = [];
+  for (const name of ALL_KNOWN_SKILL_NAMES) {
+    if (name === thread.name) continue;
+    const re = new RegExp(`\\b${escapeRegex(name)}s?\\b`);
+    if (re.test(desc)) found.push(name);
+  }
+  return found;
+}
 
-  const tDesc = thread.description || '';
+// Find parent group names (excellency / expression / domain headers) referenced
+// by name in the description. Lets "your Reservoirs" map to all skills under
+// the Reservoir hidden excellency.
+function findReferencedCategories(thread: SkillDef): string[] {
+  const desc = thread.description || '';
+  const found: string[] = [];
+  for (const cat of PARENT_CATEGORY_NAMES) {
+    const re = new RegExp(`\\b${escapeRegex(cat)}s?\\b`);
+    if (re.test(desc)) found.push(cat);
+  }
+  return found;
+}
+
+function threadAppliesTo(thread: SummarySkill, target: SummarySkill): boolean {
+  if (isSkillThread(target.def)) return false;
+
+  const tDesc = thread.def.description || '';
   const tDescL = tDesc.toLowerCase();
-  const targetVerbal = (target.verbal || '').toLowerCase();
-  const targetDescL = (target.description || '').toLowerCase();
+  const targetVerbal = (target.def.verbal || '').toLowerCase();
+  const targetDescL = (target.def.description || '').toLowerCase();
   const targetAll = targetVerbal + ' ' + targetDescL;
-  const targetName = (target.name || '').toLowerCase();
+  const targetName = (target.def.name || '').toLowerCase();
 
-  // Named-skill-specific: check for skill names in single quotes in thread description
-  const nameRefs = tDesc.match(/'([^']+)'/g);
-  if (nameRefs && nameRefs.length > 0) {
-    const names = nameRefs.map(n => n.replace(/'/g, '').trim().toLowerCase());
+  // Tier 1 — explicit single-quoted skill name references.
+  const quotedRefs = tDesc.match(/'([^']+)'/g);
+  if (quotedRefs && quotedRefs.length > 0) {
+    const names = quotedRefs.map(n => n.replace(/'/g, '').trim().toLowerCase());
     return names.some(n => targetName === n || n.includes(targetName) || targetName.includes(n));
   }
 
-  // Rule: thread targets multi-effect skills → target must have multiple effects
-  if (/granting multiple|with multiple uses/i.test(tDesc)) {
-    if (!skillHasMultipleEffects(target)) return false;
+  // Tier 2 — known full skill names referenced unquoted in description.
+  // E.g. Greater Healing's "Increase the effect of Continuous Healing by 3"
+  // restricts applicability to Continuous Healing only.
+  const referencedNames = findReferencedSkillNames(thread.def);
+  if (referencedNames.length > 0) {
+    return referencedNames.includes(target.def.name);
   }
 
-  // Rule: thread requires damage in target → target verbal must contain "Damage"
+  // Tier 3 — parent group reference (e.g., "your Reservoirs" → Reservoir
+  // hidden excellency family). Match by source or by name containing the
+  // group word.
+  const referencedCats = findReferencedCategories(thread.def);
+  if (referencedCats.length > 0) {
+    return referencedCats.some(cat =>
+      target.source === cat ||
+      target.source.startsWith(cat + ' ') ||
+      target.def.name.includes(cat)
+    );
+  }
+
+  // Tier 4 — generic effect-type matching.
+
+  // Multi-effect rule: thread enhances "skills granting multiple ... effects".
+  if (/granting multiple|with multiple uses|two or more/i.test(tDesc)) {
+    if (!skillHasMultipleEffects(target.def)) return false;
+  }
+
+  // Damage-required rule: thread requires a damage effect on the target.
   if (/called damage|damage\s+(?:archery|missile|melee|packet)\s+(?:attack|effect)|(?:melee|packet|missile|archery)\s+(?:attack|effect)\s+of\s+\d+\s+damage/i.test(tDesc)) {
-    if (!/\bdamage\b/i.test(target.verbal || '')) return false;
+    if (!/\bdamage\b/i.test(target.def.verbal || '')) return false;
   }
 
-  // Attack type matching: if thread specifies a type, require target to match
   const tMelee = /\bmelee\b/i.test(tDescL);
   const tPacket = /\bpacket\b/i.test(tDescL);
   const tMissile = /\bmissile\b|\barchery\b|\barrow\b/i.test(tDescL);
@@ -873,12 +959,20 @@ function threadAppliesTo(thread: SkillDef, target: SkillDef): boolean {
   const targetProt = /\bprotection\b/i.test(targetAll);
   const targetRepair = /\brepair armor\b/i.test(targetAll);
 
-  if (tMelee && !tPacket && !tMissile && !targetMelee) return false;
-  if (tPacket && !tMelee && !tMissile && !targetPacket) return false;
-  if (tMissile && !tMelee && !tPacket && !targetMissile) return false;
-  if (tHeal && !tMelee && !tPacket && !tMissile && !tProt && !tRepair && !targetHeal) return false;
-  if (tProt && !tMelee && !tPacket && !tHeal && !targetProt) return false;
-  if (tRepair && !tMelee && !tPacket && !targetRepair) return false;
+  // If the thread mentions any effect types, target must match at least one.
+  // (Previous logic only filtered when exactly one type was mentioned, which
+  // let multi-type threads like "Grant Protection or Heal" match anything.)
+  const anyTypeMentioned = tMelee || tPacket || tMissile || tHeal || tProt || tRepair;
+  if (anyTypeMentioned) {
+    const hasMatch =
+      (tMelee && targetMelee) ||
+      (tPacket && targetPacket) ||
+      (tMissile && targetMissile) ||
+      (tHeal && targetHeal) ||
+      (tProt && targetProt) ||
+      (tRepair && targetRepair);
+    if (!hasMatch) return false;
+  }
 
   return true;
 }
@@ -2432,7 +2526,7 @@ export default function NuminaSheet() {
                   })}
                 </Section>
 
-                <Section title="Thread Skill Applicability">
+                <Section title="Thread Skill Applicability (WIP)">
                   {threadSkills.length === 0 ? (
                     <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", fontStyle:"italic" }}>
                       No Thread Skills purchased. Purchase skills marked "Thread Skill" to see applicability analysis here.
@@ -2443,9 +2537,9 @@ export default function NuminaSheet() {
                         Skills that have applicable Thread Skills from your purchases are shown below. Up to 3 Thread Skills (+ 1 Extra Thread) may be applied per skill use. Skills marked <strong>Multi</strong> grant multiple effects and are eligible for "add one extra" threads.
                       </div>
                       {nonThreadSkills
-                        .filter(target => threadSkills.some(ts => threadAppliesTo(ts.def, target.def)))
+                        .filter(target => threadSkills.some(ts => threadAppliesTo(ts, target)))
                         .map((target, i) => {
-                          const applicable = threadSkills.filter(ts => threadAppliesTo(ts.def, target.def));
+                          const applicable = threadSkills.filter(ts => threadAppliesTo(ts, target));
                           const isMulti = skillHasMultipleEffects(target.def);
                           return (
                             <div key={i} style={{ marginBottom:8, padding:"10px 12px", background:"var(--paper-warm)", border:"1px solid var(--ink-faint)" }}>
@@ -2474,7 +2568,7 @@ export default function NuminaSheet() {
                           );
                         })}
                       {(() => {
-                        const noThreadCount = nonThreadSkills.filter(t => !threadSkills.some(ts => threadAppliesTo(ts.def, t.def))).length;
+                        const noThreadCount = nonThreadSkills.filter(t => !threadSkills.some(ts => threadAppliesTo(ts, t))).length;
                         return noThreadCount > 0 ? (
                           <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:8, fontStyle:"italic" }}>
                             {noThreadCount} skill{noThreadCount !== 1 ? 's' : ''} have no applicable Thread Skills from your current purchases.

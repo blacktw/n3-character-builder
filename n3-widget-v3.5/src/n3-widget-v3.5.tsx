@@ -867,20 +867,54 @@ function skillHasMultipleEffects(def: SkillDef): boolean {
   return false;
 }
 
-// Find every known full skill name (case-sensitive, word-boundary, optional
-// plural "s") referenced in the thread description, excluding the thread's own
-// name. Sorted longest-first so e.g. "Continuous Healing" is matched before
-// "Healing" alone — though no skill is literally named "Healing", future data
-// may introduce shorter overlapping names.
+// Single-word skill names that double as common effect or combat nouns (e.g.
+// "Protection" the Locus skill vs. "Protection" the generic effect noun).
+// For these, we only count a reference when the surrounding text explicitly
+// frames it as a skill — "X skill", "X ability", "X effect".
+const EFFECT_NOUN_SKILL_NAMES = new Set([
+  "Protection", "Attack", "Defense", "Guard", "Parry", "Shield", "Boon",
+  "Heal", "Aim", "Shift", "Refocus", "Overwhelm", "Practice", "Convert",
+  "Enhance", "Discover", "Expose", "Living", "Purposed", "Holding",
+  "Garb", "Appreciation", "Composition",
+]);
+
+// Find every known full skill name referenced in the thread description,
+// excluding the thread's own name. Combines two passes:
+//   1. Single-quoted text — exact match (after stripping trailing punctuation)
+//      against a known skill name. Quotes that are effect specs like
+//      "'Heal 5 by Water'" don't match and let other tiers run.
+//   2. Unquoted text — case-sensitive word-boundary scan, longest-first.
+//      Multi-word and unique single-word names match freely; ambiguous
+//      single-word names require "X skill / ability / effect" context.
 function findReferencedSkillNames(thread: SkillDef): string[] {
   const desc = thread.description || '';
-  const found: string[] = [];
+  const found = new Set<string>();
+
+  const lowerToOriginal = new Map<string, string>();
+  for (const n of ALL_KNOWN_SKILL_NAMES) {
+    const k = n.toLowerCase();
+    if (!lowerToOriginal.has(k)) lowerToOriginal.set(k, n);
+  }
+
+  const quotedRefs = desc.match(/'([^']+)'/g) || [];
+  for (const q of quotedRefs) {
+    const inner = q.replace(/'/g, '').trim().replace(/[,.;:!?]+$/, '').toLowerCase();
+    const orig = lowerToOriginal.get(inner);
+    if (orig && orig !== thread.name) found.add(orig);
+  }
+
   for (const name of ALL_KNOWN_SKILL_NAMES) {
     if (name === thread.name) continue;
-    const re = new RegExp(`\\b${escapeRegex(name)}s?\\b`);
-    if (re.test(desc)) found.push(name);
+    const escaped = escapeRegex(name);
+    const isMultiWord = name.includes(' ');
+    const isAmbiguous = !isMultiWord && EFFECT_NOUN_SKILL_NAMES.has(name);
+    const re = isAmbiguous
+      ? new RegExp(`\\b${escaped}\\b\\s+(?:skill|ability|effect)s?\\b`, 'i')
+      : new RegExp(`\\b${escaped}s?\\b`);
+    if (re.test(desc)) found.add(name);
   }
-  return found;
+
+  return Array.from(found);
 }
 
 // Find parent group names (excellency / expression / domain headers) referenced
@@ -904,24 +938,17 @@ function threadAppliesTo(thread: SummarySkill, target: SummarySkill): boolean {
   const targetVerbal = (target.def.verbal || '').toLowerCase();
   const targetDescL = (target.def.description || '').toLowerCase();
   const targetAll = targetVerbal + ' ' + targetDescL;
-  const targetName = (target.def.name || '').toLowerCase();
 
-  // Tier 1 — explicit single-quoted skill name references.
-  const quotedRefs = tDesc.match(/'([^']+)'/g);
-  if (quotedRefs && quotedRefs.length > 0) {
-    const names = quotedRefs.map(n => n.replace(/'/g, '').trim().toLowerCase());
-    return names.some(n => targetName === n || n.includes(targetName) || targetName.includes(n));
-  }
-
-  // Tier 2 — known full skill names referenced unquoted in description.
+  // Tier 1 — specific known skill names referenced (quoted or unquoted).
   // E.g. Greater Healing's "Increase the effect of Continuous Healing by 3"
-  // restricts applicability to Continuous Healing only.
+  // restricts to Continuous Healing only; Overflowing Bounty's "'Share the
+  // Bounty,'" restricts to Share the Bounty.
   const referencedNames = findReferencedSkillNames(thread.def);
   if (referencedNames.length > 0) {
     return referencedNames.includes(target.def.name);
   }
 
-  // Tier 3 — parent group reference (e.g., "your Reservoirs" → Reservoir
+  // Tier 2 — parent group reference (e.g., "your Reservoirs" → Reservoir
   // hidden excellency family). Match by source or by name containing the
   // group word.
   const referencedCats = findReferencedCategories(thread.def);
@@ -933,7 +960,7 @@ function threadAppliesTo(thread: SummarySkill, target: SummarySkill): boolean {
     );
   }
 
-  // Tier 4 — generic effect-type matching.
+  // Tier 3 — generic effect-type matching.
 
   // Multi-effect rule: thread enhances "skills granting multiple ... effects".
   if (/granting multiple|with multiple uses|two or more/i.test(tDesc)) {

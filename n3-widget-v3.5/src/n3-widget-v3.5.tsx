@@ -812,77 +812,6 @@ function isSkillThread(def: SkillDef): boolean {
   return /thread skill|extra thread/i.test(combined);
 }
 
-function isExtraThread(def: SkillDef): boolean {
-  const combined = (def.description || '') + ' ' + (def.attribute || '') + ' ' + (def.verbal || '');
-  return /extra thread/i.test(combined);
-}
-
-function skillHasMultipleEffects(def: SkillDef): boolean {
-  const desc = def.description || '';
-  const verbal = def.verbal || '';
-  if (/counts as multiple attacks for thread skills/i.test(desc)) return true;
-  if (/\btriple\b/i.test(verbal)) return true;
-  const m = desc.match(/(?:gain|grant(?:ing)?|get)\s+(two|three|four|five|six|seven|eight|nine|ten|\d+)\s+(?:additional\s+)?(?:missile|melee|archery|packet|healing)?\s*(?:attacks?|effects?|uses?)/i);
-  if (m) {
-    const w = m[1].toLowerCase();
-    const n = WORD_TO_NUM[w] ?? parseInt(w) ?? 0;
-    if (n > 1) return true;
-  }
-  return false;
-}
-
-function threadAppliesTo(thread: SkillDef, target: SkillDef): boolean {
-  if (isSkillThread(target)) return false;
-
-  const tDesc = thread.description || '';
-  const tDescL = tDesc.toLowerCase();
-  const targetVerbal = (target.verbal || '').toLowerCase();
-  const targetDescL = (target.description || '').toLowerCase();
-  const targetAll = targetVerbal + ' ' + targetDescL;
-  const targetName = (target.name || '').toLowerCase();
-
-  // Named-skill-specific: check for skill names in single quotes in thread description
-  const nameRefs = tDesc.match(/'([^']+)'/g);
-  if (nameRefs && nameRefs.length > 0) {
-    const names = nameRefs.map(n => n.replace(/'/g, '').trim().toLowerCase());
-    return names.some(n => targetName === n || n.includes(targetName) || targetName.includes(n));
-  }
-
-  // Rule: thread targets multi-effect skills → target must have multiple effects
-  if (/granting multiple|with multiple uses/i.test(tDesc)) {
-    if (!skillHasMultipleEffects(target)) return false;
-  }
-
-  // Rule: thread requires damage in target → target verbal must contain "Damage"
-  if (/called damage|damage\s+(?:archery|missile|melee|packet)\s+(?:attack|effect)|(?:melee|packet|missile|archery)\s+(?:attack|effect)\s+of\s+\d+\s+damage/i.test(tDesc)) {
-    if (!/\bdamage\b/i.test(target.verbal || '')) return false;
-  }
-
-  // Attack type matching: if thread specifies a type, require target to match
-  const tMelee = /\bmelee\b/i.test(tDescL);
-  const tPacket = /\bpacket\b/i.test(tDescL);
-  const tMissile = /\bmissile\b|\barchery\b|\barrow\b/i.test(tDescL);
-  const tHeal = /\bheal\b/i.test(tDescL);
-  const tProt = /\bprotection\b/i.test(tDescL);
-  const tRepair = /\brepair armor\b/i.test(tDescL);
-
-  const targetMelee = /\bmelee\b/i.test(targetAll);
-  const targetPacket = /\bpacket\b/i.test(targetAll);
-  const targetMissile = /\bmissile\b|\barchery\b|\barrow\b|\bbow\b|\bcrossbow\b/i.test(targetAll);
-  const targetHeal = /\bheal\b/i.test(targetAll);
-  const targetProt = /\bprotection\b/i.test(targetAll);
-  const targetRepair = /\brepair armor\b/i.test(targetAll);
-
-  if (tMelee && !tPacket && !tMissile && !targetMelee) return false;
-  if (tPacket && !tMelee && !tMissile && !targetPacket) return false;
-  if (tMissile && !tMelee && !tPacket && !targetMissile) return false;
-  if (tHeal && !tMelee && !tPacket && !tMissile && !tProt && !tRepair && !targetHeal) return false;
-  if (tProt && !tMelee && !tPacket && !tHeal && !targetProt) return false;
-  if (tRepair && !tMelee && !tPacket && !targetRepair) return false;
-
-  return true;
-}
-
 function getAllSkillsForSummary(char: CharState): SummarySkill[] {
   const skills: SummarySkill[] = [];
 
@@ -2430,59 +2359,6 @@ export default function NuminaSheet() {
                       </div>
                     );
                   })}
-                </Section>
-
-                <Section title="Thread Skill Applicability">
-                  {threadSkills.length === 0 ? (
-                    <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", fontStyle:"italic" }}>
-                      No Thread Skills purchased. Purchase skills marked "Thread Skill" to see applicability analysis here.
-                    </div>
-                  ) : (
-                    <>
-                      <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:12, lineHeight:1.5 }}>
-                        Skills that have applicable Thread Skills from your purchases are shown below. Up to 3 Thread Skills (+ 1 Extra Thread) may be applied per skill use. Skills marked <strong>Multi</strong> grant multiple effects and are eligible for "add one extra" threads.
-                      </div>
-                      {nonThreadSkills
-                        .filter(target => threadSkills.some(ts => threadAppliesTo(ts.def, target.def)))
-                        .map((target, i) => {
-                          const applicable = threadSkills.filter(ts => threadAppliesTo(ts.def, target.def));
-                          const isMulti = skillHasMultipleEffects(target.def);
-                          return (
-                            <div key={i} style={{ marginBottom:8, padding:"10px 12px", background:"var(--paper-warm)", border:"1px solid var(--ink-faint)" }}>
-                              <div style={{ display:"flex", gap:8, alignItems:"baseline", flexWrap:"wrap", marginBottom:6 }}>
-                                <span style={{ fontFamily:"var(--font-display)", fontSize:13, color:"var(--ink)" }}>{target.name}</span>
-                                <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>{target.source}</span>
-                                {target.def.verbal && target.def.verbal !== 'N/A' && (
-                                  <span style={{ fontSize:9, fontStyle:"italic", color:"var(--ink-mid)" }}>"{target.def.verbal}"</span>
-                                )}
-                                {isMulti && (
-                                  <span style={{ fontSize:9, padding:"1px 5px", background:"var(--ink)", color:"var(--paper)", fontFamily:"var(--font-display)" }}>Multi</span>
-                                )}
-                              </div>
-                              <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
-                                {applicable.map((ts, j) => {
-                                  const extra = isExtraThread(ts.def);
-                                  return (
-                                    <div key={j} style={{ padding:"3px 8px", background: extra ? "var(--red)" : "var(--ink)", color:"var(--paper)", fontSize:10, fontFamily:"var(--font-display)" }}>
-                                      {extra ? '★ ' : ''}{ts.name}
-                                      <span style={{ fontWeight:"normal", fontSize:9, color:"rgba(255,255,255,0.6)", marginLeft:4 }}>({ts.source})</span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      {(() => {
-                        const noThreadCount = nonThreadSkills.filter(t => !threadSkills.some(ts => threadAppliesTo(ts.def, t.def))).length;
-                        return noThreadCount > 0 ? (
-                          <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:8, fontStyle:"italic" }}>
-                            {noThreadCount} skill{noThreadCount !== 1 ? 's' : ''} have no applicable Thread Skills from your current purchases.
-                          </div>
-                        ) : null;
-                      })()}
-                    </>
-                  )}
                 </Section>
 
                 <Section title="Spellcasting & Abilities Summary" accent>

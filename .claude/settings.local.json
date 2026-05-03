@@ -12,7 +12,8 @@
       "Bash(python -c \"import pdfminer; print\\('ok'\\)\")",
       "Bash(pip install *)",
       "Bash(python -)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx vite *)"
     ]
   }
 }

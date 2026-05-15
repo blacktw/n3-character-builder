@@ -276,7 +276,7 @@ const EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   ],
   "Ordinator": [
     { name:"Continuous Healing", cost:0, verbal:"'Heal 2 by Water'", description:"When Centered, spend 1 Attribute for one Heal 2. Refresh twice with 10 seconds of roleplay.", attribute:"1 Insight" },
-    { name:"Extended Healing", cost:3, verbal:"N/A", description:"Gain two additional refreshes for Continuous Protection and Continuous Healing. Can be purchased twice (total +4 refreshes). Thread Skill.", attribute:"Thread Skill" },
+    { name:"Extended Healing", cost:3, verbal:"N/A", description:"Gain two additional refreshes for Continuous Protection and Continuous Healing. Can be purchased twice (total +4 refreshes). Thread Skill.", attribute:"Thread Skill", maxCount:2 },
     { name:"Continuous Protection", cost:4, verbal:"'Grant 2 Protection by Water'", description:"When Centered, spend 1 Attribute to 'Grant 2 Protection.' Refresh once with 10 seconds of roleplay.", attribute:"1 Fortitude" },
     { name:"Instantaneous Casting", cost:2, verbal:"'Imbue by Earth'", description:"Twice per event, forego the roleplay requirement to refresh a skill." },
     { name:"Instantaneous Centering", cost:4, verbal:"'Grant [Centered]'", description:"Once per Long Rest, spend 1 Attribute to be instantly Centered.", attribute:"1 Insight" },
@@ -2039,7 +2039,7 @@ export default function NuminaSheet() {
                   const purchased = char.excellencySkillsPurchased[exclName] || [];
                   const totalSpent = purchased.reduce((s: number, e: PurchasedSkill) => s+e.cost, 0);
                   const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
-                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) < (skill.maxCount || 1);
                   const addSkill = (skill: SkillDef) => {
                     if (!canAdd(skill)) return;
                     setChar(c => ({ ...c, excellencySkillsPurchased: { ...c.excellencySkillsPurchased, [exclName]: [...(c.excellencySkillsPurchased[exclName]||[]), {name:skill.name,cost:skill.cost}] } }));

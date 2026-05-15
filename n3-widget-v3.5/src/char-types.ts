@@ -8,11 +8,15 @@ export interface SkillDef {
   attribute?: string;
   isAttributeOrArmor?: boolean;
   maxCount?: number;
+  grantsAttributeChoice?: boolean;
 }
+
+export type AttributeChoice = "Prowess" | "Insight" | "Fortitude";
 
 export interface PurchasedSkill {
   name: string;
   cost: number;
+  attributeChoice?: AttributeChoice;
 }
 
 export interface CharState {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import type { SkillDef, PurchasedSkill, CharState } from "./char-types";
+import type { SkillDef, PurchasedSkill, CharState, AttributeChoice } from "./char-types";
 import { DEFAULT_CHAR } from "./char-types";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
     { name:"Dual Citizenship", cost:0, verbal:"See Description", description:"Select a second culture, gain its trait, and may purchase its skills. Spend 1 Fortitude and use a touch packet of 'Grant (melee/missile/packet) attack to Culture 5 Damage by Presence'.", attribute:"1 Fortitude" },
     { name:"Multinational", cost:4, verbal:"See Description", description:"Select a third culture, gain its trait, and may purchase its skills. Once per event: touch packet 'Cure Death to [Culture]'." },
     { name:"Spreading Appreciation", cost:4, verbal:"'Grant <attack> 4 damage by Will'", description:"Perform an action exemplifying a culture you belong to, then grant an attack (melee, missile, or magic) to yourself or another.", attribute:"1 Insight" },
-    { name:"Hardy Traveler", cost:3, verbal:"N/A", description:"Gain +1 point to one attribute of your choice (Prowess, Fortitude, or Insight)." },
+    { name:"Hardy Traveler", cost:3, verbal:"N/A", description:"Gain +1 point to one attribute of your choice (Prowess, Fortitude, or Insight).", grantsAttributeChoice:true },
   ],
   "Fortune Teller": [
     { name:"Prophecy", cost:0, verbal:"See skill description", description:"Do a reading in a Place of Peace. Choose one grant: (1) Grant 2 Protection by Trance to target and self, (2) Grant Melee Attack 2 Damage to target and self, or (3) Grant Heal 2 by Trance to target and self.", attribute:"1 Insight" },
@@ -512,6 +512,27 @@ function totalAttrCost(purchased: number): number {
 function excellencyCost(index: number): number { return 5 + index; }
 function expressionCost(index: number): number { return 5 + index; }
 
+type AttrBonusKey = "Prowess" | "Insight" | "Fortitude" | "Purpose" | "Vitality";
+function attributeBonuses(char: CharState): Record<AttrBonusKey, number> {
+  const out: Record<AttrBonusKey, number> = { Prowess: 0, Insight: 0, Fortitude: 0, Purpose: 0, Vitality: 0 };
+  for (const s of char.aspectSkillsPurchased) {
+    if (s.name === "Extra Attribute" && s.attributeChoice) out[s.attributeChoice] += 1;
+  }
+  const exprPools = [char.expressionSkillsPurchased, char.hiddenExpressionSkillsPurchased || {}];
+  for (const pool of exprPools) {
+    for (const s of (pool["Far Traveler"] || [])) {
+      if (s.name === "Hardy Traveler" && s.attributeChoice) out[s.attributeChoice] += 1;
+    }
+    for (const s of (pool["Foreseer"] || [])) {
+      if (s.name === "Certainty is Strength") out.Purpose += 1;
+    }
+    for (const s of (pool["Savant"] || [])) {
+      if (s.name === "Hard at Work") out.Vitality += 1;
+    }
+  }
+  return out;
+}
+
 const ADVENTURER_SKILLS = [
   { name:"Base Weapon Skills", description:"Skilled with Basic One-Handed & Two-Handed weapons." },
   { name:"First Aid", description:"Stabilize or Cure Maim Limb on yourself or another (1 min)." },
@@ -533,7 +554,7 @@ const ARMOR_TYPES = [
 ];
 
 const ASPECT_SKILLS: SkillDef[] = [
-  { name:"Extra Attribute", cost:3, verbal:"N/A", description:"You have an additional Attribute (choose one of Prowess, Insight, or Fortitude).", isAttributeOrArmor:true },
+  { name:"Extra Attribute", cost:3, verbal:"N/A", description:"You have an additional Attribute (choose one of Prowess, Insight, or Fortitude).", isAttributeOrArmor:true, grantsAttributeChoice:true },
   { name:"Aspect Armaments", cost:4, verbal:"N/A", description:"You gain a special weapon tied to your Aspect. See Aspect Armament Skills section for details.", isAttributeOrArmor:false },
   { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
   { name:"Unravel Magic", cost:2, verbal:"Purge Will", description:"Once per event, you can Purge an effect that has the Will trait.", isAttributeOrArmor:false },
@@ -964,12 +985,50 @@ function attrChipColor(attribute: string): string | null {
   return null;
 }
 
-function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove }: {
+const ATTRIBUTE_CHOICES: AttributeChoice[] = ["Prowess", "Insight", "Fortitude"];
+
+function AttributeChoicePicker({ value, onChange, onDark }: {
+  value: AttributeChoice | undefined;
+  onChange: (v: AttributeChoice) => void;
+  onDark: boolean;
+}) {
+  const colorVar = (a: AttributeChoice) =>
+    a === "Prowess" ? "var(--prowess)" : a === "Insight" ? "var(--insight)" : "var(--fortitude)";
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:6, flexWrap:"wrap" }}>
+      <span style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color: onDark ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>
+        Add +1 to:
+      </span>
+      {ATTRIBUTE_CHOICES.map(a => {
+        const selected = value === a;
+        return (
+          <button key={a} onClick={() => onChange(a)} style={{
+            fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.05em",
+            padding:"3px 8px", cursor:"pointer", borderRadius:0,
+            border: `1.5px solid ${colorVar(a)}`,
+            background: selected ? colorVar(a) : "transparent",
+            color: selected ? "var(--paper)" : (onDark ? "rgba(255,255,255,0.85)" : colorVar(a)),
+            fontWeight: selected ? 700 : 500,
+          }}>{a}</button>
+        );
+      })}
+      {!value && (
+        <span style={{ fontSize:10, fontStyle:"italic", color: onDark ? "rgba(255,200,200,0.85)" : "var(--red)" }}>
+          ← pick one
+        </span>
+      )}
+    </div>
+  );
+}
+
+function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttributeChoice, onAttributeChoiceChange }: {
   skills: SkillDef[];
   countOf: (name: string) => number;
   canAdd: (skill: SkillDef) => boolean;
   onAdd: (skill: SkillDef) => void;
   onRemove: (name: string) => void;
+  getAttributeChoice?: (name: string) => AttributeChoice | undefined;
+  onAttributeChoiceChange?: (name: string, choice: AttributeChoice) => void;
 }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -1006,6 +1065,13 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove }: {
                 {(skill.maxCount ?? 0) > 1 && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)", fontStyle:"italic" }}>[up to {skill.maxCount}×]</span>}
               </div>
               <div style={{ fontSize:10, marginTop:2, lineHeight:1.4, color: isPurchased ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>{skill.description}</div>
+              {skill.grantsAttributeChoice && isPurchased && onAttributeChoiceChange && (
+                <AttributeChoicePicker
+                  value={getAttributeChoice?.(skill.name)}
+                  onChange={(c) => onAttributeChoiceChange(skill.name, c)}
+                  onDark={isPurchased}
+                />
+              )}
             </div>
           </div>
         );
@@ -1121,11 +1187,12 @@ function ExportPanel({ char, setChar }: {
   }
 
   function buildPrintHTML() {
-    const prowess = 2 + (char.prowessPurchased || 0);
-    const insight = 2 + (char.insightPurchased || 0);
-    const fortitude = 2 + (char.fortitudePurchased || 0);
-    const purpose = 5 + (char.purposePurchased || 0);
-    const vitality = 2 + (char.vitalityPurchased || 0);
+    const bonus = attributeBonuses(char);
+    const prowess = 2 + (char.prowessPurchased || 0) + bonus.Prowess;
+    const insight = 2 + (char.insightPurchased || 0) + bonus.Insight;
+    const fortitude = 2 + (char.fortitudePurchased || 0) + bonus.Fortitude;
+    const purpose = 5 + (char.purposePurchased || 0) + bonus.Purpose;
+    const vitality = 2 + (char.vitalityPurchased || 0) + bonus.Vitality;
     const used = usedCP(char);
     const total = 50 + (char.bonusCP || 0);
     const activeAspects = [char.aspect1, char.aspect2, char.aspect3].filter(a => a && a !== "(none)");
@@ -1418,11 +1485,12 @@ export default function NuminaSheet() {
 
   const update = useCallback(<K extends keyof CharState>(key: K, val: CharState[K]) => setChar(c => ({ ...c, [key]: val })), []);
 
-  const prowessVal = 2 + char.prowessPurchased;
-  const insightVal = 2 + char.insightPurchased;
-  const fortitudeVal = 2 + char.fortitudePurchased;
-  const purposeVal = 5 + char.purposePurchased;
-  const vitalityVal = 2 + char.vitalityPurchased;
+  const bonus = attributeBonuses(char);
+  const prowessVal = 2 + char.prowessPurchased + bonus.Prowess;
+  const insightVal = 2 + char.insightPurchased + bonus.Insight;
+  const fortitudeVal = 2 + char.fortitudePurchased + bonus.Fortitude;
+  const purposeVal = 5 + char.purposePurchased + bonus.Purpose;
+  const vitalityVal = 2 + char.vitalityPurchased + bonus.Vitality;
   const totalCP = 50 + char.bonusCP;
   const used = usedCP(char);
 
@@ -1673,6 +1741,11 @@ export default function NuminaSheet() {
                       if (idx === -1) return;
                       update("aspectSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length - 1 - idx));
                     };
+                    const getAspectChoice = (name: string): AttributeChoice | undefined =>
+                      purchased.find((s: PurchasedSkill) => s.name === name)?.attributeChoice;
+                    const setAspectChoice = (name: string, choice: AttributeChoice) => {
+                      update("aspectSkillsPurchased", purchased.map((s: PurchasedSkill) => s.name === name ? { ...s, attributeChoice: choice } : s));
+                    };
                     return (
                       <>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:8 }}>
@@ -1706,6 +1779,13 @@ export default function NuminaSheet() {
                                     {skill.isAttributeOrArmor && <span style={{ fontSize:9, color: isPurchased ? "rgba(255,255,255,0.5)" : "var(--ink-light)", fontStyle:"italic" }}>[limit: 1 max]</span>}
                                   </div>
                                   <div style={{ fontSize:10, marginTop:2, lineHeight:1.4, color: isPurchased ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>{skill.description}</div>
+                                  {skill.grantsAttributeChoice && isPurchased && (
+                                    <AttributeChoicePicker
+                                      value={getAspectChoice(skill.name)}
+                                      onChange={(c) => setAspectChoice(skill.name, c)}
+                                      onDark={isPurchased}
+                                    />
+                                  )}
                                 </div>
                               </div>
                             );
@@ -1885,9 +1965,9 @@ export default function NuminaSheet() {
               <Section title="Core Attributes" accent>
                 <div style={{ fontFamily:"var(--font-body)", fontSize:12, color:"var(--ink-mid)", marginBottom:16, lineHeight:1.5 }}>Prowess, Insight, and Fortitude start at 2 each and are <em>spent</em> to use skills.</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:20, justifyContent:"center", marginBottom:20 }}>
-                  <StatBox label="Prowess" value={prowessVal} min={2} max={10} onChange={v => update("prowessPurchased",v-2)} costNext={attrCost(char.prowessPurchased)} accentColor="var(--prowess)" />
-                  <StatBox label="Insight" value={insightVal} min={2} max={10} onChange={v => update("insightPurchased",v-2)} costNext={attrCost(char.insightPurchased)} accentColor="var(--insight)" />
-                  <StatBox label="Fortitude" value={fortitudeVal} min={2} max={10} onChange={v => update("fortitudePurchased",v-2)} costNext={attrCost(char.fortitudePurchased)} accentColor="var(--fortitude)" />
+                  <StatBox label="Prowess" value={prowessVal} min={2 + bonus.Prowess} max={10 + bonus.Prowess} onChange={v => update("prowessPurchased",Math.max(0, v - 2 - bonus.Prowess))} costNext={attrCost(char.prowessPurchased)} accentColor="var(--prowess)" />
+                  <StatBox label="Insight" value={insightVal} min={2 + bonus.Insight} max={10 + bonus.Insight} onChange={v => update("insightPurchased",Math.max(0, v - 2 - bonus.Insight))} costNext={attrCost(char.insightPurchased)} accentColor="var(--insight)" />
+                  <StatBox label="Fortitude" value={fortitudeVal} min={2 + bonus.Fortitude} max={10 + bonus.Fortitude} onChange={v => update("fortitudePurchased",Math.max(0, v - 2 - bonus.Fortitude))} costNext={attrCost(char.fortitudePurchased)} accentColor="var(--fortitude)" />
                 </div>
                 <div style={{ fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--ink-mid)", marginBottom:8 }}>Attribute CP Cost Table</div>
                 <div style={{ display:"flex", gap:0, marginBottom:16, fontFamily:"var(--font-body)", fontSize:11 }}>
@@ -1907,13 +1987,13 @@ export default function NuminaSheet() {
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:20, justifyContent:"center" }}>
                   <StatBox label="Void" value={2} min={2} max={2} readOnly onChange={()=>{}} />
-                  <StatBox label="Purpose" value={purposeVal} min={5} max={10} onChange={v => update("purposePurchased",v-5)} costNext={4} />
+                  <StatBox label="Purpose" value={purposeVal} min={5 + bonus.Purpose} max={10 + bonus.Purpose} onChange={v => update("purposePurchased",Math.max(0, v - 5 - bonus.Purpose))} costNext={4} />
                 </div>
               </Section>
 
               <Section title="Vitality">
                 <div style={{ display:"flex", justifyContent:"center", gap:20 }}>
-                  <StatBox label="Vitality" value={vitalityVal} min={2} max={7} onChange={v => update("vitalityPurchased",v-2)} costNext={attrCost(char.vitalityPurchased)} />
+                  <StatBox label="Vitality" value={vitalityVal} min={2 + bonus.Vitality} max={7 + bonus.Vitality} onChange={v => update("vitalityPurchased",Math.max(0, v - 2 - bonus.Vitality))} costNext={attrCost(char.vitalityPurchased)} />
                   <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", maxWidth:300, lineHeight:1.6 }}>At 0 Vitality you fall unconscious. Uncalled hits = stable. Called/packet damage = unstable (1 min to die without aid). A Death Strike to torso kills outright.</div>
                 </div>
               </Section>
@@ -2097,12 +2177,20 @@ export default function NuminaSheet() {
                       return { ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: arr.filter((_: PurchasedSkill, i: number) => i !== arr.length-1-idx) } };
                     });
                   };
+                  const getAttributeChoice = (name: string): AttributeChoice | undefined =>
+                    purchased.find((s: PurchasedSkill) => s.name === name)?.attributeChoice;
+                  const setAttributeChoice = (name: string, choice: AttributeChoice) => {
+                    setChar(c => {
+                      const arr = c.hiddenExpressionSkillsPurchased[exprName] || [];
+                      return { ...c, hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, attributeChoice: choice } : s) } };
+                    });
+                  };
                   return (
                     <Section key={exprName} title={`${exprName} Skills`}>
                       <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
                         <div style={{fontFamily:"var(--font-body)",fontSize:11,color:"var(--ink-mid)"}}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} />
                     </Section>
                   );
                 })}
@@ -2133,6 +2221,14 @@ export default function NuminaSheet() {
                     if (exprName==="Far Traveler" && name==="Dual Citizenship") { upd.culture2=""; upd.culture3=""; }
                     if (exprName==="Far Traveler" && name==="Multinational") upd.culture3="";
                     return { ...c, ...upd };
+                  });
+                };
+                const getAttributeChoice = (name: string): AttributeChoice | undefined =>
+                  purchased.find((s: PurchasedSkill) => s.name === name)?.attributeChoice;
+                const setAttributeChoice = (name: string, choice: AttributeChoice) => {
+                  setChar(c => {
+                    const arr = c.expressionSkillsPurchased[exprName] || [];
+                    return { ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, attributeChoice: choice } : s) } };
                   });
                 };
                 return (
@@ -2214,7 +2310,7 @@ export default function NuminaSheet() {
                         {showThirdCulture && (char.culture3 ? ` Multinational active: Culture 3 = ${char.culture3}.` : " Multinational active — select Culture 3 on the Background tab.")}
                       </div>
                     )}
-                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} />
                   </Section>
                 );
               })}

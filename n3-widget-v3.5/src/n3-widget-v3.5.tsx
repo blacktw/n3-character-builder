@@ -1935,7 +1935,7 @@ export default function NuminaSheet() {
                   const skills = DOMAIN_SKILLS[char.domain] || [];
                   const purchased = char.domainSkillsPurchased;
                   const countOf = (name: string) => purchased.filter((e: PurchasedSkill) => e.name === name).length;
-                  const canAdd = (skill: SkillDef) => countOf(skill.name) === 0;
+                  const canAdd = (skill: SkillDef) => countOf(skill.name) < (skill.maxCount || 1);
                   const addSkill = (skill: SkillDef) => { if (!canAdd(skill)) return; update("domainSkillsPurchased", [...purchased, {name:skill.name, cost:skill.cost}]); };
                   const removeSkill = (name: string) => {
                     const idx = [...purchased].reverse().findIndex((e: PurchasedSkill) => e.name === name);

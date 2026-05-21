@@ -1641,7 +1641,7 @@ export default function NuminaSheet() {
               <strong>Starting CP:</strong> 50 &nbsp;·&nbsp; <strong>Bonus CP:</strong>
               <input type="number" value={char.bonusCP} onChange={e => update("bonusCP", parseInt(e.target.value)||0)} style={{ ...inputStyle, width:46, marginLeft:4 }} min={0} />
             </div>
-            <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:4, lineHeight:1.4 }}>Earn bonus CP by attending events (1), submitting PELs (0.5), NPCing (up to 2), setup/cleanup tasks (0.5 each).</div>
+            <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", marginTop:4, lineHeight:1.4 }}>Earn bonus CP by attending events (1), submitting PELs (0.5), setup/cleanup tasks (0.5 each). Earned CP cap for 2026 is 100 CP.</div>
             <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:11, color:"var(--ink-light)", marginTop:6, letterSpacing:"0.02em" }}>All contents were created by Zyz Inc for use with the Numina LARP. Rules version v3.5.1</div>
           </div>
         </div>

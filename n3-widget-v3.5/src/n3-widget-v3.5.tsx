@@ -2513,7 +2513,7 @@ export default function NuminaSheet() {
 
             const freqLabel: Record<FrequencyType, string> = {
               passive: 'Passive / Always Available',
-              attribute: 'Attribute Pool (Restores on Short Rest)',
+              attribute: 'Attribute Pool (Restore on Short Rest with Void; or Purpose on Long Rest)',
               'short-rest': 'Short Rest',
               'long-rest': 'Long Rest',
               event: 'Per Event',

@@ -791,6 +791,7 @@ interface SummarySkill {
   name: string;
   source: string;
   def: SkillDef;
+  purchaseChoice?: string;
 }
 
 const WORD_TO_NUM: Record<string, number> = {
@@ -851,29 +852,29 @@ function getAllSkillsForSummary(char: CharState): SummarySkill[] {
     if (def) skills.push({ name: sName, source: 'Savant (free)', def });
   });
 
-  const sources: Array<{ name: string; source: string; skillDefs: SkillDef[] }> = [
+  const sources: Array<{ name: string; source: string; skillDefs: SkillDef[]; purchaseChoice?: string }> = [
     ...Object.entries(char.excellencySkillsPurchased).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXCELLENCY_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXCELLENCY_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.expressionSkillsPurchased).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXPRESSION_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXPRESSION_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.hiddenExcellencySkillsPurchased || {}).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXCELLENCY_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXCELLENCY_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.hiddenExpressionSkillsPurchased || {}).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
-    ...char.domainSkillsPurchased.filter(s => s.cost > 0).map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [] })),
-    ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS })),
-    ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation) })),
-    ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS })),
-    ...char.openSkillsPurchased.map(s => ({ name: s.name, source: 'Open Skills', skillDefs: OPEN_SKILLS })),
+    ...char.domainSkillsPurchased.filter(s => s.cost > 0).map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [], purchaseChoice: s.purchaseChoice })),
+    ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS, purchaseChoice: s.purchaseChoice })),
+    ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation), purchaseChoice: s.purchaseChoice })),
+    ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS, purchaseChoice: s.purchaseChoice })),
+    ...char.openSkillsPurchased.map(s => ({ name: s.name, source: 'Open Skills', skillDefs: OPEN_SKILLS, purchaseChoice: s.purchaseChoice })),
   ];
 
-  sources.forEach(({ name, source, skillDefs }) => {
+  sources.forEach(({ name, source, skillDefs, purchaseChoice }) => {
     const def = skillDefs.find(d => d.name === name);
-    if (def) skills.push({ name, source, def });
+    if (def) skills.push({ name, source, def, purchaseChoice });
   });
 
   return skills;
@@ -1343,10 +1344,11 @@ function ExportPanel({ char, setChar }: {
           : `<span style="font-size:7pt;background:#1a1410;color:white;padding:1pt 3pt;">${s.cost} CP</span>`;
         const threadBadge = isExtra ? '<span style="font-size:7pt;background:#7a1e1e;color:white;padding:1pt 3pt;margin-left:3pt;">Extra Thread</span>'
           : isThreadSkill ? '<span style="font-size:7pt;background:#555;color:white;padding:1pt 3pt;margin-left:3pt;">Thread</span>' : "";
+        const choiceBadge = s.purchaseChoice ? `<span style="font-size:7pt;background:#3a4a5a;color:white;padding:1pt 4pt;margin-left:3pt;">${s.purchaseChoice}</span>` : "";
         const srcBadge = s.source ? `<span style="font-size:7.5pt;color:#5a4e3a;font-style:italic;margin-left:4pt;">· ${s.source}</span>` : "";
         const attrBadge = s.attribute ? `<span style="font-size:7.5pt;font-weight:600;color:#7a4e1e;border-bottom:1.5px solid #7a4e1e;margin-left:4pt;">[${s.attribute}]</span>` : "";
         return `<div style="margin-bottom:5pt;padding-bottom:5pt;border-bottom:0.5pt dashed #c8bca0;">
-          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${attrBadge}${srcBadge}</div>
+          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${choiceBadge}${attrBadge}${srcBadge}</div>
           ${s.verbal&&s.verbal!=="N/A"&&!/^thread skill$/i.test(s.verbal.trim())?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
           ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${s.description}</div>`:""}
         </div>`;
@@ -2546,6 +2548,9 @@ export default function NuminaSheet() {
                                 <div style={{ flex:1 }}>
                                   <div style={{ display:"flex", gap:6, alignItems:"baseline", flexWrap:"wrap" }}>
                                     <span style={{ fontFamily:"var(--font-display)", fontSize:12, color:"var(--ink)" }}>{s.name}</span>
+                                    {s.purchaseChoice && (
+                                      <span style={{ fontSize:9, padding:"1px 6px", background:"var(--ink)", color:"var(--paper-warm)", fontFamily:"var(--font-display)", letterSpacing:"0.04em" }}>{s.purchaseChoice}</span>
+                                    )}
                                     {countBadge && (
                                       <span style={{ fontSize:9, padding:"1px 5px", background:freqColor[freqType], color:"white", fontFamily:"var(--font-display)" }}>{countBadge}</span>
                                     )}

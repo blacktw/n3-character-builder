@@ -970,7 +970,7 @@ function CPBadge({ used, total }: { used: number; total: number }) {
   );
 }
 
-const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Summary","Export / Print","Notes"];
+const TABS = ["Identity","Background","Attributes","Excellencies","Expressions","Open Skills","Summary","Print / Export","Notes"];
 
 function Tab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
@@ -1438,6 +1438,18 @@ ${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
       {/* PRINT MODAL */}
       {showPrint && <PrintModal html={buildPrintHTML()} onClose={() => setShowPrint(false)} />}
 
+      {/* SHAREABLE LINK */}
+      <div style={ss.section}>
+        <div style={ss.title}>Shareable Link</div>
+        <div style={ss.body}>
+          Generates a link with your current character encoded in the URL. Anyone who opens it will see this character loaded automatically.
+        </div>
+        <button style={ss.btn} onClick={handleCopyLink}>{linkMsg}</button>
+        <div style={ss.note}>
+          The link encodes the full character state. It can be long — use a URL shortener if needed.
+        </div>
+      </div>
+
       {/* JSON EXPORT */}
       <div style={ss.section}>
         <div style={ss.title}>Export Character Data (JSON)</div>
@@ -1463,18 +1475,6 @@ ${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
         )}
         <div style={ss.note}>
           Click the text area to select all, then Ctrl/Cmd+C to copy. Save into a <code>.json</code> file to keep it long-term.
-        </div>
-      </div>
-
-      {/* SHAREABLE LINK */}
-      <div style={ss.section}>
-        <div style={ss.title}>Shareable Link</div>
-        <div style={ss.body}>
-          Generates a link with your current character encoded in the URL. Anyone who opens it will see this character loaded automatically.
-        </div>
-        <button style={ss.btn} onClick={handleCopyLink}>{linkMsg}</button>
-        <div style={ss.note}>
-          The link encodes the full character state. It can be long — use a URL shortener if needed.
         </div>
       </div>
 
@@ -1507,7 +1507,7 @@ ${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", lineHeight:1.8 }}>
           The JSON is a plain object. Key fields for compatible tools:&nbsp;
           {["name","aspect1/2/3","foundation","foundation2","culture","culture2","culture3","domain","excellencies[]","expressions[]","prowessPurchased","insightPurchased","fortitudePurchased","excellencySkillsPurchased{}","expressionSkillsPurchased{}"].map(f => (
-            <code key={f} style={{ fontFamily:"monospace", fontSize:10, background:"var(--paper-warm)", padding:"1px 4px", marginRight:4 }}>{f}</code>
+            <code key={f} style={{ fontFamily:"monospace", fontSize:10, background:"var(--paper-warm)", color:"var(--ink)", padding:"1px 4px", marginRight:4 }}>{f}</code>
           ))}
         </div>
       </div>
@@ -1657,7 +1657,7 @@ export default function NuminaSheet() {
       `}</style>
 
       <div style={{
-        width:"100%", maxWidth:860, background:"var(--paper)",
+        width:"100%", maxWidth:1040, background:"var(--paper)",
         boxShadow:"0 0 60px rgba(0,0,0,0.7), inset 0 0 100px rgba(0,0,0,0.05)",
         position:"relative", overflow:"hidden",
         // Theme tokens — cascade to all children
@@ -2594,6 +2594,9 @@ export default function NuminaSheet() {
           {/* ── TAB 8: NOTES ── */}
           {tab === 8 && (
             <>
+              <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)", background:"var(--paper-warm)", border:"1px solid var(--ink-faint)", padding:"8px 12px", marginBottom:12, lineHeight:1.6 }}>
+                This information is for your own reference only and is not included in the printed output.
+              </div>
               <Section title="Character History & Background" accent>
                 <textarea value={char.history||""} onChange={e => update("history",e.target.value)} placeholder="Write your character's history here. Submitting a character history is worth 2 bonus CP!" style={{...inputStyle,width:"100%",minHeight:160,resize:"vertical",lineHeight:1.7}} />
               </Section>

@@ -557,7 +557,7 @@ const ARMOR_TYPES = [
 const ASPECT_SKILLS: SkillDef[] = [
   { name:"Extra Attribute", cost:3, verbal:"N/A", description:"You have an additional Attribute (choose one of Prowess, Insight, or Fortitude).", isAttributeOrArmor:true, grantsAttributeChoice:true },
   { name:"Aspect Armaments", cost:4, verbal:"N/A", description:"You gain a special weapon tied to your Aspect. See Aspect Armament Skills section for details.", isAttributeOrArmor:false },
-  { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
+  { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Once per Event. Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
   { name:"Unravel Magic", cost:2, verbal:"Purge Will", description:"Once per event, you can Purge an effect that has the Will trait.", isAttributeOrArmor:false },
   { name:"Invoke Aspect", cost:2, verbal:"… by Aspect", description:"Once per event, change the effect Trait of any non-per-event Skill to the name of your Aspect. This is an Extra Thread Skill.", isAttributeOrArmor:false },
   { name:"Tongue of Aspect", cost:2, verbal:"Speak to <Aspect>", description:"Once per Short Rest, use the ability 'Speak to <Aspect>' where Aspect represents your aspect.", isAttributeOrArmor:false },

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import LZString from "lz-string";
 import type { SkillDef, PurchasedSkill, CharState, AttributeChoice } from "./char-types";
 import { DEFAULT_CHAR } from "./char-types";
 
@@ -1137,6 +1138,20 @@ function PrintModal({ html, onClose }: { html: string; onClose: () => void }) {
   );
 }
 
+function charToShareParam(char: CharState): string {
+  return LZString.compressToEncodedURIComponent(JSON.stringify(char));
+}
+
+function charFromShareParam(param: string): CharState | null {
+  try {
+    const json = LZString.decompressFromEncodedURIComponent(param);
+    if (!json) return null;
+    return JSON.parse(json) as CharState;
+  } catch {
+    return null;
+  }
+}
+
 function ExportPanel({ char, setChar }: {
   char: CharState;
   setChar: React.Dispatch<React.SetStateAction<CharState>>;
@@ -1147,6 +1162,19 @@ function ExportPanel({ char, setChar }: {
   const [showPrint, setShowPrint] = useState(false);
   const [showJSON, setShowJSON] = useState(false);
   const [copyMsg, setCopyMsg] = useState("Select all & copy");
+  const [linkMsg, setLinkMsg] = useState("Copy Shareable Link");
+
+  function handleCopyLink() {
+    const param = charToShareParam(char);
+    const url = `${window.location.origin}${window.location.pathname}?c=${param}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkMsg("✓ Link copied!");
+      setTimeout(() => setLinkMsg("Copy Shareable Link"), 3000);
+    }).catch(() => {
+      setLinkMsg("Copy failed — try again");
+      setTimeout(() => setLinkMsg("Copy Shareable Link"), 3000);
+    });
+  }
 
   const jsonExport = JSON.stringify(char, null, 2);
 
@@ -1438,6 +1466,18 @@ ${char.abilitiesNotes||char.notes||char.threadNotes?`<hr><div class="cols">
         </div>
       </div>
 
+      {/* SHAREABLE LINK */}
+      <div style={ss.section}>
+        <div style={ss.title}>Shareable Link</div>
+        <div style={ss.body}>
+          Generates a link with your current character encoded in the URL. Anyone who opens it will see this character loaded automatically.
+        </div>
+        <button style={ss.btn} onClick={handleCopyLink}>{linkMsg}</button>
+        <div style={ss.note}>
+          The link encodes the full character state. It can be long — use a URL shortener if needed.
+        </div>
+      </div>
+
       {/* IMPORT */}
       <div style={ss.section}>
         <div style={ss.title}>Import Character Data</div>
@@ -1481,7 +1521,23 @@ export default function NuminaSheet() {
   const [tab, setTab] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
 
-  const [char, setChar] = useState<CharState>(DEFAULT_CHAR);
+  const [char, setChar] = useState<CharState>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const c = params.get("c");
+    if (c) {
+      const loaded = charFromShareParam(c);
+      if (loaded) return { ...DEFAULT_CHAR, ...loaded };
+    }
+    return DEFAULT_CHAR;
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("c")) {
+      // Clean the URL after loading so the address bar stays tidy
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   const update = useCallback(<K extends keyof CharState>(key: K, val: CharState[K]) => setChar(c => ({ ...c, [key]: val })), []);
 

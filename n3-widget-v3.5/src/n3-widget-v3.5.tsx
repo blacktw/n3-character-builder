@@ -376,9 +376,9 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
     { name:"Cultural Versatility", cost:0, verbal:"N/A", description:"Purchase up to 3 additional abilities from your available cultural skill list." },
   ],
   "Empowered Aspect": [
-    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill", purchaseChoices:["Benign","Malevolent"], purchaseChoiceLabel:"Choose:", purchaseChoiceDescriptions:{ Benign:"Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Thread Skill.", Malevolent:"Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill." } },
     { name:"Greater Aspect Weapons", cost:4, verbal:"N/A", description:"Gain the Aspect weapon skill of one of your Aspects. Your Aspect weapons are immune to Destroy and Disarm effects." },
-    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess" },
+    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess", purchaseChoices:["Melee","Missile","Packet"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Spend one attribute to make a Melee attack for 6 damage by your Chosen Aspect Trait.", Missile:"Spend one attribute to make a Missile attack for 6 damage by your Chosen Aspect Trait.", Packet:"Spend one attribute to make a Packet attack for 6 damage by your Chosen Aspect Trait." } },
     { name:"Greater Aspect Balm", cost:4, verbal:"See Description", description:"You can 'Absorb to Heal 2', 'Cure', or 'Purge' an effect by your Chosen Aspect Trait.", attribute:"1 Fortitude" },
   ],
   "Far Traveler": [
@@ -557,7 +557,7 @@ const ARMOR_TYPES = [
 const ASPECT_SKILLS: SkillDef[] = [
   { name:"Extra Attribute", cost:3, verbal:"N/A", description:"You have an additional Attribute (choose one of Prowess, Insight, or Fortitude).", isAttributeOrArmor:true, grantsAttributeChoice:true },
   { name:"Aspect Armaments", cost:4, verbal:"N/A", description:"You gain a special weapon tied to your Aspect. See Aspect Armament Skills section for details.", isAttributeOrArmor:false },
-  { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
+  { name:"Blast Aspect", cost:2, verbal:"Triple 3 Damage by <Trait>", description:"Once per Event. Choose melee, missile, or packet. Uses your Chosen Aspect Trait.", isAttributeOrArmor:false },
   { name:"Unravel Magic", cost:2, verbal:"Purge Will", description:"Once per event, you can Purge an effect that has the Will trait.", isAttributeOrArmor:false },
   { name:"Invoke Aspect", cost:2, verbal:"… by Aspect", description:"Once per event, change the effect Trait of any non-per-event Skill to the name of your Aspect. This is an Extra Thread Skill.", isAttributeOrArmor:false },
   { name:"Tongue of Aspect", cost:2, verbal:"Speak to <Aspect>", description:"Once per Short Rest, use the ability 'Speak to <Aspect>' where Aspect represents your aspect.", isAttributeOrArmor:false },
@@ -578,9 +578,9 @@ const FOUNDATION_TYPES: Record<string, string> = {
 };
 
 const PLACE_SKILLS: SkillDef[] = [
-  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this." },
+  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this.", purchaseChoices:["Melee","Missile","Spell"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Twice per event, gain a 4-damage Melee attack when in your place.", Missile:"Twice per event, gain a 4-damage Missile attack when in your place.", Spell:"Twice per event, gain a 4-damage Spell attack when in your place." } },
   { name:"Defense", cost:2, verbal:"'Reduce to 2 damage'", description:"Once per event, reduce any damage melee, missile, or packet attack to 1 damage." },
-  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place." },
+  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place.", purchaseChoices:["Melee","Missile","Magic"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Twice per event, gift another a 4-damage Melee attack when in your place.", Missile:"Twice per event, gift another a 4-damage Missile attack when in your place.", Magic:"Twice per event, gift another a 4-damage Magic attack when in your place." } },
   { name:"War Story", cost:2, verbal:"'Grant 2 Protection'", description:"Once per event, when you tell a war story from this or the last event, give yourself and the listener a Protection effect." },
   { name:"Home Ground", cost:2, verbal:"N/A", description:"Once per event, when in your place, gain +1 point of any attribute of your choice. Lost when you leave or after your next Long Rest." },
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
@@ -791,6 +791,7 @@ interface SummarySkill {
   name: string;
   source: string;
   def: SkillDef;
+  purchaseChoice?: string;
 }
 
 const WORD_TO_NUM: Record<string, number> = {
@@ -834,6 +835,13 @@ function isSkillThread(def: SkillDef): boolean {
   return /thread skill|extra thread/i.test(combined);
 }
 
+function resolveDescription(def: SkillDef, purchaseChoice?: string): string {
+  if (purchaseChoice && def.purchaseChoiceDescriptions?.[purchaseChoice]) {
+    return def.purchaseChoiceDescriptions[purchaseChoice];
+  }
+  return def.description;
+}
+
 function getAllSkillsForSummary(char: CharState): SummarySkill[] {
   const skills: SummarySkill[] = [];
 
@@ -851,29 +859,29 @@ function getAllSkillsForSummary(char: CharState): SummarySkill[] {
     if (def) skills.push({ name: sName, source: 'Savant (free)', def });
   });
 
-  const sources: Array<{ name: string; source: string; skillDefs: SkillDef[] }> = [
+  const sources: Array<{ name: string; source: string; skillDefs: SkillDef[]; purchaseChoice?: string }> = [
     ...Object.entries(char.excellencySkillsPurchased).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXCELLENCY_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXCELLENCY_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.expressionSkillsPurchased).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXPRESSION_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: n, skillDefs: EXPRESSION_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.hiddenExcellencySkillsPurchased || {}).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXCELLENCY_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXCELLENCY_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
     ...Object.entries(char.hiddenExpressionSkillsPurchased || {}).flatMap(([n, arr]) =>
-      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [] }))
+      (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [], purchaseChoice: s.purchaseChoice }))
     ),
-    ...char.domainSkillsPurchased.map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [] })),
-    ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS })),
-    ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation) })),
-    ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS })),
-    ...char.openSkillsPurchased.map(s => ({ name: s.name, source: 'Open Skills', skillDefs: OPEN_SKILLS })),
+    ...char.domainSkillsPurchased.filter(s => s.cost > 0).map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [], purchaseChoice: s.purchaseChoice })),
+    ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS, purchaseChoice: s.purchaseChoice })),
+    ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation), purchaseChoice: s.purchaseChoice })),
+    ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS, purchaseChoice: s.purchaseChoice })),
+    ...char.openSkillsPurchased.map(s => ({ name: s.name, source: 'Open Skills', skillDefs: OPEN_SKILLS, purchaseChoice: s.purchaseChoice })),
   ];
 
-  sources.forEach(({ name, source, skillDefs }) => {
+  sources.forEach(({ name, source, skillDefs, purchaseChoice }) => {
     const def = skillDefs.find(d => d.name === name);
-    if (def) skills.push({ name, source, def });
+    if (def) skills.push({ name, source, def, purchaseChoice });
   });
 
   return skills;
@@ -1022,7 +1030,41 @@ function AttributeChoicePicker({ value, onChange, onDark }: {
   );
 }
 
-function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttributeChoice, onAttributeChoiceChange }: {
+function PurchaseChoicePicker({ label, choices, value, onChange, onDark }: {
+  label: string;
+  choices: string[];
+  value: string | undefined;
+  onChange: (v: string) => void;
+  onDark: boolean;
+}) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:6, flexWrap:"wrap" }}>
+      <span style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color: onDark ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>
+        {label}
+      </span>
+      {choices.map(c => {
+        const selected = value === c;
+        return (
+          <button key={c} onClick={() => onChange(c)} style={{
+            fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.05em",
+            padding:"3px 8px", cursor:"pointer", borderRadius:0,
+            border: `1.5px solid ${onDark ? "rgba(255,255,255,0.45)" : "var(--ink-light)"}`,
+            background: selected ? (onDark ? "rgba(255,255,255,0.22)" : "var(--ink)") : "transparent",
+            color: selected ? (onDark ? "var(--paper-warm)" : "var(--paper)") : (onDark ? "rgba(255,255,255,0.85)" : "var(--ink)"),
+            fontWeight: selected ? 700 : 500,
+          }}>{c}</button>
+        );
+      })}
+      {!value && (
+        <span style={{ fontSize:10, fontStyle:"italic", color: onDark ? "rgba(255,200,200,0.85)" : "var(--red)" }}>
+          ← pick one
+        </span>
+      )}
+    </div>
+  );
+}
+
+function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttributeChoice, onAttributeChoiceChange, getPurchaseChoice, onPurchaseChoiceChange }: {
   skills: SkillDef[];
   countOf: (name: string) => number;
   canAdd: (skill: SkillDef) => boolean;
@@ -1030,6 +1072,8 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttribut
   onRemove: (name: string) => void;
   getAttributeChoice?: (name: string) => AttributeChoice | undefined;
   onAttributeChoiceChange?: (name: string, choice: AttributeChoice) => void;
+  getPurchaseChoice?: (name: string) => string | undefined;
+  onPurchaseChoiceChange?: (name: string, choice: string) => void;
 }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -1070,6 +1114,15 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttribut
                 <AttributeChoicePicker
                   value={getAttributeChoice?.(skill.name)}
                   onChange={(c) => onAttributeChoiceChange(skill.name, c)}
+                  onDark={isPurchased}
+                />
+              )}
+              {skill.purchaseChoices && isPurchased && onPurchaseChoiceChange && (
+                <PurchaseChoicePicker
+                  label={skill.purchaseChoiceLabel ?? "Choose:"}
+                  choices={skill.purchaseChoices}
+                  value={getPurchaseChoice?.(skill.name)}
+                  onChange={(c) => onPurchaseChoiceChange(skill.name, c)}
                   onDark={isPurchased}
                 />
               )}
@@ -1298,12 +1351,13 @@ function ExportPanel({ char, setChar }: {
           : `<span style="font-size:7pt;background:#1a1410;color:white;padding:1pt 3pt;">${s.cost} CP</span>`;
         const threadBadge = isExtra ? '<span style="font-size:7pt;background:#7a1e1e;color:white;padding:1pt 3pt;margin-left:3pt;">Extra Thread</span>'
           : isThreadSkill ? '<span style="font-size:7pt;background:#555;color:white;padding:1pt 3pt;margin-left:3pt;">Thread</span>' : "";
+        const choiceBadge = s.purchaseChoice ? `<span style="font-size:7pt;background:#3a4a5a;color:white;padding:1pt 4pt;margin-left:3pt;">${s.purchaseChoice}</span>` : "";
         const srcBadge = s.source ? `<span style="font-size:7.5pt;color:#5a4e3a;font-style:italic;margin-left:4pt;">· ${s.source}</span>` : "";
         const attrBadge = s.attribute ? `<span style="font-size:7.5pt;font-weight:600;color:#7a4e1e;border-bottom:1.5px solid #7a4e1e;margin-left:4pt;">[${s.attribute}]</span>` : "";
         return `<div style="margin-bottom:5pt;padding-bottom:5pt;border-bottom:0.5pt dashed #c8bca0;">
-          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${attrBadge}${srcBadge}</div>
+          <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${choiceBadge}${attrBadge}${srcBadge}</div>
           ${s.verbal&&s.verbal!=="N/A"&&!/^thread skill$/i.test(s.verbal.trim())?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
-          ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${s.description}</div>`:""}
+          ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${(s.purchaseChoice && s.purchaseChoiceDescriptions?.[s.purchaseChoice]) || s.description}</div>`:""}
         </div>`;
       }).join("");
     }
@@ -1894,6 +1948,10 @@ export default function NuminaSheet() {
                     if (idx===-1) return;
                     update("foundationSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length-1-idx));
                   };
+                  const getFoundationPurchaseChoice = (name: string): string | undefined =>
+                    purchased.find((s: PurchasedSkill) => s.name === name)?.purchaseChoice;
+                  const setFoundationPurchaseChoice = (name: string, choice: string) =>
+                    update("foundationSkillsPurchased", purchased.map((s: PurchasedSkill) => s.name === name ? { ...s, purchaseChoice: choice } : s));
                   return (
                     <div style={{ marginTop:14, borderTop:"1px dashed var(--ink-faint)", paddingTop:12 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
@@ -1902,7 +1960,7 @@ export default function NuminaSheet() {
                         </div>
                         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skillList} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skillList} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getPurchaseChoice={getFoundationPurchaseChoice} onPurchaseChoiceChange={setFoundationPurchaseChoice} />
                     </div>
                   );
                 })()}
@@ -2287,6 +2345,14 @@ export default function NuminaSheet() {
                     return { ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, attributeChoice: choice } : s) } };
                   });
                 };
+                const getExprPurchaseChoice = (name: string): string | undefined =>
+                  purchased.find((s: PurchasedSkill) => s.name === name)?.purchaseChoice;
+                const setExprPurchaseChoice = (name: string, choice: string) => {
+                  setChar(c => {
+                    const arr = c.expressionSkillsPurchased[exprName] || [];
+                    return { ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, purchaseChoice: choice } : s) } };
+                  });
+                };
                 return (
                   <Section key={exprName} title={`${exprName} Skills`}>
                     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
@@ -2366,7 +2432,7 @@ export default function NuminaSheet() {
                         {showThirdCulture && (char.culture3 ? ` Multinational active: Culture 3 = ${char.culture3}.` : " Multinational active — select Culture 3 on the Background tab.")}
                       </div>
                     )}
-                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} />
+                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} getPurchaseChoice={getExprPurchaseChoice} onPurchaseChoiceChange={setExprPurchaseChoice} />
                   </Section>
                 );
               })}
@@ -2489,6 +2555,9 @@ export default function NuminaSheet() {
                                 <div style={{ flex:1 }}>
                                   <div style={{ display:"flex", gap:6, alignItems:"baseline", flexWrap:"wrap" }}>
                                     <span style={{ fontFamily:"var(--font-display)", fontSize:12, color:"var(--ink)" }}>{s.name}</span>
+                                    {s.purchaseChoice && (
+                                      <span style={{ fontSize:9, padding:"1px 6px", background:"var(--ink)", color:"var(--paper-warm)", fontFamily:"var(--font-display)", letterSpacing:"0.04em" }}>{s.purchaseChoice}</span>
+                                    )}
                                     {countBadge && (
                                       <span style={{ fontSize:9, padding:"1px 5px", background:freqColor[freqType], color:"white", fontFamily:"var(--font-display)" }}>{countBadge}</span>
                                     )}
@@ -2501,7 +2570,7 @@ export default function NuminaSheet() {
                                     )}
                                   </div>
                                   {s.def.description && (
-                                    <div style={{ fontSize:10, color:"var(--ink-mid)", marginTop:2, lineHeight:1.4 }}>{s.def.description}</div>
+                                    <div style={{ fontSize:10, color:"var(--ink-mid)", marginTop:2, lineHeight:1.4 }}>{resolveDescription(s.def, s.purchaseChoice)}</div>
                                   )}
                                 </div>
                               </div>
@@ -2526,24 +2595,24 @@ export default function NuminaSheet() {
                     Thread Skills enhance other skills. You may apply up to 3 Thread Skills to a single effect (plus 1 Extra Thread Skill). Thread Skills cannot be applied to uncalled damage, grants, or item effects.
                   </div>
                   {(() => {
-                    const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean }[] = [];
+                    const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean; purchaseChoice?: string }[] = [];
                     const allSourceSkills = [
                       ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
                       ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),
-                      ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
-                      ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
+                      ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as PurchasedSkill[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
+                      ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as PurchasedSkill[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
                       ...char.domainSkillsPurchased.map(s => ({...s, source:`${char.domain} Domain`, skillDefs:DOMAIN_SKILLS[char.domain]||[]})),
                       ...char.aspectSkillsPurchased.map(s => ({...s, source:"Aspect", skillDefs:ASPECT_SKILLS})),
                       ...char.foundationSkillsPurchased.map(s => { const defs = getFoundationSkills(); return {...s, source:`${char.foundation} Foundation`, skillDefs:defs}; }),
                       ...char.cultureSkillsPurchased.map(s => ({...s, source:`${char.culture} Culture`, skillDefs:CULTURE_SKILLS})),
                     ];
-                    allSourceSkills.forEach(({name, source, skillDefs}) => {
+                    allSourceSkills.forEach(({name, source, skillDefs, purchaseChoice}) => {
                       const def = skillDefs.find(d => d.name === name);
                       if (!def) return;
                       const combined = (def.description||"") + " " + (def.attribute||"") + " " + (def.verbal||"");
                       const isExtra = /extra thread/i.test(combined);
                       const isThread = isExtra || /thread skill/i.test(combined);
-                      if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra});
+                      if (isThread) threadSkills.push({name, source, description:resolveDescription(def, purchaseChoice), verbal:def.verbal, isExtra, purchaseChoice});
                     });
 
                     if (threadSkills.length === 0) {
@@ -2556,6 +2625,9 @@ export default function NuminaSheet() {
                             <div style={{flex:1}}>
                               <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
                                 <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--ink)"}}>{ts.name}</span>
+                                {ts.purchaseChoice && (
+                                  <span style={{fontSize:9,padding:"1px 6px",background:"var(--ink)",color:"var(--paper-warm)",fontFamily:"var(--font-display)",letterSpacing:"0.04em"}}>{ts.purchaseChoice}</span>
+                                )}
                                 {ts.isExtra
                                   ? <span style={{fontSize:9,padding:"1px 5px",background:"var(--red)",color:"white"}}>Extra Thread</span>
                                   : <span style={{fontSize:9,padding:"1px 5px",background:"var(--ink)",color:"var(--paper)"}}>Thread Skill</span>}

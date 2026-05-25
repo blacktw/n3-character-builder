@@ -9,6 +9,8 @@ export interface SkillDef {
   isAttributeOrArmor?: boolean;
   maxCount?: number;
   grantsAttributeChoice?: boolean;
+  purchaseChoices?: string[];
+  purchaseChoiceLabel?: string;
 }
 
 export type AttributeChoice = "Prowess" | "Insight" | "Fortitude";
@@ -17,6 +19,7 @@ export interface PurchasedSkill {
   name: string;
   cost: number;
   attributeChoice?: AttributeChoice;
+  purchaseChoice?: string;
 }
 
 export interface CharState {

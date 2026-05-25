@@ -13,7 +13,9 @@
       "Bash(pip install *)",
       "Bash(python -)",
       "Bash(npx tsc *)",
-      "Bash(npx vite *)"
+      "Bash(npx vite *)",
+      "PowerShell(cd d:\\\\Dev\\\\n3\\\\n3-character-builder\\\\n3-widget-v3.5; $job = Start-Job { Set-Location d:\\\\Dev\\\\n3\\\\n3-character-builder\\\\n3-widget-v3.5; npm run preview -- --port 4173 2>&1 }; Start-Sleep -Seconds 4; Receive-Job $job; Write-Host \"Job state: $\\($job.State\\)\")",
+      "PowerShell(npx playwright --version 2>&1)"
     ]
   }
 }

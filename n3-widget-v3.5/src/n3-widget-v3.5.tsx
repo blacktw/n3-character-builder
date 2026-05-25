@@ -376,9 +376,9 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
     { name:"Cultural Versatility", cost:0, verbal:"N/A", description:"Purchase up to 3 additional abilities from your available cultural skill list." },
   ],
   "Empowered Aspect": [
-    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill", purchaseChoices:["Benign","Malevolent"], purchaseChoiceLabel:"Choose:" },
     { name:"Greater Aspect Weapons", cost:4, verbal:"N/A", description:"Gain the Aspect weapon skill of one of your Aspects. Your Aspect weapons are immune to Destroy and Disarm effects." },
-    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess" },
+    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess", purchaseChoices:["Melee","Missile","Packet"], purchaseChoiceLabel:"Attack type:" },
     { name:"Greater Aspect Balm", cost:4, verbal:"See Description", description:"You can 'Absorb to Heal 2', 'Cure', or 'Purge' an effect by your Chosen Aspect Trait.", attribute:"1 Fortitude" },
   ],
   "Far Traveler": [
@@ -578,9 +578,9 @@ const FOUNDATION_TYPES: Record<string, string> = {
 };
 
 const PLACE_SKILLS: SkillDef[] = [
-  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this." },
+  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this.", purchaseChoices:["Melee","Missile","Spell"], purchaseChoiceLabel:"Attack type:" },
   { name:"Defense", cost:2, verbal:"'Reduce to 2 damage'", description:"Once per event, reduce any damage melee, missile, or packet attack to 1 damage." },
-  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place." },
+  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place.", purchaseChoices:["Melee","Missile","Magic"], purchaseChoiceLabel:"Attack type:" },
   { name:"War Story", cost:2, verbal:"'Grant 2 Protection'", description:"Once per event, when you tell a war story from this or the last event, give yourself and the listener a Protection effect." },
   { name:"Home Ground", cost:2, verbal:"N/A", description:"Once per event, when in your place, gain +1 point of any attribute of your choice. Lost when you leave or after your next Long Rest." },
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
@@ -1022,7 +1022,41 @@ function AttributeChoicePicker({ value, onChange, onDark }: {
   );
 }
 
-function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttributeChoice, onAttributeChoiceChange }: {
+function PurchaseChoicePicker({ label, choices, value, onChange, onDark }: {
+  label: string;
+  choices: string[];
+  value: string | undefined;
+  onChange: (v: string) => void;
+  onDark: boolean;
+}) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:6, flexWrap:"wrap" }}>
+      <span style={{ fontFamily:"var(--font-display)", fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color: onDark ? "rgba(255,255,255,0.7)" : "var(--ink-mid)" }}>
+        {label}
+      </span>
+      {choices.map(c => {
+        const selected = value === c;
+        return (
+          <button key={c} onClick={() => onChange(c)} style={{
+            fontFamily:"var(--font-display)", fontSize:10, letterSpacing:"0.05em",
+            padding:"3px 8px", cursor:"pointer", borderRadius:0,
+            border: `1.5px solid ${onDark ? "rgba(255,255,255,0.45)" : "var(--ink-light)"}`,
+            background: selected ? (onDark ? "rgba(255,255,255,0.22)" : "var(--ink)") : "transparent",
+            color: selected ? (onDark ? "var(--paper-warm)" : "var(--paper)") : (onDark ? "rgba(255,255,255,0.85)" : "var(--ink)"),
+            fontWeight: selected ? 700 : 500,
+          }}>{c}</button>
+        );
+      })}
+      {!value && (
+        <span style={{ fontSize:10, fontStyle:"italic", color: onDark ? "rgba(255,200,200,0.85)" : "var(--red)" }}>
+          ← pick one
+        </span>
+      )}
+    </div>
+  );
+}
+
+function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttributeChoice, onAttributeChoiceChange, getPurchaseChoice, onPurchaseChoiceChange }: {
   skills: SkillDef[];
   countOf: (name: string) => number;
   canAdd: (skill: SkillDef) => boolean;
@@ -1030,6 +1064,8 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttribut
   onRemove: (name: string) => void;
   getAttributeChoice?: (name: string) => AttributeChoice | undefined;
   onAttributeChoiceChange?: (name: string, choice: AttributeChoice) => void;
+  getPurchaseChoice?: (name: string) => string | undefined;
+  onPurchaseChoiceChange?: (name: string, choice: string) => void;
 }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
@@ -1070,6 +1106,15 @@ function SkillPickerList({ skills, countOf, canAdd, onAdd, onRemove, getAttribut
                 <AttributeChoicePicker
                   value={getAttributeChoice?.(skill.name)}
                   onChange={(c) => onAttributeChoiceChange(skill.name, c)}
+                  onDark={isPurchased}
+                />
+              )}
+              {skill.purchaseChoices && isPurchased && onPurchaseChoiceChange && (
+                <PurchaseChoicePicker
+                  label={skill.purchaseChoiceLabel ?? "Choose:"}
+                  choices={skill.purchaseChoices}
+                  value={getPurchaseChoice?.(skill.name)}
+                  onChange={(c) => onPurchaseChoiceChange(skill.name, c)}
                   onDark={isPurchased}
                 />
               )}
@@ -1894,6 +1939,10 @@ export default function NuminaSheet() {
                     if (idx===-1) return;
                     update("foundationSkillsPurchased", purchased.filter((_: PurchasedSkill, i: number) => i !== purchased.length-1-idx));
                   };
+                  const getFoundationPurchaseChoice = (name: string): string | undefined =>
+                    purchased.find((s: PurchasedSkill) => s.name === name)?.purchaseChoice;
+                  const setFoundationPurchaseChoice = (name: string, choice: string) =>
+                    update("foundationSkillsPurchased", purchased.map((s: PurchasedSkill) => s.name === name ? { ...s, purchaseChoice: choice } : s));
                   return (
                     <div style={{ marginTop:14, borderTop:"1px dashed var(--ink-faint)", paddingTop:12 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6 }}>
@@ -1902,7 +1951,7 @@ export default function NuminaSheet() {
                         </div>
                         <div style={{ fontFamily:"var(--font-body)", fontSize:11, color:"var(--ink-mid)" }}>{totalSpent} CP spent</div>
                       </div>
-                      <SkillPickerList skills={skillList} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} />
+                      <SkillPickerList skills={skillList} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getPurchaseChoice={getFoundationPurchaseChoice} onPurchaseChoiceChange={setFoundationPurchaseChoice} />
                     </div>
                   );
                 })()}
@@ -2287,6 +2336,14 @@ export default function NuminaSheet() {
                     return { ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, attributeChoice: choice } : s) } };
                   });
                 };
+                const getExprPurchaseChoice = (name: string): string | undefined =>
+                  purchased.find((s: PurchasedSkill) => s.name === name)?.purchaseChoice;
+                const setExprPurchaseChoice = (name: string, choice: string) => {
+                  setChar(c => {
+                    const arr = c.expressionSkillsPurchased[exprName] || [];
+                    return { ...c, expressionSkillsPurchased: { ...c.expressionSkillsPurchased, [exprName]: arr.map((s: PurchasedSkill) => s.name === name ? { ...s, purchaseChoice: choice } : s) } };
+                  });
+                };
                 return (
                   <Section key={exprName} title={`${exprName} Skills`}>
                     <div style={{display:"flex",justifyContent:"flex-end",marginBottom:6}}>
@@ -2366,7 +2423,7 @@ export default function NuminaSheet() {
                         {showThirdCulture && (char.culture3 ? ` Multinational active: Culture 3 = ${char.culture3}.` : " Multinational active — select Culture 3 on the Background tab.")}
                       </div>
                     )}
-                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} />
+                    <SkillPickerList skills={skills} countOf={countOf} canAdd={canAdd} onAdd={addSkill} onRemove={removeSkill} getAttributeChoice={getAttributeChoice} onAttributeChoiceChange={setAttributeChoice} getPurchaseChoice={getExprPurchaseChoice} onPurchaseChoiceChange={setExprPurchaseChoice} />
                   </Section>
                 );
               })}

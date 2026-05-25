@@ -11,6 +11,7 @@ export interface SkillDef {
   grantsAttributeChoice?: boolean;
   purchaseChoices?: string[];
   purchaseChoiceLabel?: string;
+  purchaseChoiceDescriptions?: Record<string, string>;
 }
 
 export type AttributeChoice = "Prowess" | "Insight" | "Fortitude";

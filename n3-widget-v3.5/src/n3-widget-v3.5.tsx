@@ -376,9 +376,9 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
     { name:"Cultural Versatility", cost:0, verbal:"N/A", description:"Purchase up to 3 additional abilities from your available cultural skill list." },
   ],
   "Empowered Aspect": [
-    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill", purchaseChoices:["Benign","Malevolent"], purchaseChoiceLabel:"Choose:" },
+    { name:"Channel Aspect", cost:0, verbal:"N/A", description:"Choose Benign or Malevolent. Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill.", attribute:"Thread Skill", purchaseChoices:["Benign","Malevolent"], purchaseChoiceLabel:"Choose:", purchaseChoiceDescriptions:{ Benign:"Benign: convert all Beneficial effects to your Chosen Aspect Trait, +1 to healing or repair armor from Domain skills by that Trait. Thread Skill.", Malevolent:"Malevolent: convert all non-beneficial called effects to your Chosen Aspect Trait, +1 to damage from Domain skills by that Trait. Thread Skill." } },
     { name:"Greater Aspect Weapons", cost:4, verbal:"N/A", description:"Gain the Aspect weapon skill of one of your Aspects. Your Aspect weapons are immune to Destroy and Disarm effects." },
-    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess", purchaseChoices:["Melee","Missile","Packet"], purchaseChoiceLabel:"Attack type:" },
+    { name:"Greater Aspect Attack", cost:4, verbal:"'6 damage by [Trait]'", description:"Choose Melee, Missile, or Packet. Spend one attribute to make that attack for 6 damage by your Chosen Aspect Trait.", attribute:"1 Prowess", purchaseChoices:["Melee","Missile","Packet"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Spend one attribute to make a Melee attack for 6 damage by your Chosen Aspect Trait.", Missile:"Spend one attribute to make a Missile attack for 6 damage by your Chosen Aspect Trait.", Packet:"Spend one attribute to make a Packet attack for 6 damage by your Chosen Aspect Trait." } },
     { name:"Greater Aspect Balm", cost:4, verbal:"See Description", description:"You can 'Absorb to Heal 2', 'Cure', or 'Purge' an effect by your Chosen Aspect Trait.", attribute:"1 Fortitude" },
   ],
   "Far Traveler": [
@@ -578,9 +578,9 @@ const FOUNDATION_TYPES: Record<string, string> = {
 };
 
 const PLACE_SKILLS: SkillDef[] = [
-  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this.", purchaseChoices:["Melee","Missile","Spell"], purchaseChoiceLabel:"Attack type:" },
+  { name:"Attack", cost:2, verbal:"'4 damage'", description:"Twice per event, gain a 4-damage attack when in your place. Choose Melee, Missile, or Spell when you purchase this.", purchaseChoices:["Melee","Missile","Spell"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Twice per event, gain a 4-damage Melee attack when in your place.", Missile:"Twice per event, gain a 4-damage Missile attack when in your place.", Spell:"Twice per event, gain a 4-damage Spell attack when in your place." } },
   { name:"Defense", cost:2, verbal:"'Reduce to 2 damage'", description:"Once per event, reduce any damage melee, missile, or packet attack to 1 damage." },
-  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place.", purchaseChoices:["Melee","Missile","Magic"], purchaseChoiceLabel:"Attack type:" },
+  { name:"Boon", cost:2, verbal:"'Grant Melee Attack 4 Damage'", description:"Twice per event, gift another a 4-damage attack (choose Melee, Missile, or Magic when purchased) when in your place.", purchaseChoices:["Melee","Missile","Magic"], purchaseChoiceLabel:"Attack type:", purchaseChoiceDescriptions:{ Melee:"Twice per event, gift another a 4-damage Melee attack when in your place.", Missile:"Twice per event, gift another a 4-damage Missile attack when in your place.", Magic:"Twice per event, gift another a 4-damage Magic attack when in your place." } },
   { name:"War Story", cost:2, verbal:"'Grant 2 Protection'", description:"Once per event, when you tell a war story from this or the last event, give yourself and the listener a Protection effect." },
   { name:"Home Ground", cost:2, verbal:"N/A", description:"Once per event, when in your place, gain +1 point of any attribute of your choice. Lost when you leave or after your next Long Rest." },
   { name:"Holding", cost:4, verbal:"N/A", description:"You have a holding — a place or business representing resources tied to your Foundation." },
@@ -833,6 +833,13 @@ function parseSkillFrequency(def: SkillDef): { type: FrequencyType; count: numbe
 function isSkillThread(def: SkillDef): boolean {
   const combined = (def.description || '') + ' ' + (def.attribute || '') + ' ' + (def.verbal || '');
   return /thread skill|extra thread/i.test(combined);
+}
+
+function resolveDescription(def: SkillDef, purchaseChoice?: string): string {
+  if (purchaseChoice && def.purchaseChoiceDescriptions?.[purchaseChoice]) {
+    return def.purchaseChoiceDescriptions[purchaseChoice];
+  }
+  return def.description;
 }
 
 function getAllSkillsForSummary(char: CharState): SummarySkill[] {
@@ -1350,7 +1357,7 @@ function ExportPanel({ char, setChar }: {
         return `<div style="margin-bottom:5pt;padding-bottom:5pt;border-bottom:0.5pt dashed #c8bca0;">
           <div style="font-family:'IM Fell English',serif;font-size:10pt;">${s.name} ${badge}${threadBadge}${choiceBadge}${attrBadge}${srcBadge}</div>
           ${s.verbal&&s.verbal!=="N/A"&&!/^thread skill$/i.test(s.verbal.trim())?`<div style="font-size:8.5pt;font-style:italic;color:#5a4e3a;">"${s.verbal}"</div>`:""}
-          ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${s.description}</div>`:""}
+          ${s.description?`<div style="font-size:8.5pt;color:#5a4e3a;line-height:1.4;margin-top:1pt;">${(s.purchaseChoice && s.purchaseChoiceDescriptions?.[s.purchaseChoice]) || s.description}</div>`:""}
         </div>`;
       }).join("");
     }
@@ -2563,7 +2570,7 @@ export default function NuminaSheet() {
                                     )}
                                   </div>
                                   {s.def.description && (
-                                    <div style={{ fontSize:10, color:"var(--ink-mid)", marginTop:2, lineHeight:1.4 }}>{s.def.description}</div>
+                                    <div style={{ fontSize:10, color:"var(--ink-mid)", marginTop:2, lineHeight:1.4 }}>{resolveDescription(s.def, s.purchaseChoice)}</div>
                                   )}
                                 </div>
                               </div>
@@ -2605,7 +2612,7 @@ export default function NuminaSheet() {
                       const combined = (def.description||"") + " " + (def.attribute||"") + " " + (def.verbal||"");
                       const isExtra = /extra thread/i.test(combined);
                       const isThread = isExtra || /thread skill/i.test(combined);
-                      if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra, purchaseChoice});
+                      if (isThread) threadSkills.push({name, source, description:resolveDescription(def, purchaseChoice), verbal:def.verbal, isExtra, purchaseChoice});
                     });
 
                     if (threadSkills.length === 0) {

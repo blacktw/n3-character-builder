@@ -1657,7 +1657,7 @@ export default function NuminaSheet() {
       `}</style>
 
       <div style={{
-        width:"100%", maxWidth:1040, background:"var(--paper)",
+        width:"100%", maxWidth:920, background:"var(--paper)",
         boxShadow:"0 0 60px rgba(0,0,0,0.7), inset 0 0 100px rgba(0,0,0,0.05)",
         position:"relative", overflow:"hidden",
         // Theme tokens — cascade to all children

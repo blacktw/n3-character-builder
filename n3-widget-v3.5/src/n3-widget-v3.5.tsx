@@ -864,7 +864,7 @@ function getAllSkillsForSummary(char: CharState): SummarySkill[] {
     ...Object.entries(char.hiddenExpressionSkillsPurchased || {}).flatMap(([n, arr]) =>
       (arr as PurchasedSkill[]).map(s => ({ name: s.name, source: `${n} (Hidden)`, skillDefs: HIDDEN_EXPRESSION_SKILLS[n] || [] }))
     ),
-    ...char.domainSkillsPurchased.map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [] })),
+    ...char.domainSkillsPurchased.filter(s => s.cost > 0).map(s => ({ name: s.name, source: `${char.domain} Domain`, skillDefs: DOMAIN_SKILLS[char.domain] || [] })),
     ...char.aspectSkillsPurchased.map(s => ({ name: s.name, source: 'Aspect', skillDefs: ASPECT_SKILLS })),
     ...char.foundationSkillsPurchased.map(s => ({ name: s.name, source: `${char.foundation} Foundation`, skillDefs: getFoundationSkillList(char.foundation) })),
     ...char.cultureSkillsPurchased.map(s => ({ name: s.name, source: `${char.culture} Culture`, skillDefs: CULTURE_SKILLS })),

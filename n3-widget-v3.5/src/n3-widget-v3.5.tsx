@@ -2588,24 +2588,24 @@ export default function NuminaSheet() {
                     Thread Skills enhance other skills. You may apply up to 3 Thread Skills to a single effect (plus 1 Extra Thread Skill). Thread Skills cannot be applied to uncalled damage, grants, or item effects.
                   </div>
                   {(() => {
-                    const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean }[] = [];
+                    const threadSkills: { name: string; source: string; description: string; verbal: string; isExtra: boolean; purchaseChoice?: string }[] = [];
                     const allSourceSkills = [
                       ...Object.entries(char.excellencySkillsPurchased).flatMap(([exclName,arr]) => arr.map(s => ({...s, source:exclName, skillDefs:EXCELLENCY_SKILLS[exclName]||[]}))),
                       ...Object.entries(char.expressionSkillsPurchased).flatMap(([exprName,arr]) => arr.map(s => ({...s, source:exprName, skillDefs:EXPRESSION_SKILLS[exprName]||[]}))),
-                      ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
-                      ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as {name:string,cost:number}[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
+                      ...Object.entries(char.hiddenExcellencySkillsPurchased||{}).flatMap(([exclName,arr]) => (arr as PurchasedSkill[]).map(s => ({...s, source:`${exclName} (Hidden)`, skillDefs:HIDDEN_EXCELLENCY_SKILLS[exclName]||[]}))),
+                      ...Object.entries(char.hiddenExpressionSkillsPurchased||{}).flatMap(([exprName,arr]) => (arr as PurchasedSkill[]).map(s => ({...s, source:`${exprName} (Hidden)`, skillDefs:HIDDEN_EXPRESSION_SKILLS[exprName]||[]}))),
                       ...char.domainSkillsPurchased.map(s => ({...s, source:`${char.domain} Domain`, skillDefs:DOMAIN_SKILLS[char.domain]||[]})),
                       ...char.aspectSkillsPurchased.map(s => ({...s, source:"Aspect", skillDefs:ASPECT_SKILLS})),
                       ...char.foundationSkillsPurchased.map(s => { const defs = getFoundationSkills(); return {...s, source:`${char.foundation} Foundation`, skillDefs:defs}; }),
                       ...char.cultureSkillsPurchased.map(s => ({...s, source:`${char.culture} Culture`, skillDefs:CULTURE_SKILLS})),
                     ];
-                    allSourceSkills.forEach(({name, source, skillDefs}) => {
+                    allSourceSkills.forEach(({name, source, skillDefs, purchaseChoice}) => {
                       const def = skillDefs.find(d => d.name === name);
                       if (!def) return;
                       const combined = (def.description||"") + " " + (def.attribute||"") + " " + (def.verbal||"");
                       const isExtra = /extra thread/i.test(combined);
                       const isThread = isExtra || /thread skill/i.test(combined);
-                      if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra});
+                      if (isThread) threadSkills.push({name, source, description:def.description, verbal:def.verbal, isExtra, purchaseChoice});
                     });
 
                     if (threadSkills.length === 0) {
@@ -2618,6 +2618,9 @@ export default function NuminaSheet() {
                             <div style={{flex:1}}>
                               <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
                                 <span style={{fontFamily:"var(--font-display)",fontSize:12,color:"var(--ink)"}}>{ts.name}</span>
+                                {ts.purchaseChoice && (
+                                  <span style={{fontSize:9,padding:"1px 6px",background:"var(--ink)",color:"var(--paper-warm)",fontFamily:"var(--font-display)",letterSpacing:"0.04em"}}>{ts.purchaseChoice}</span>
+                                )}
                                 {ts.isExtra
                                   ? <span style={{fontSize:9,padding:"1px 5px",background:"var(--red)",color:"white"}}>Extra Thread</span>
                                   : <span style={{fontSize:9,padding:"1px 5px",background:"var(--ink)",color:"var(--paper)"}}>Thread Skill</span>}

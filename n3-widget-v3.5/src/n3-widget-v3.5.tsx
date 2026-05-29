@@ -682,8 +682,8 @@ const DOMAIN_SKILLS: Record<string, SkillDef[]> = {
     { name:"Fire's Last Stand", cost:2, verbal:"'6 damage by Fire'", description:"Once per event, cast '6 damage by Fire.' Twice per event call 'Surge' to refresh your packet Flurry." },
     { name:"Fire's Gift", cost:2, verbal:"'Refresh <Skill Name> to self'", description:"Once per Long Rest, if you missed a per-event packet attack Skill, rest 10 seconds to regain it. Cannot be used on multi-effect Skills." },
     { name:"Fire's Shield", cost:2, verbal:"'By my gesture repel by <Trait>'", description:"Once per event, point at a target and Repel them. Twice per event call 'Surge' to refresh your packet Flurry." },
-    { name:"Empower Fire", cost:3, verbal:"N/A", description:"When you cast an offensive packet attack of 4 damage or greater, add 1 to the total." },
-    { name:"Enhance Fire", cost:3, verbal:"N/A", description:"When you use a Skill granting multiple packet damage attacks, gain one extra packet attack." },
+    { name:"Empower Fire", cost:3, verbal:"Thread Skill", description:"When you cast an offensive packet attack of 4 damage or greater, add 1 to the total." },
+    { name:"Enhance Fire", cost:3, verbal:"Thread Skill", description:"When you use a Skill granting multiple packet damage attacks, gain one extra packet attack." },
   ],
   Ice: [
     { name:"Ice's Determination", cost:0, verbal:"'Repair 1 Armor to self'", description:"When you take a Short Rest, gain three uses of 'Repair 1 Armor to self'." },

@@ -458,7 +458,7 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
@@ -491,6 +491,16 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Shatter Blade", cost:4, verbal:"'Short Destroy Weapon'", description:"Spend 1 Fortitude to make a packet attack calling 'Short Destroy Weapon'.", attribute:"1 Fortitude" },
     { name:"Shrug It Off", cost:4, verbal:"'Avoid'", description:"Once per short rest: spend 1 Fortitude to resist any melee, missile, or packet attack.", attribute:"1 Fortitude" },
     { name:"Armored Spell", cost:2, verbal:"N/A", description:"Once per event: for your next 10 packet attacks, each time you successfully strike an opponent and they register the hit, you may repair 1 armor." },
+  ],
+  "Poison Arrow": [
+    { name:"Create Lesser Venom", cost:0, verbal:"'Grant Missile Attack <Effect> by Poison'", description:"You can craft alchemical Venom substances. Each venom has a unique cost in coin, components, and/or attributes, spent when you craft the item, not when you invoke it. You may also spend 10 seconds of roleplay to apply a Venom to an arrow to create a Poison Arrow. You may only carry 1 Poison Arrow at a time.", attribute:"See Formula" },
+    { name:"Create Lesser Elixir", cost:4, verbal:"N/A", description:"You can craft alchemical Elixir substances. Each elixir has a unique cost in coin, components, and/or attributes, spent when you craft the item, not when you invoke it.", attribute:"See Formula" },
+    { name:"Prep your Quiver", cost:2, verbal:"N/A", description:"You may carry up to 2 Poison Arrows." },
+    { name:"Know the Poison", cost:4, verbal:"'Cure Poison (and Grant 1 Common Component)'", description:"Spend an attribute to cure poison effects. Three times per event, this skill also grants 1 common component.", attribute:"1 Insight" },
+    { name:"Target the Vein", cost:3, verbal:"N/A", description:"When you hit with a Poison Arrow, add +2 damage.", attribute:"Thread Skill" },
+    { name:"Natural Alchemy", cost:2, verbal:"'By Alchemy, Grant <Effect>'", description:"Twice per event, take 10 seconds of roleplay to create any Alchemy on the field, away from an Alchemy Lab. No components are required to craft this Alchemy." },
+    { name:"Retrieve Venom", cost:2, verbal:"N/A", description:"If you shoot a Poison Arrow and miss your target or the arrow is blocked, spend 5 seconds searching near where it fell to retrieve it and use it again." },
+    { name:"Poison", cost:4, verbal:"'5 Damage by Poison'", description:"Shoot an arrow for 5 damage by Poison. This is not a Poison Arrow for the purposes of other skills in this Excellency.", attribute:"1 Fortitude" },
   ],
 };
 

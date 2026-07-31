@@ -1917,15 +1917,26 @@ export default function NuminaSheet() {
                 <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:10 }}>
                   <SelectInput label="Foundation 1" value={char.foundation} onChange={v => {
                     setChar(c => {
-                      const oldFreeNames = c.domain ? (DOMAIN_SKILLS[c.domain]||[]).filter(s=>s.cost===0).map(s=>s.name) : [];
-                      return { ...c, foundation:v, foundationSkillsPurchased:[] };
+                      const validNames = new Set([
+                        ...(v ? getFoundationSkillList(v).map(s => s.name) : []),
+                        ...(showSecondFoundation && c.foundation2 && FOUNDATION_TYPES[v] !== FOUNDATION_TYPES[c.foundation2] ? getFoundationSkillList(c.foundation2).map(s => s.name) : []),
+                      ]);
+                      return { ...c, foundation:v, foundationSkillsPurchased: c.foundationSkillsPurchased.filter(e => validNames.has(e.name)) };
                     });
                   }} options={FOUNDATIONS} />
                   {showSecondFoundation && (
                     <SelectInput
                       label="Foundation 2 (Savant · Skilled Learner)"
                       value={char.foundation2}
-                      onChange={v => update("foundation2", v)}
+                      onChange={v => {
+                        setChar(c => {
+                          const validNames = new Set([
+                            ...(c.foundation ? getFoundationSkillList(c.foundation).map(s => s.name) : []),
+                            ...(v && FOUNDATION_TYPES[c.foundation] !== FOUNDATION_TYPES[v] ? getFoundationSkillList(v).map(s => s.name) : []),
+                          ]);
+                          return { ...c, foundation2:v, foundationSkillsPurchased: c.foundationSkillsPurchased.filter(e => validNames.has(e.name)) };
+                        });
+                      }}
                       options={FOUNDATIONS.filter(f => f !== char.foundation)}
                     />
                   )}
@@ -2040,9 +2051,7 @@ export default function NuminaSheet() {
                 <SelectInput label="Domain" value={char.domain} onChange={v => {
                   setChar(c => {
                     const freeSkills = v ? (DOMAIN_SKILLS[v]||[]).filter(s=>s.cost===0) : [];
-                    const oldFreeNames = c.domain ? (DOMAIN_SKILLS[c.domain]||[]).filter(s=>s.cost===0).map(s=>s.name) : [];
-                    const kept = c.domainSkillsPurchased.filter(e => !oldFreeNames.includes(e.name));
-                    return { ...c, domain:v, domainSkillsPurchased:[...kept, ...freeSkills.map(s=>({name:s.name, cost:0}))] };
+                    return { ...c, domain:v, domainSkillsPurchased: freeSkills.map(s=>({name:s.name, cost:0})) };
                   });
                 }} options={DOMAINS} wide />
                 {char.domain && (() => {

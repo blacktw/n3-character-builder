@@ -23,8 +23,8 @@ const REQUIRED_KEYS: (keyof CharState)[] = [
   "armorType",
   "openSkillsPurchased",
   "excellencySkillsPurchased", "expressionSkillsPurchased",
-  "hiddenExcellencies", "hiddenExcellencySkillsPurchased",
-  "hiddenExpressions", "hiddenExpressionSkillsPurchased",
+  "hiddenExcellencies", "hiddenExcellencySkillsPurchased", "hiddenExcellencyFixedCost",
+  "hiddenExpressions", "hiddenExpressionSkillsPurchased", "hiddenExpressionFixedCost",
   "abilitiesNotes", "notes", "threadNotes",
   "bonusCP",
 ];

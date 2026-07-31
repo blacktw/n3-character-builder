@@ -47,8 +47,10 @@ export interface CharState {
   expressionSkillsPurchased: Record<string, PurchasedSkill[]>;
   hiddenExcellencies: string[];
   hiddenExcellencySkillsPurchased: Record<string, PurchasedSkill[]>;
+  hiddenExcellencyFixedCost: Record<string, boolean>;
   hiddenExpressions: string[];
   hiddenExpressionSkillsPurchased: Record<string, PurchasedSkill[]>;
+  hiddenExpressionFixedCost: Record<string, boolean>;
   abilitiesNotes: string; notes: string; threadNotes: string;
   bonusCP: number;
   craftingNotes?: string;
@@ -83,8 +85,10 @@ export const DEFAULT_CHAR: CharState = {
   expressionSkillsPurchased: {},
   hiddenExcellencies: [],
   hiddenExcellencySkillsPurchased: {},
+  hiddenExcellencyFixedCost: {},
   hiddenExpressions: [],
   hiddenExpressionSkillsPurchased: {},
+  hiddenExpressionFixedCost: {},
   abilitiesNotes: "", notes: "", threadNotes: "",
   bonusCP: 0,
 };

@@ -461,6 +461,14 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
+// Whether each hidden excellency/expression defaults to the flat Fixed Cost (1 CP) or the
+// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow is newly added and
+// not yet blessed at the flat rate, so it defaults to scaling (toggle remains available).
+const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false };
+const HIDDEN_EXCELLENCY_FIXED_COST_LOCKED = new Set<string>();
+const HIDDEN_EXPRESSION_FIXED_COST_DEFAULT: Record<string, boolean> = { "Shadewalker": true };
+const HIDDEN_EXPRESSION_FIXED_COST_LOCKED = new Set<string>();
+
 const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   "Reservoir": [
     { name:"Healing Reservoir", cost:0, verbal:"'Imbue (my name) Reservoir up to 2 people'", description:"Spend 1 Fortitude. Up to 2 imbued people may visit your Reservoir up to 3 times each to 'Heal 2 to Self'. Reservoir cannot be moved once placed. Once per long rest.", attribute:"1 Fortitude" },
@@ -522,6 +530,27 @@ function totalAttrCost(purchased: number): number {
 }
 function excellencyCost(index: number): number { return 5 + index; }
 function expressionCost(index: number): number { return 5 + index; }
+
+// A hidden excellency/expression either pays the flat Fixed Cost (1 CP) or slots into the
+// scaling Excellency/Expression cost curve, counted after the regular (non-hidden) picks.
+function isHiddenExcellencyFixedCost(char: CharState, name: string): boolean {
+  if (HIDDEN_EXCELLENCY_FIXED_COST_LOCKED.has(name)) return HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT[name] ?? true;
+  return char.hiddenExcellencyFixedCost?.[name] ?? HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT[name] ?? true;
+}
+function hiddenExcellencyCost(char: CharState, name: string): number {
+  if (isHiddenExcellencyFixedCost(char, name)) return HIDDEN_EXCELLENCY_COSTS[name] || 1;
+  const idx = char.excellencies.length + char.hiddenExcellencies.indexOf(name);
+  return excellencyCost(idx);
+}
+function isHiddenExpressionFixedCost(char: CharState, name: string): boolean {
+  if (HIDDEN_EXPRESSION_FIXED_COST_LOCKED.has(name)) return HIDDEN_EXPRESSION_FIXED_COST_DEFAULT[name] ?? true;
+  return char.hiddenExpressionFixedCost?.[name] ?? HIDDEN_EXPRESSION_FIXED_COST_DEFAULT[name] ?? true;
+}
+function hiddenExpressionCost(char: CharState, name: string): number {
+  if (isHiddenExpressionFixedCost(char, name)) return HIDDEN_EXPRESSION_COSTS[name] || 1;
+  const idx = char.expressions.length + char.hiddenExpressions.indexOf(name);
+  return expressionCost(idx);
+}
 
 type AttrBonusKey = "Prowess" | "Insight" | "Fortitude" | "Purpose" | "Vitality";
 function attributeBonuses(char: CharState): Record<AttrBonusKey, number> {
@@ -786,8 +815,8 @@ function usedCP(char: CharState): number {
   char.domainSkillsPurchased.forEach((s: PurchasedSkill) => { used += s.cost; });
   Object.values(char.excellencySkillsPurchased).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
   Object.values(char.expressionSkillsPurchased).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
-  (char.hiddenExcellencies || []).forEach((name: string) => { used += HIDDEN_EXCELLENCY_COSTS[name] || 0; });
-  (char.hiddenExpressions || []).forEach((name: string) => { used += HIDDEN_EXPRESSION_COSTS[name] || 0; });
+  (char.hiddenExcellencies || []).forEach((name: string) => { used += hiddenExcellencyCost(char, name); });
+  (char.hiddenExpressions || []).forEach((name: string) => { used += hiddenExpressionCost(char, name); });
   Object.values(char.hiddenExcellencySkillsPurchased || {}).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
   Object.values(char.hiddenExpressionSkillsPurchased || {}).forEach((arr: PurchasedSkill[]) => arr.forEach((s: PurchasedSkill) => { used += s.cost; }));
   return used;
@@ -1440,8 +1469,8 @@ hr{border:none;border-top:1pt solid #c8bca0;margin:9pt 0;}
       ${[["Prowess",prowess],["Insight",insight],["Fortitude",fortitude],["Void",2],["Purpose",purpose],["Vitality",vitality]].map(([n,v])=>`<div class="stat"><div class="stat-v">${v}</div><div class="stat-n">${n}</div></div>`).join("")}
     </div>
   </div>
-  ${(char.excellencies.length||(char.hiddenExcellencies||[]).length)?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}${(char.hiddenExcellencies||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXCELLENCY_COSTS[e]||1} CP`)).join("")}</div>`:""}
-  ${(char.expressions.length||(char.hiddenExpressions||[]).length)?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}${(char.hiddenExpressions||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${HIDDEN_EXPRESSION_COSTS[e]||1} CP`)).join("")}</div>`:""}
+  ${(char.excellencies.length||(char.hiddenExcellencies||[]).length)?`<div class="sec"><div class="sec-t">Excellencies</div>${char.excellencies.map((e,i)=>infoRow(e,`${5+i} CP`)).join("")}${(char.hiddenExcellencies||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${hiddenExcellencyCost(char,e)} CP`)).join("")}</div>`:""}
+  ${(char.expressions.length||(char.hiddenExpressions||[]).length)?`<div class="sec"><div class="sec-t">Expressions</div>${char.expressions.map((e,i)=>infoRow(e,`${4+i} CP`)).join("")}${(char.hiddenExpressions||[]).map((e:string)=>infoRow(`${e} <span style="font-size:7pt;background:#3a2a1a;color:#c8bca0;padding:1pt 3pt;vertical-align:middle;">Hidden</span>`,`${hiddenExpressionCost(char,e)} CP`)).join("")}</div>`:""}
 </div>
 </div>
 
@@ -1663,20 +1692,46 @@ export default function NuminaSheet() {
   function addHiddenExcellency(name: string): void {
     if (!name || char.hiddenExcellencies.includes(name) || totalExcellencies >= 3) return;
     const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
-    setChar(c => ({ ...c, hiddenExcellencies: [...c.hiddenExcellencies, name], hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
+    setChar(c => ({
+      ...c,
+      hiddenExcellencies: [...c.hiddenExcellencies, name],
+      hiddenExcellencySkillsPurchased: { ...c.hiddenExcellencySkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) },
+      hiddenExcellencyFixedCost: { ...c.hiddenExcellencyFixedCost, [name]: HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT[name] ?? true },
+    }));
   }
   function removeHiddenExcellency(name: string): void {
-    setChar(c => { const next = { ...c.hiddenExcellencySkillsPurchased }; delete next[name]; return { ...c, hiddenExcellencies: c.hiddenExcellencies.filter((e: string) => e !== name), hiddenExcellencySkillsPurchased: next }; });
+    setChar(c => {
+      const next = { ...c.hiddenExcellencySkillsPurchased }; delete next[name];
+      const nextFixed = { ...c.hiddenExcellencyFixedCost }; delete nextFixed[name];
+      return { ...c, hiddenExcellencies: c.hiddenExcellencies.filter((e: string) => e !== name), hiddenExcellencySkillsPurchased: next, hiddenExcellencyFixedCost: nextFixed };
+    });
+  }
+  function setHiddenExcellencyFixedCost(name: string, fixed: boolean): void {
+    if (HIDDEN_EXCELLENCY_FIXED_COST_LOCKED.has(name)) return;
+    setChar(c => ({ ...c, hiddenExcellencyFixedCost: { ...c.hiddenExcellencyFixedCost, [name]: fixed } }));
   }
 
   // Add/remove hidden expression
   function addHiddenExpression(name: string): void {
     if (!name || char.hiddenExpressions.includes(name) || totalExpressions >= 2) return;
     const freeSkills = (HIDDEN_EXPRESSION_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
-    setChar(c => ({ ...c, hiddenExpressions: [...c.hiddenExpressions, name], hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) } }));
+    setChar(c => ({
+      ...c,
+      hiddenExpressions: [...c.hiddenExpressions, name],
+      hiddenExpressionSkillsPurchased: { ...c.hiddenExpressionSkillsPurchased, [name]: freeSkills.map((s: SkillDef) => ({ name:s.name, cost:0 })) },
+      hiddenExpressionFixedCost: { ...c.hiddenExpressionFixedCost, [name]: HIDDEN_EXPRESSION_FIXED_COST_DEFAULT[name] ?? true },
+    }));
   }
   function removeHiddenExpression(name: string): void {
-    setChar(c => { const next = { ...c.hiddenExpressionSkillsPurchased }; delete next[name]; return { ...c, hiddenExpressions: c.hiddenExpressions.filter((e: string) => e !== name), hiddenExpressionSkillsPurchased: next }; });
+    setChar(c => {
+      const next = { ...c.hiddenExpressionSkillsPurchased }; delete next[name];
+      const nextFixed = { ...c.hiddenExpressionFixedCost }; delete nextFixed[name];
+      return { ...c, hiddenExpressions: c.hiddenExpressions.filter((e: string) => e !== name), hiddenExpressionSkillsPurchased: next, hiddenExpressionFixedCost: nextFixed };
+    });
+  }
+  function setHiddenExpressionFixedCost(name: string, fixed: boolean): void {
+    if (HIDDEN_EXPRESSION_FIXED_COST_LOCKED.has(name)) return;
+    setChar(c => ({ ...c, hiddenExpressionFixedCost: { ...c.hiddenExpressionFixedCost, [name]: fixed } }));
   }
 
   // Add/remove expression
@@ -2203,13 +2258,21 @@ export default function NuminaSheet() {
                   ⚠ These Excellencies are only available to characters who have unlocked them in-game. Anyone may view and plan with them here.
                 </div>
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
-                  {char.hiddenExcellencies.map(e => (
-                    <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink)",background:"var(--ink)",color:"var(--paper)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
-                      <span>{e}</span>
-                      <span style={{fontSize:10,color:"var(--ink-faint)"}}>(1 CP)</span>
-                      <button onClick={() => removeHiddenExcellency(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--paper-warm)"}}>✕</button>
-                    </div>
-                  ))}
+                  {char.hiddenExcellencies.map(e => {
+                    const fixed = isHiddenExcellencyFixedCost(char, e);
+                    const locked = HIDDEN_EXCELLENCY_FIXED_COST_LOCKED.has(e);
+                    return (
+                      <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink)",background:"var(--ink)",color:"var(--paper)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
+                        <span>{e}</span>
+                        <span style={{fontSize:10,color:"var(--ink-faint)"}}>({hiddenExcellencyCost(char, e)} CP)</span>
+                        <label style={{display:"flex",alignItems:"center",gap:4,fontSize:10,color:"var(--ink-faint)",fontFamily:"var(--font-body)",cursor:locked?"default":"pointer",opacity:locked?0.6:1}} title={locked?"This Excellency's cost is locked to the scaling rate":"Toggle between the flat 1 CP cost and the scaling Excellency cost"}>
+                          <input type="checkbox" checked={fixed} disabled={locked} onChange={ev => setHiddenExcellencyFixedCost(e, ev.target.checked)} style={{margin:0}} />
+                          Fixed Cost
+                        </label>
+                        <button onClick={() => removeHiddenExcellency(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--paper-warm)"}}>✕</button>
+                      </div>
+                    );
+                  })}
                   {totalExcellencies < 3 && (
                     <select defaultValue="" onChange={e => { addHiddenExcellency(e.target.value); e.target.value=""; }} style={{...inputStyle,flex:"none"}}>
                       <option value="">+ Add Hidden Excellency (1 CP)</option>
@@ -2276,13 +2339,21 @@ export default function NuminaSheet() {
                   ⚠ These Expressions are only available to characters who have unlocked them in-game. Anyone may view and plan with them here.
                 </div>
                 <div style={{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}}>
-                  {char.hiddenExpressions.map(e => (
-                    <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink-mid)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
-                      <span>{e}</span>
-                      <span style={{fontSize:10,color:"var(--ink-mid)"}}>(1 CP)</span>
-                      <button onClick={() => removeHiddenExpression(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--ink-mid)"}}>✕</button>
-                    </div>
-                  ))}
+                  {char.hiddenExpressions.map(e => {
+                    const fixed = isHiddenExpressionFixedCost(char, e);
+                    const locked = HIDDEN_EXPRESSION_FIXED_COST_LOCKED.has(e);
+                    return (
+                      <div key={e} style={{padding:"4px 10px",border:"2px solid var(--ink-mid)",fontFamily:"var(--font-display)",fontSize:12,display:"flex",alignItems:"center",gap:8}}>
+                        <span>{e}</span>
+                        <span style={{fontSize:10,color:"var(--ink-mid)"}}>({hiddenExpressionCost(char, e)} CP)</span>
+                        <label style={{display:"flex",alignItems:"center",gap:4,fontSize:10,color:"var(--ink-mid)",fontFamily:"var(--font-body)",cursor:locked?"default":"pointer",opacity:locked?0.6:1}} title={locked?"This Expression's cost is locked to the scaling rate":"Toggle between the flat 1 CP cost and the scaling Expression cost"}>
+                          <input type="checkbox" checked={fixed} disabled={locked} onChange={ev => setHiddenExpressionFixedCost(e, ev.target.checked)} style={{margin:0}} />
+                          Fixed Cost
+                        </label>
+                        <button onClick={() => removeHiddenExpression(e)} style={{...btnStyle,width:14,height:14,fontSize:9,background:"transparent",border:"none",color:"var(--ink-mid)"}}>✕</button>
+                      </div>
+                    );
+                  })}
                   {totalExpressions < 2 && (
                     <select defaultValue="" onChange={e => { addHiddenExpression(e.target.value); e.target.value=""; }} style={{...inputStyle,flex:"none"}}>
                       <option value="">+ Add Hidden Expression (1 CP)</option>

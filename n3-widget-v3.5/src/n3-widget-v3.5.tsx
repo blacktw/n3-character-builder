@@ -458,13 +458,13 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 // Whether each hidden excellency/expression defaults to the flat Fixed Cost (1 CP) or the
-// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow is newly added and
-// not yet blessed at the flat rate, so it defaults to scaling (toggle remains available).
-const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false };
+// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow and Wardancer are newly
+// added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
+const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false };
 const HIDDEN_EXCELLENCY_FIXED_COST_LOCKED = new Set<string>();
 const HIDDEN_EXPRESSION_FIXED_COST_DEFAULT: Record<string, boolean> = { "Shadewalker": true };
 const HIDDEN_EXPRESSION_FIXED_COST_LOCKED = new Set<string>();
@@ -509,6 +509,17 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Natural Alchemy", cost:2, verbal:"'By Alchemy, Grant <Effect>'", description:"Twice per event, take 10 seconds of roleplay to create any Alchemy on the field, away from an Alchemy Lab. No components are required to craft this Alchemy." },
     { name:"Retrieve Venom", cost:2, verbal:"N/A", description:"If you shoot a Poison Arrow and miss your target or the arrow is blocked, spend 5 seconds searching near where it fell to retrieve it and use it again." },
     { name:"Poison", cost:4, verbal:"'5 Damage by Poison'", description:"Shoot an arrow for 5 damage by Poison. This is not a Poison Arrow for the purposes of other skills in this Excellency.", attribute:"1 Fortitude" },
+  ],
+  "Wardancer": [
+    { name:"Readied for Battle", cost:0, verbal:"'2 Damage'", description:"You gain the ability to have a stored 2 free 2 damage attacks, one melee attack and one missile attack.", attribute:"1 Fortitude" },
+    { name:"Bow and Sword", cost:4, verbal:"N/A", description:"Fight with bow and sword." },
+    { name:"Missile to Melee", cost:3, verbal:"N/A", description:"When you spend an attribute for a missile attack, refresh your 2 damage melee attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Melee to Missile", cost:3, verbal:"N/A", description:"When you spend an attribute for a melee attack, refresh your 2 damage missile attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Expanded Preparation", cost:3, verbal:"N/A", description:"Gain a second melee and missile attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Rapid Change", cost:4, verbal:"See description", description:"Once per Short Rest, your first called damage attack when you go from melee to missile or missile to melee is +2 damage.", attribute:"1 Fortitude" },
+    { name:"Readied Blow", cost:4, verbal:"'8 Damage'", description:"Once per Long Rest, you can make a melee attack or missile attack for 8 damage.", attribute:"1 Insight" },
+    { name:"Simple Attack", cost:4, verbal:"'4 Damage'", description:"4 damage melee attack.", attribute:"1 Fortitude" },
+    { name:"Simple Arrow", cost:4, verbal:"'4 Damage'", description:"4 damage missile attack.", attribute:"1 Insight" },
   ],
 };
 

@@ -458,13 +458,13 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1, "Fortress": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1, "Fortress": 1, "Mutant": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 // Whether each hidden excellency/expression defaults to the flat Fixed Cost (1 CP) or the
-// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow, Wardancer and Fortress
-// are newly added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
-const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false, "Fortress": false };
+// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow, Wardancer, Fortress and
+// Mutant are newly added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
+const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false, "Fortress": false, "Mutant": false };
 const HIDDEN_EXCELLENCY_FIXED_COST_LOCKED = new Set<string>();
 const HIDDEN_EXPRESSION_FIXED_COST_DEFAULT: Record<string, boolean> = { "Shadewalker": true };
 const HIDDEN_EXPRESSION_FIXED_COST_LOCKED = new Set<string>();
@@ -532,6 +532,16 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Inviolate", cost:0, verbal:"'Grant Defense Resist Physical'", description:"Once per Long Rest, Grant Defense 'Resist Physical'." },
     { name:"Resistant", cost:0, verbal:"'Grant Defense Resist Metabolic'", description:"Once per Long Rest, spend one Fortitude to Grant Defense 'Resist Metabolic'.", attribute:"1 Fortitude" },
     { name:"Sharing the Healing", cost:0, verbal:"'Grant Packet Attack, Heal 2 Damage by Water'", description:"Spend one Fortitude to gain two uses of 'Grant Packet Attack, Heal 2 Damage by Water'. You cannot use this skill on yourself. You cannot stack uses of this skill; if you have uses remaining when you reactivate this skill, the uses from the previous one are lost.", attribute:"1 Fortitude" },
+  ],
+  "Mutant": [
+    { name:"Mutation", cost:4, verbal:"N/A", description:"You can use components and coin to create Mutations that last for an event. This is a crafting skill.", attribute:"See Formula" },
+    { name:"Blade Alchemy", cost:4, verbal:"N/A", description:"You can create Alchemical substances labeled 'Blade'.", attribute:"See Formula" },
+    { name:"Shapeshift", cost:4, verbal:"'Purge'", description:"Once per Short Rest you may call 'Purge' to end a Root or Slow effect.", attribute:"1 Insight" },
+    { name:"Cleanse the Blood", cost:4, verbal:"'Purge'", description:"You may call 'Purge' to end a metabolic effect.", attribute:"1 Fortitude" },
+    { name:"Feat of Great Strength", cost:4, verbal:"See description", description:"Once per Long Rest you may increase a called melee attack by +5 damage. You may instead use this ability to break a lock, chain, or shackle with your hands or a melee strike. The call for this is 'Destroy <lock, chain, shackle>'.", attribute:"1 Insight" },
+    { name:"Bull Charge", cost:2, verbal:"'Slam'", description:"Twice per event you may deliver a melee attack for 'Slam'." },
+    { name:"Restoration", cost:4, verbal:"'Heal All to Self'", description:"Call 'Heal All to Self' to regenerate all your lost hit points.", attribute:"1 Fortitude" },
+    { name:"Strengthen Limbs", cost:4, verbal:"N/A", description:"When wielding a 2 handed weapon with only a single striking end you increase all called melee damage by 1. Thread Skill.", attribute:"Thread Skill" },
   ],
 };
 

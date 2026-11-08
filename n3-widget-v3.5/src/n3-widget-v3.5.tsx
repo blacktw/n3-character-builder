@@ -458,13 +458,13 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1, "Fortress": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 // Whether each hidden excellency/expression defaults to the flat Fixed Cost (1 CP) or the
-// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow and Wardancer are newly
-// added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
-const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false };
+// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow, Wardancer and Fortress
+// are newly added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
+const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false, "Fortress": false };
 const HIDDEN_EXCELLENCY_FIXED_COST_LOCKED = new Set<string>();
 const HIDDEN_EXPRESSION_FIXED_COST_DEFAULT: Record<string, boolean> = { "Shadewalker": true };
 const HIDDEN_EXPRESSION_FIXED_COST_LOCKED = new Set<string>();
@@ -520,6 +520,18 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Readied Blow", cost:4, verbal:"'8 Damage'", description:"Once per Long Rest, you can make a melee attack or missile attack for 8 damage.", attribute:"1 Insight" },
     { name:"Simple Attack", cost:4, verbal:"'4 Damage'", description:"4 damage melee attack.", attribute:"1 Fortitude" },
     { name:"Simple Arrow", cost:4, verbal:"'4 Damage'", description:"4 damage missile attack.", attribute:"1 Insight" },
+  ],
+  // Costs other than the included skill are placeholders (0) pending confirmation.
+  // Protection's attribute is assumed to be Insight pending clarification.
+  "Fortress": [
+    { name:"Protection", cost:0, verbal:"'Grant 1 Protection'", description:"Gain the ability to Grant 1 Protection to others 3 times.", attribute:"1 Insight" },
+    { name:"Additional Protections", cost:0, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency you gain 4 uses instead of three. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Enhanced Protections", cost:0, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency, increase the protection effect by one. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Enshrouded", cost:0, verbal:"'Grant Defense Resist Elemental'", description:"Once per Long Rest, spend one Insight to Grant Defense 'Resist Elemental'.", attribute:"1 Insight" },
+    { name:"Guardian", cost:0, verbal:"'Grant Defense Guard vs Melee'", description:"Once per Short Rest, spend one Fortitude to Grant Defense 'Guard vs Melee'. Only 4 times per Long Rest.", attribute:"1 Fortitude" },
+    { name:"Inviolate", cost:0, verbal:"'Grant Defense Resist Physical'", description:"Once per Long Rest, Grant Defense 'Resist Physical'." },
+    { name:"Resistant", cost:0, verbal:"'Grant Defense Resist Metabolic'", description:"Once per Long Rest, spend one Fortitude to Grant Defense 'Resist Metabolic'.", attribute:"1 Fortitude" },
+    { name:"Sharing the Healing", cost:0, verbal:"'Grant Packet Attack, Heal 2 Damage by Water'", description:"Spend one Fortitude to gain two uses of 'Grant Packet Attack, Heal 2 Damage by Water'. You cannot use this skill on yourself. You cannot stack uses of this skill; if you have uses remaining when you reactivate this skill, the uses from the previous one are lost.", attribute:"1 Fortitude" },
   ],
 };
 
@@ -1702,7 +1714,9 @@ export default function NuminaSheet() {
   // Add/remove hidden excellency
   function addHiddenExcellency(name: string): void {
     if (!name || char.hiddenExcellencies.includes(name) || totalExcellencies >= 3) return;
-    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    // Only the included (first) skill is auto-granted; other 0-cost skills (e.g. Fortress's
+    // placeholder-free skills) must still be picked explicitly.
+    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef, i: number) => i === 0 && s.cost === 0);
     setChar(c => ({
       ...c,
       hiddenExcellencies: [...c.hiddenExcellencies, name],

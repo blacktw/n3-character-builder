@@ -458,13 +458,13 @@ const EXPRESSION_SKILLS: Record<string, SkillDef[]> = {
 // ─── HIDDEN (UNLOCKABLE) EXCELLENCIES & EXPRESSIONS ─────────────────────────
 
 // Selection costs for hidden excellencies (0 = free to add; skills themselves cost CP)
-const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1 };
+const HIDDEN_EXCELLENCY_COSTS: Record<string, number> = { "Reservoir": 1, "Deadeye": 1, "Whisperer": 1, "Poison Arrow": 1, "Wardancer": 1, "Fortress": 1, "Mutant": 1 };
 const HIDDEN_EXPRESSION_COSTS: Record<string, number> = { "Shadewalker": 1 };
 
 // Whether each hidden excellency/expression defaults to the flat Fixed Cost (1 CP) or the
-// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow is newly added and
-// not yet blessed at the flat rate, so it defaults to scaling (toggle remains available).
-const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false };
+// scaling Excellency/Expression cost (5-6-7 based on slot). Poison Arrow, Wardancer, Fortress and
+// Mutant are newly added and not yet blessed at the flat rate, so they default to scaling (toggle remains available).
+const HIDDEN_EXCELLENCY_FIXED_COST_DEFAULT: Record<string, boolean> = { "Reservoir": true, "Deadeye": true, "Whisperer": true, "Poison Arrow": false, "Wardancer": false, "Fortress": false, "Mutant": false };
 const HIDDEN_EXCELLENCY_FIXED_COST_LOCKED = new Set<string>();
 const HIDDEN_EXPRESSION_FIXED_COST_DEFAULT: Record<string, boolean> = { "Shadewalker": true };
 const HIDDEN_EXPRESSION_FIXED_COST_LOCKED = new Set<string>();
@@ -509,6 +509,39 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
     { name:"Natural Alchemy", cost:2, verbal:"'By Alchemy, Grant <Effect>'", description:"Twice per event, take 10 seconds of roleplay to create any Alchemy on the field, away from an Alchemy Lab. No components are required to craft this Alchemy." },
     { name:"Retrieve Venom", cost:2, verbal:"N/A", description:"If you shoot a Poison Arrow and miss your target or the arrow is blocked, spend 5 seconds searching near where it fell to retrieve it and use it again." },
     { name:"Poison", cost:4, verbal:"'5 Damage by Poison'", description:"Shoot an arrow for 5 damage by Poison. This is not a Poison Arrow for the purposes of other skills in this Excellency.", attribute:"1 Fortitude" },
+  ],
+  "Wardancer": [
+    { name:"Readied for Battle", cost:0, verbal:"'2 Damage'", description:"You gain the ability to have a stored 2 free 2 damage attacks, one melee attack and one missile attack.", attribute:"1 Fortitude" },
+    { name:"Bow and Sword", cost:4, verbal:"N/A", description:"Fight with bow and sword." },
+    { name:"Missile to Melee", cost:3, verbal:"N/A", description:"When you spend an attribute for a missile attack, refresh your 2 damage melee attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Melee to Missile", cost:3, verbal:"N/A", description:"When you spend an attribute for a melee attack, refresh your 2 damage missile attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Expanded Preparation", cost:3, verbal:"N/A", description:"Gain a second melee and missile attack. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Rapid Change", cost:4, verbal:"See description", description:"Once per Short Rest, your first called damage attack when you go from melee to missile or missile to melee is +2 damage.", attribute:"1 Fortitude" },
+    { name:"Readied Blow", cost:4, verbal:"'8 Damage'", description:"Once per Long Rest, you can make a melee attack or missile attack for 8 damage.", attribute:"1 Insight" },
+    { name:"Simple Attack", cost:4, verbal:"'4 Damage'", description:"4 damage melee attack.", attribute:"1 Fortitude" },
+    { name:"Simple Arrow", cost:4, verbal:"'4 Damage'", description:"4 damage missile attack.", attribute:"1 Insight" },
+  ],
+  // Costs other than the included skill are placeholders (0) pending confirmation.
+  // Protection's attribute is assumed to be Insight pending clarification.
+  "Fortress": [
+    { name:"Protection", cost:0, verbal:"'Grant 1 Protection'", description:"Gain the ability to Grant 1 Protection to others 3 times.", attribute:"1 Insight" },
+    { name:"Additional Protections", cost:0, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency you gain 4 uses instead of three. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Enhanced Protections", cost:0, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency, increase the protection effect by one. Thread Skill.", attribute:"Thread Skill" },
+    { name:"Enshrouded", cost:0, verbal:"'Grant Defense Resist Elemental'", description:"Once per Long Rest, spend one Insight to Grant Defense 'Resist Elemental'.", attribute:"1 Insight" },
+    { name:"Guardian", cost:0, verbal:"'Grant Defense Guard vs Melee'", description:"Once per Short Rest, spend one Fortitude to Grant Defense 'Guard vs Melee'. Only 4 times per Long Rest.", attribute:"1 Fortitude" },
+    { name:"Inviolate", cost:0, verbal:"'Grant Defense Resist Physical'", description:"Once per Long Rest, Grant Defense 'Resist Physical'." },
+    { name:"Resistant", cost:0, verbal:"'Grant Defense Resist Metabolic'", description:"Once per Long Rest, spend one Fortitude to Grant Defense 'Resist Metabolic'.", attribute:"1 Fortitude" },
+    { name:"Sharing the Healing", cost:0, verbal:"'Grant Packet Attack, Heal 2 Damage by Water'", description:"Spend one Fortitude to gain two uses of 'Grant Packet Attack, Heal 2 Damage by Water'. You cannot use this skill on yourself. You cannot stack uses of this skill; if you have uses remaining when you reactivate this skill, the uses from the previous one are lost.", attribute:"1 Fortitude" },
+  ],
+  "Mutant": [
+    { name:"Mutation", cost:4, verbal:"N/A", description:"You can use components and coin to create Mutations that last for an event. This is a crafting skill.", attribute:"See Formula" },
+    { name:"Blade Alchemy", cost:4, verbal:"N/A", description:"You can create Alchemical substances labeled 'Blade'.", attribute:"See Formula" },
+    { name:"Shapeshift", cost:4, verbal:"'Purge'", description:"Once per Short Rest you may call 'Purge' to end a Root or Slow effect.", attribute:"1 Insight" },
+    { name:"Cleanse the Blood", cost:4, verbal:"'Purge'", description:"You may call 'Purge' to end a metabolic effect.", attribute:"1 Fortitude" },
+    { name:"Feat of Great Strength", cost:4, verbal:"See description", description:"Once per Long Rest you may increase a called melee attack by +5 damage. You may instead use this ability to break a lock, chain, or shackle with your hands or a melee strike. The call for this is 'Destroy <lock, chain, shackle>'.", attribute:"1 Insight" },
+    { name:"Bull Charge", cost:2, verbal:"'Slam'", description:"Twice per event you may deliver a melee attack for 'Slam'." },
+    { name:"Restoration", cost:4, verbal:"'Heal All to Self'", description:"Call 'Heal All to Self' to regenerate all your lost hit points.", attribute:"1 Fortitude" },
+    { name:"Strengthen Limbs", cost:4, verbal:"N/A", description:"When wielding a 2 handed weapon with only a single striking end you increase all called melee damage by 1. Thread Skill.", attribute:"Thread Skill" },
   ],
 };
 
@@ -1691,7 +1724,9 @@ export default function NuminaSheet() {
   // Add/remove hidden excellency
   function addHiddenExcellency(name: string): void {
     if (!name || char.hiddenExcellencies.includes(name) || totalExcellencies >= 3) return;
-    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef) => s.cost === 0);
+    // Only the included (first) skill is auto-granted; other 0-cost skills (e.g. Fortress's
+    // placeholder-free skills) must still be picked explicitly.
+    const freeSkills = (HIDDEN_EXCELLENCY_SKILLS[name] || []).filter((s: SkillDef, i: number) => i === 0 && s.cost === 0);
     setChar(c => ({
       ...c,
       hiddenExcellencies: [...c.hiddenExcellencies, name],

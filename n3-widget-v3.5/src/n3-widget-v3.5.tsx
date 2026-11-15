@@ -524,13 +524,13 @@ const HIDDEN_EXCELLENCY_SKILLS: Record<string, SkillDef[]> = {
   // Costs other than the included skill are placeholders (0) pending confirmation.
   // Protection's attribute is assumed to be Insight pending clarification.
   "Fortress": [
-    { name:"Protection", cost:0, verbal:"'Grant 1 Protection'", description:"Gain the ability to Grant 1 Protection to others 3 times.", attribute:"1 Insight" },
+    { name:"Protection", cost:0, verbal:"'Grant 1 Protection'", description:"Gain the ability to Grant 1 Protection to others 3 times.", attribute:"1 Prowess" },
     { name:"Additional Protections", cost:3, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency you gain 4 uses instead of three. Thread Skill.", attribute:"Thread Skill" },
     { name:"Enhanced Protections", cost:3, verbal:"N/A", description:"When Centered, when you use the skill 'Protection' from this Excellency, increase the protection effect by one. Thread Skill.", attribute:"Thread Skill" },
-    { name:"Enshrouded", cost:4, verbal:"'Grant Defense Resist Elemental'", description:"Once per Long Rest, spend one Insight to Grant Defense 'Resist Elemental'.", attribute:"1 Insight" },
+    { name:"Enshrouded", cost:4, verbal:"'Grant Defense Resist Elemental'", description:"Once per Long Rest, spend one Insight to Grant Defense 'Resist Elemental'. Cannot be used in a Place of Peace.", attribute:"1 Prowess" },
     { name:"Guardian", cost:4, verbal:"'Grant Defense Guard vs Melee'", description:"Once per Short Rest, spend one Fortitude to Grant Defense 'Guard vs Melee'. Only 4 times per Long Rest.", attribute:"1 Fortitude" },
-    { name:"Inviolate", cost:4, verbal:"'Grant Defense Resist Physical'", description:"Once per Long Rest, Grant Defense 'Resist Physical'." },
-    { name:"Resistant", cost:4, verbal:"'Grant Defense Resist Metabolic'", description:"Once per Long Rest, spend one Fortitude to Grant Defense 'Resist Metabolic'.", attribute:"1 Fortitude" },
+    { name:"Inviolate", cost:4, verbal:"'Grant Defense Resist Physical'", description:"Once per Long Rest, Grant Defense 'Resist Physical'. Cannot be used in a Place of Peace.", attribute:"1 Prowess" },
+    { name:"Resistant", cost:4, verbal:"'Grant Defense Resist Metabolic'", description:"Once per Long Rest, spend one Fortitude to Grant Defense 'Resist Metabolic'. Cannot be used in a Place of Peace.", attribute:"1 Fortitude" },
     { name:"Sharing the Healing", cost:4, verbal:"'Grant Packet Attack, Heal 2 Damage by Water'", description:"Spend one Fortitude to gain two uses of 'Grant Packet Attack, Heal 2 Damage by Water'. You cannot use this skill on yourself. You cannot stack uses of this skill; if you have uses remaining when you reactivate this skill, the uses from the previous one are lost.", attribute:"1 Fortitude" },
   ],
   "Mutant": [
